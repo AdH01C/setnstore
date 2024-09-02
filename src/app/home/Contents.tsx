@@ -3,6 +3,7 @@
 import { currentlySelectedAtom } from "@/jotai/Navigation";
 import { useAtom } from 'jotai'
 import Dashboard from "./Dashboard";
+import Ruleset from "./Ruleset";
 
 export default function Contents() {
     const [currentlySelected, setCurrentlySelected] = useAtom(currentlySelectedAtom);
@@ -13,9 +14,7 @@ export default function Contents() {
             <Dashboard />
         )}
         {currentlySelected === "Ruleset Management" && (
-            <div className="flex justify-center items-center w-full h-full text-4xl py-2 rounded-lg font-bold bg-secondary">
-                <h1>Ruleset Management</h1>
-            </div>
+            <Ruleset />
         )}
         {currentlySelected === "Application Status" && (
             <div className="flex justify-center items-center w-full h-full text-4xl py-2 rounded-lg font-bold bg-secondary">
