@@ -5,7 +5,7 @@ export default function Home() {
     
 
     return (
-        <main className="flex min-h-screen flex-col gap-16 bg-background">
+        <main className="flex min-h-screen flex-col bg-background">
             <Navbar />
             <Contents />
         </main>
