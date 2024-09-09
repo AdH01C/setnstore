@@ -1,151 +1,25 @@
-"use client"
+import { useEffect, useState } from 'react';
+import { schema, hostJSON } from '@/app/schema'; // Import hostJSON along with schema
 
+// Code mirror
+import CodeMirror from '@uiw/react-codemirror';
+import { javascript } from '@codemirror/lang-javascript';
+import { keymap } from '@codemirror/view'; // For key bindings
+import { defaultKeymap } from '@codemirror/commands'; // Default key bindings
+import { barf } from 'thememirror'; // Import the specific theme
+
+
+// JSON Schema Form
 import Form from '@rjsf/antd';
 import validator from '@rjsf/validator-ajv8';
-import { RJSFSchema } from '@rjsf/utils';
-import { useEffect, useState } from 'react';
 import Loading from '@/app/components/Loading';
-import { Button, Drawer } from 'antd';
-import { QuestionCircleOutlined } from "@ant-design/icons";
+
+// Ant Design Icons
 import { AppstoreOutlined, MailOutlined, SettingOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Menu } from 'antd';
 
-const schema: RJSFSchema = {
-    "title": "Configuration Schema",
-    "description": "Schema for configuration settings including metadata, authorization, and host information.",
-    "type": "object",
-    "properties": {
-      "metadata": {
-        "type": "object",
-        "properties": {
-          "trailingSlashMode": { "type": "string" },
-          "redirectSlashes": { "type": "string" },
-          "caseSensitive": { "type": "boolean" },
-          "entityValueCase": { "type": "string" },
-          "optionsPassthrough": { "type": "boolean" }
-        },
-        "required": ["trailingSlashMode", "caseSensitive", "entityValueCase", "optionsPassthrough"]
-      },
-      "authorization": {
-        "type": "object",
-        "properties": {
-          "user": {
-            "type": "object",
-            "properties": {
-              "relations": {
-                "type": "object",
-                "properties": {
-                  "user": {
-                    "type": "array",
-                    "items": { "type": "object", "properties": { "facet": { "type": "string" } } }
-                  }
-                }
-              },
-              "permissions": {
-                "type": "object",
-                "properties": {
-                  "read": { "type": "object", "properties": { "relation": { "type": "string" } } }
-                }
-              }
-            }
-          },
-          "serviceaccount": { "type": "object" },
-          "code": {
-            "type": "object",
-            "properties": {
-              "relations": {
-                "type": "object",
-                "properties": {
-                  "reader": {
-                    "type": "array",
-                    "items": { "type": "object", "properties": { "facet": { "type": "string" } } }
-                  },
-                  "writer": {
-                    "type": "array",
-                    "items": { "type": "object", "properties": { "facet": { "type": "string" } } }
-                  },
-                  "admin": {
-                    "type": "array",
-                    "items": { "type": "object", "properties": { "facet": { "type": "string" } } }
-                  }
-                }
-              },
-              "permissions": {
-                "type": "object",
-                "properties": {
-                  "read": {
-                    "type": "object",
-                    "properties": {
-                      "type": { "type": "string" },
-                      "operations": {
-                        "type": "array",
-                        "items": { "type": "object", "properties": { "relation": { "type": "string" } } }
-                      }
-                    }
-                  },
-                  "write": {
-                    "type": "object",
-                    "properties": {
-                      "type": { "type": "string" },
-                      "operations": {
-                        "type": "array",
-                        "items": { "type": "object", "properties": { "relation": { "type": "string" } } }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "host": {
-        "type": "object",
-        "patternProperties": {
-          "^.+$": {
-            "type": "object",
-            "properties": {
-              "permission": {
-                "type": "object",
-                "properties": {
-                  "GET": { "type": ["object", "null"] },
-                  "POST": { "type": ["object", "null"] },
-                  "PATCH": { "type": ["object", "null"] },
-                  "PUT": { "type": ["object", "null"] },
-                  "DELETE": { "type": ["object", "null"] },
-                  "OPTIONS": { "type": ["object", "null"] }
-                }
-              },
-              "children": {
-                "type": "object",
-                "patternProperties": {
-                  "^#?$": {
-                    "type": "object",
-                    "properties": {
-                      "entity": { "type": "string" },
-                      "relations": { "type": "array", "items": { "type": "string" } },
-                      "permission": {
-                        "type": "object",
-                        "properties": {
-                          "GET": { "type": ["object", "null"] },
-                          "POST": { "type": ["object", "null"] },
-                          "PATCH": { "type": ["object", "null"] },
-                          "PUT": { "type": ["object", "null"] },
-                          "DELETE": { "type": ["object", "null"] }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "required": ["metadata", "authorization", "host"]
-  }
+
 
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -154,52 +28,11 @@ const items: MenuItem[] = [
   {
     key: '1',
     icon: <MailOutlined />,
-    label: 'Project 1',
+    label: 'http.127.0.0.1.nip.io:8443',
     children: [
-      { key: '11', label: 'Option 1' },
-      { key: '12', label: 'Option 2' },
-      { key: '13', label: 'Option 3' },
-      { key: '14', label: 'Option 4' },
+      { key: '11', label: '/' },
     ],
-  },
-  {
-    key: '2',
-    icon: <AppstoreOutlined />,
-    label: 'Project 2',
-    children: [
-      { key: '21', label: 'Option 1' },
-      { key: '22', label: 'Option 2' },
-      {
-        key: '23',
-        label: 'Submenu',
-        children: [
-          { key: '231', label: 'Option 1' },
-          { key: '232', label: 'Option 2' },
-          { key: '233', label: 'Option 3' },
-        ],
-      },
-      {
-        key: '24',
-        label: 'Submenu 2',
-        children: [
-          { key: '241', label: 'Option 1' },
-          { key: '242', label: 'Option 2' },
-          { key: '243', label: 'Option 3' },
-        ],
-      },
-    ],
-  },
-  {
-    key: '3',
-    icon: <SettingOutlined />,
-    label: 'Project 3',
-    children: [
-      { key: '31', label: 'Option 1' },
-      { key: '32', label: 'Option 2' },
-      { key: '33', label: 'Option 3' },
-      { key: '34', label: 'Option 4' },
-    ],
-  },
+  }
 ];
 
 interface LevelKeysProps {
@@ -225,88 +58,109 @@ const getLevelKeys = (items1: LevelKeysProps[]) => {
 
 const levelKeys = getLevelKeys(items as LevelKeysProps[]);
 
-
 export default function Ruleset() {
-    const log = (type: string) => console.log.bind(console, type);
-    const [isLoading, setIsLoading] = useState(true);
-    const [open, setOpen] = useState(false);
-    const [formData, setFormData] = useState(null);
 
-    const showDrawer = () => {
-        setOpen(true);
-    };
+  const log = (type: string) => console.log.bind(console, type);
+  const [isLoading, setIsLoading] = useState(true);
+  const [formData, setFormData] = useState<any>( hostJSON ); // Initialize with hostJSON
+  const [textAreaValue, setTextAreaValue] = useState<string>("");
 
-    const onClose = () => {
-        setOpen(false);
-    };
+  useEffect(() => {
+    // Allow time for render
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 50);
 
-    useEffect(() => {
-        // Allow time for render
-        const timer = setTimeout(() => {
-        setIsLoading(false);
-        }, 50);
+    // Cleanup the timer on component unmount
+    return () => clearTimeout(timer);
+  }, []);
 
-        // Cleanup the timer on component unmount
-        return () => clearTimeout(timer);
-    }, []);
+  useEffect(() => {
+    // Update the CodeMirror value when formData changes
+    setTextAreaValue(JSON.stringify(formData, null, 2));
+  }, [formData]);
 
-    const [stateOpenKeys, setStateOpenKeys] = useState(['1']);
+  const [stateOpenKeys, setStateOpenKeys] = useState(['1']);
 
-    const onOpenChange: MenuProps['onOpenChange'] = (openKeys) => {
-        const currentOpenKey = openKeys.find((key) => stateOpenKeys.indexOf(key) === -1);
-        // open
-        if (currentOpenKey !== undefined) {
-        const repeatIndex = openKeys
-            .filter((key) => key !== currentOpenKey)
-            .findIndex((key) => levelKeys[key] === levelKeys[currentOpenKey]);
+  const onOpenChange: MenuProps['onOpenChange'] = (openKeys) => {
+    const currentOpenKey = openKeys.find((key) => stateOpenKeys.indexOf(key) === -1);
+    // open
+    if (currentOpenKey !== undefined) {
+      const repeatIndex = openKeys
+        .filter((key) => key !== currentOpenKey)
+        .findIndex((key) => levelKeys[key] === levelKeys[currentOpenKey]);
 
-        setStateOpenKeys(
-            openKeys
-            // remove repeat key
-            .filter((_, index) => index !== repeatIndex)
-            // remove current level all child
-            .filter((key) => levelKeys[key] <= levelKeys[currentOpenKey]),
-        );
-        } else {
-        // close
-        setStateOpenKeys(openKeys);
-        }
-    };
+      setStateOpenKeys(
+        openKeys
+          // remove repeat key
+          .filter((_, index) => index !== repeatIndex)
+          // remove current level all child
+          .filter((key) => levelKeys[key] <= levelKeys[currentOpenKey]),
+      );
+    } else {
+      // close
+      setStateOpenKeys(openKeys);
+    }
+  };
 
-    return (
-        <div className="flex flex-col justify-center items-center w-full h-full text-4xl gap-8 font-bold">
-            {isLoading ? (
-                <Loading />
-            ) : (
-            <div className="flex">
-                <Menu
-                mode="inline"
-                openKeys={stateOpenKeys}
-                onOpenChange={onOpenChange}
-                style={{ width: 256 }}
-                items={items}
-                className='rounded-lg bg-[#E9E9E9]'
-                />
-                <div className="flex flex-col items-center w-full">
-                    <QuestionCircleOutlined type="primary" onClick={showDrawer} className='w-full justify-end px-8 text-2xl' />
-                    <Form
-                        className="flex flex-col w-3/4 px-32 bg-[#FFFFFFFF] p-4 rounded-lg relative bottom-6 pt-12" 
-                        schema={schema}
-                        validator={validator}
-                        onChange={(e) => {console.log(e.formData); setFormData(e.formData)}}
-                        onSubmit={log('submitted')}
-                        onError={log('errors')}
-                        formData={formData}
-                    />
-                </div>
-            </div>
-            )}
+  const handleCodeMirrorChange = (value: string) => {
+    setTextAreaValue(value);
+
+    try {
+      // Try to parse the JSON from CodeMirror editor
+      const parsedData = JSON.parse(value);
+      setFormData(parsedData);
+    } catch (error) {
+      // If parsing fails, keep the current formData
+      console.error("Invalid JSON:", error);
+    }
+  };
+
+  const handleSubmit = () => { 
+    console.log('submit', formData);
+  }
+
+  return (
+    <div className="flex flex-col justify-center items-center w-full h-full text-4xl font-bold">
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <div className="flex justify-between gap-4">
+          <Menu
+            mode="inline"
+            openKeys={stateOpenKeys}
+            onOpenChange={onOpenChange}
+            style={{ width: 256 }}
+            items={items}
+            className="rounded-lg bg-[#E9E9E9]"
+          />
+
+          <Form
+            className="flex flex-col bg-[#FFFFFFFF] p-4 rounded-lg w-1/2"
+            schema={schema}
+            validator={validator}
+            onChange={(e) => {
+              setFormData({ ...formData, ...e.formData });
+            }}
+            onSubmit={handleSubmit}
+            onError={log('errors')}
+            formData={formData}
+          />
+
+          <CodeMirror
+            value={textAreaValue}
+            extensions={[
+              javascript(), // JavaScript mode for syntax highlighting
+              keymap.of(defaultKeymap), // Add key bindings for basic text editing
+
+            ]}
+            onChange={handleCodeMirrorChange}
+            theme={barf} 
+            className="w-1/2 h-full rounded-lg text-sm"
             
-            <Drawer title="Generated JSON" onClose={onClose} open={open}>
-                <pre>
-                    <code>{JSON.stringify(formData, null, 2)}</code> {/* Format JSON with indentation */}
-                </pre>
-            </Drawer>
+          />
         </div>
-    );
+      )}
+    </div>
+  );
 }

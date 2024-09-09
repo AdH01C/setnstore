@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Loading from '@/app/components/Loading';
 import ProjectCard from './ProjectCard';
+import CreateProjectCard from './CreateProjectCard';
 
 
 export default function Dashboard() {
@@ -25,12 +26,7 @@ export default function Dashboard() {
             ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-3/4">
                 <ProjectCard />
-                <ProjectCard />
-                <ProjectCard />
-                <ProjectCard />
-                <ProjectCard />
-                <ProjectCard />
-                <ProjectCard />
+                <CreateProjectCard />
                 
   
             </div>
