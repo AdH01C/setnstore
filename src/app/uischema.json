@@ -1,0 +1,21 @@
+{
+  "type": "VerticalLayout",
+  "elements": [
+    {
+      "type": "Control",
+      "scope": "#/properties/authorization"
+    },
+    {
+      "type": "Control",
+      "scope": "#/properties/host"
+    },
+    {
+      "type": "Control",
+      "scope": "#/properties/allowedOrigins"
+    },
+    {
+      "type": "Control",
+      "scope": "#/properties/metadata"
+    }
+  ]
+}

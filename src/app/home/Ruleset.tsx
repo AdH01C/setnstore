@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { schema, hostJSON } from '@/app/schema'; // Import hostJSON along with schema
+import Loading from '@/app/components/Loading';
 
 // Code mirror
 import CodeMirror from '@uiw/react-codemirror';
@@ -8,20 +8,30 @@ import { keymap } from '@codemirror/view'; // For key bindings
 import { defaultKeymap } from '@codemirror/commands'; // Default key bindings
 import { barf } from 'thememirror'; // Import the specific theme
 
-
 // JSON Schema Form
-import Form from '@rjsf/antd';
-import validator from '@rjsf/validator-ajv8';
-import Loading from '@/app/components/Loading';
+import { JsonForms } from '@jsonforms/react';
+import {
+  materialCells,
+  materialRenderers,
+} from '@jsonforms/material-renderers';
+import {
+  vanillaCells,
+  vanillaRenderers,
+} from '@jsonforms/vanilla-renderers';
+import schema from '@/app/schema.json';
+import uischema from '@/app/uischema.json';
+import metaDataControlTester from '@/app/components/renderer/MetaDataControlTester';
+import MetaDataControl from '@/app/components/renderer/MetaDataControl';
+import authorizationControlTester from '@/app/components/renderer/AuthorizationControlTester';
+import authorizationControl from '@/app/components/renderer/AuthorizationControl';
+
 
 // Ant Design Icons
 import { AppstoreOutlined, MailOutlined, SettingOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Menu } from 'antd';
 
-
-
-
+// Antd Sidebar
 type MenuItem = Required<MenuProps>['items'][number];
 
 const items: MenuItem[] = [
@@ -58,11 +68,190 @@ const getLevelKeys = (items1: LevelKeysProps[]) => {
 
 const levelKeys = getLevelKeys(items as LevelKeysProps[]);
 
-export default function Ruleset() {
+// JSON Forms
+const initialData = {
+  metadata: {
+    trailingSlashMode: 'strict',
+    redirectSlashes: '',
+    caseSensitive: true,
+    entityValueCase: 'none',
+    optionsPassthrough: true,
+  },
+  authorization: {
+    user: {
+      relations: {
+        friend: [{ facet: 'user' }],
+        mutualFriend: [{ facet: 'user' }],
+      },
+      permissions: {
+        sendMessage: {
+          type: 'union',
+          operations: [{ relation: 'friend' }, { relation: 'mutualFriend' }],
+        },
+      },
+    },
+    serviceaccount: {},
+    code: {
+      relations: {
+        reader: [{ facet: 'user' }, { facet: 'serviceaccount' }],
+        writer: [{ facet: 'user' }, { facet: 'serviceaccount' }],
+        admin: [{ facet: 'user' }, { facet: 'serviceaccount' }],
+      },
+      permissions: {
+        read: {
+          type: 'union',
+          operations: [{ relation: 'reader' }, { relation: 'admin' }],
+        },
+        write: {
+          type: 'union',
+          operations: [{ relation: 'writer' }, { relation: 'admin' }],
+        },
+      },
+    },
+  },
+  host: {
+    'http.127.0.0.1.nip.io:8443': {
+      '': {
+        permission: {
+          GET: null,
+        },
+      },
+      flasgger_static: {
+        children: {
+          '#': {
+            entity: 'static',
+            relations: [],
+            permission: {
+              GET: null,
+            },
+            children: {
+              '#': {
+                entity: 'lib',
+                relations: [],
+                permission: {
+                  GET: null,
+                },
+              },
+            },
+          },
+        },
+      },
+      'spec.json': {
+        permission: {
+          GET: null,
+        },
+      },
+      get: {
+        permission: {
+          GET: null,
+        },
+      },
+      post: {
+        permission: {
+          POST: null,
+        },
+      },
+      patch: {
+        permission: {
+          PATCH: null,
+        },
+      },
+      put: {
+        permission: {
+          PUT: null,
+        },
+      },
+      delete: {
+        permission: {
+          DELETE: null,
+        },
+      },
+      status: {
+        children: {
+          '#': {
+            entity: 'code',
+            permission: {
+              GET: {
+                entity: 'code',
+                type: 'read',
+              },
+              POST: {
+                entity: 'code',
+                type: 'write',
+              },
+              PATCH: {
+                entity: 'code',
+                type: 'write',
+              },
+              PUT: {
+                entity: 'code',
+                type: 'write',
+              },
+              DELETE: {
+                entity: 'code',
+                type: 'admin',
+              },
+            },
+          },
+        },
+      },
+      headers: {
+        permission: {
+          GET: {},
+        },
+      },
+      options: {
+        permission: {
+          OPTIONS: null,
+        },
+      },
+      ip: {
+        permission: {
+          GET: {},
+        },
+      },
+      'user-agent': {
+        permission: {
+          GET: {},
+        },
+      },
+      anything: {
+        permission: {
+          GET: {},
+          POST: {},
+          PATCH: {},
+          PUT: {},
+          DELETE: {},
+        },
+        children: {
+          '#': {
+            entity: 'anything',
+            permission: {
+              GET: {},
+              POST: {},
+              PATCH: {},
+              PUT: {},
+              DELETE: {},
+            },
+          },
+        },
+      },
+    },
+  },
+};
 
-  const log = (type: string) => console.log.bind(console, type);
+const renderers = [
+  ...vanillaRenderers,
+  //register custom renderers
+  { tester: authorizationControlTester, renderer: authorizationControl },
+  { tester: metaDataControlTester, renderer: MetaDataControl },
+];
+
+
+export default function Ruleset() {
   const [isLoading, setIsLoading] = useState(true);
-  const [formData, setFormData] = useState<any>( hostJSON ); // Initialize with hostJSON
+  // const [formData, setFormData] = useState<any>( hostJSON );
+  const [formData, setFormData] = useState<any>(initialData);
   const [textAreaValue, setTextAreaValue] = useState<string>("");
 
   useEffect(() => {
@@ -126,16 +315,8 @@ export default function Ruleset() {
         <Loading />
       ) : (
         <div className="flex justify-between gap-4">
-          <Menu
-            mode="inline"
-            openKeys={stateOpenKeys}
-            onOpenChange={onOpenChange}
-            style={{ width: 256 }}
-            items={items}
-            className="rounded-lg bg-[#E9E9E9]"
-          />
 
-          <Form
+          {/* <Form
             className="flex flex-col bg-[#FFFFFFFF] p-4 rounded-lg w-1/2"
             schema={schema}
             validator={validator}
@@ -145,6 +326,15 @@ export default function Ruleset() {
             onSubmit={handleSubmit}
             onError={log('errors')}
             formData={formData}
+          /> */}
+
+          <JsonForms
+            schema={schema}
+            uischema={uischema}
+            data={formData}
+            renderers={renderers}
+            cells={vanillaCells}
+            onChange={(formData: { data: any; }) => setFormData(formData.data)}
           />
 
           <CodeMirror
