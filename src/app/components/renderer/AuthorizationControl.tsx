@@ -132,33 +132,40 @@ function Authorization({ id, value, updateValue }: AuthorizationProps) {
                               },
                             });
                             }}
-                            />
+                          />
                           ),
-                          },
-                          {
+                        },
+                        {
                           title: 'Facet',
                           dataIndex: 'facet',
                           key: 'facet',
                           render: (text, record) => (
-                            <Input
+                          <Select
                             defaultValue={text}
-                            onBlur={(e) => {
-                              const newRelations = { ...value[entity].relations };
-                              newRelations[record.relation] = newRelations[record.relation].map((rel, idx) =>
-                              idx === record.index ? { ...rel, facet: e.target.value } : rel
-                              );
-                              updateValue({
+                            onChange={(selectedFacet) => {
+                            const newRelations = { ...value[entity].relations };
+                            newRelations[record.relation] = newRelations[record.relation].map((rel, idx) =>
+                              idx === record.index ? { ...rel, facet: selectedFacet } : rel
+                            );
+                            updateValue({
                               ...value,
                               [entity]: {
-                                ...value[entity],
-                                relations: newRelations,
+                              ...value[entity],
+                              relations: newRelations,
                               },
-                              });
+                            });
                             }}
-                            />
+                            style={{ width: '100%' }}
+                          >
+                            {Object.keys(value).map((entityKey) => (
+                            <Select.Option key={entityKey} value={entityKey}>
+                              {entityKey}
+                            </Select.Option>
+                            ))}
+                          </Select>
                           ),
-                          },
-                          {
+                        },
+                        {
                           title: 'Delete',
                           key: 'delete',
                           render: (_, record) => (
