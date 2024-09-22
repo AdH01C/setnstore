@@ -1,12 +1,27 @@
 import http from "@/app/http-common";
 
 class RulesetDataService {
-  getRulesetByAppId(appId: string): Promise<any> {
-    return http.get(`/ruleset/${appId}`);
+  getRulesetsByAppId(companyName: string, appId: string): Promise<any> {
+    return http.get(`v0/company/${companyName}/applications/${appId}/rulesets`);
   }
 
-  getRulesetByRulesetId(rulesetId: string): Promise<any> {
-    return http.get(`/rulesetByRulesetId/${rulesetId}`);
+  async getRulesetByRulesetId(
+    companyName: string,
+    appId: string,
+    rulesetId: string
+  ): Promise<any | null> {
+    try {
+      const response = await http.get(
+        `/v0/company/${companyName}/applications/${appId}/rulesets/${rulesetId}`
+      );
+
+      return response.data; // Return the ruleset data if found
+    } catch (error: any) {
+      if (error.response && error.response.status === 404) {
+        return null; // Return null if ruleset is not found
+      }
+      throw error; // Rethrow if it's another error
+    }
   }
 
   createRuleset(data: any, companyName: string, appId: string): Promise<any> {
@@ -16,8 +31,16 @@ class RulesetDataService {
     );
   }
 
-  updateRuleset(data: any): Promise<any> {
-    return http.post("/rulesetsUpdate", data);
+  updateRuleset(
+    data: any,
+    companyName: string,
+    appId: string,
+    rulesetId: string
+  ): Promise<any> {
+    return http.put(
+      `v0/company/${companyName}/applications/${appId}/rulesets/${rulesetId}`,
+      data
+    );
   }
 
   deleteRulesetByAppId(appId: string): Promise<any> {

@@ -309,13 +309,34 @@ export default function Ruleset() {
 
   const handleSubmit = async () => {
     try {
-      const companyName = "company1";
-      const appId = "qNdPP5Qy1kP";
+      const companyName = "company1"; // Replace with actual company name
+      const appId = "qNdPP5Qy1kP"; // Replace with actual app ID
+      const rulesetId = "IPYCw0KjNqA"; // Replace with actual ruleset ID
       const payload = {
         ruleset_json: formData, // Wrap formData inside the "ruleset_json" key
       };
-      await RulesetDataService.createRuleset(payload, companyName, appId);
-      console.log("Ruleset created successfully");
+
+      // Check if the ruleset exists
+      const existingRuleset = await RulesetDataService.getRulesetByRulesetId(
+        companyName,
+        appId,
+        rulesetId // Replace with actual ruleset ID
+      );
+
+      if (existingRuleset) {
+        // Update the existing ruleset
+        await RulesetDataService.updateRuleset(
+          payload,
+          companyName,
+          appId,
+          rulesetId
+        );
+        console.log("Ruleset updated successfully");
+      } else {
+        // Create a new ruleset
+        await RulesetDataService.createRuleset(payload, companyName, appId);
+        console.log("Ruleset created successfully");
+      }
     } catch (error) {
       console.error("Error creating ruleset:", error);
     }
