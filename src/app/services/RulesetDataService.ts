@@ -1,4 +1,4 @@
-import http from "../http-common";
+import http from "@/app/http-common";
 
 class RulesetDataService {
   getRulesetByAppId(appId: string): Promise<any> {
