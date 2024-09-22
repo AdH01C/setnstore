@@ -22,4 +22,5 @@ class ApplicationDataService {
   }
 }
 
-export default new ApplicationDataService();
+const applicationDataService = new ApplicationDataService();
+export default applicationDataService;

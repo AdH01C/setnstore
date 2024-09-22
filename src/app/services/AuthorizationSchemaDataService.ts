@@ -77,4 +77,5 @@ class AuthorizationSchemaDataService {
   }
 }
 
-export default new AuthorizationSchemaDataService();
+const authorizationSchemaDataService = new AuthorizationSchemaDataService();
+export default authorizationSchemaDataService;

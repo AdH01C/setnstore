@@ -52,4 +52,5 @@ class RulesetDataService {
   }
 }
 
-export default new RulesetDataService();
+const rulesetDataService = new RulesetDataService();
+export default rulesetDataService;
