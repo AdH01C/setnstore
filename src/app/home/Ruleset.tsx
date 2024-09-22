@@ -1,30 +1,26 @@
-import { useEffect, useState } from 'react';
-import Loading from '@/app/components/Loading';
+import { useEffect, useState } from "react";
+import Loading from "@/app/components/Loading";
 
 // Code mirror
-import CodeMirror from '@uiw/react-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { keymap } from '@codemirror/view'; // For key bindings
-import { defaultKeymap } from '@codemirror/commands'; // Default key bindings
-import { barf } from 'thememirror'; // Import the specific theme
+import CodeMirror from "@uiw/react-codemirror";
+import { javascript } from "@codemirror/lang-javascript";
+import { keymap } from "@codemirror/view"; // For key bindings
+import { defaultKeymap } from "@codemirror/commands"; // Default key bindings
+import { barf } from "thememirror"; // Import the specific theme
 
 // JSON Schema Form
-import { JsonForms } from '@jsonforms/react';
+import { JsonForms } from "@jsonforms/react";
 import {
   materialCells,
   materialRenderers,
-} from '@jsonforms/material-renderers';
-import {
-  vanillaCells,
-  vanillaRenderers,
-} from '@jsonforms/vanilla-renderers';
-import schema from '@/app/schema.json';
-import uischema from '@/app/uischema.json';
-import metaDataControlTester from '@/app/components/renderer/MetaDataControlTester';
-import MetaDataControl from '@/app/components/renderer/MetaDataControl';
-import authorizationControlTester from '@/app/components/renderer/AuthorizationControlTester';
-import authorizationControl from '@/app/components/renderer/AuthorizationControl';
-
+} from "@jsonforms/material-renderers";
+import { vanillaCells, vanillaRenderers } from "@jsonforms/vanilla-renderers";
+import schema from "@/app/schema.json";
+import uischema from "@/app/uischema.json";
+import metaDataControlTester from "@/app/components/renderer/MetaDataControlTester";
+import MetaDataControl from "@/app/components/renderer/MetaDataControl";
+import authorizationControlTester from "@/app/components/renderer/AuthorizationControlTester";
+import authorizationControl from "@/app/components/renderer/AuthorizationControl";
 
 // Ant Design Icons
 import {
@@ -36,10 +32,11 @@ import type { MenuProps } from "antd";
 import { Menu } from "antd";
 
 // Backend Hooks
+import ApplicationDataService from "@/app/services/ApplicationDataService";
 import RulesetDataService from "@/app/services/RulesetDataService";
 
 // Antd Sidebar
-type MenuItem = Required<MenuProps>['items'][number];
+type MenuItem = Required<MenuProps>["items"][number];
 
 const items: MenuItem[] = [
   {
@@ -76,62 +73,62 @@ const levelKeys = getLevelKeys(items as LevelKeysProps[]);
 // JSON Forms
 const initialData = {
   metadata: {
-    trailingSlashMode: 'strict',
-    redirectSlashes: '',
+    trailingSlashMode: "strict",
+    redirectSlashes: "",
     caseSensitive: true,
-    entityValueCase: 'none',
+    entityValueCase: "none",
     optionsPassthrough: true,
   },
   authorization: {
     user: {
       relations: {
-        friend: [{ facet: 'user' }],
-        mutualFriend: [{ facet: 'user' }],
+        friend: [{ facet: "user" }],
+        mutualFriend: [{ facet: "user" }],
       },
       permissions: {
         sendMessage: {
-          type: 'union',
-          operations: [{ relation: 'friend' }, { relation: 'mutualFriend' }],
+          type: "union",
+          operations: [{ relation: "friend" }, { relation: "mutualFriend" }],
         },
       },
     },
     serviceaccount: {},
     code: {
       relations: {
-        reader: [{ facet: 'user' }, { facet: 'serviceaccount' }],
-        writer: [{ facet: 'user' }, { facet: 'serviceaccount' }],
-        admin: [{ facet: 'user' }, { facet: 'serviceaccount' }],
+        reader: [{ facet: "user" }, { facet: "serviceaccount" }],
+        writer: [{ facet: "user" }, { facet: "serviceaccount" }],
+        admin: [{ facet: "user" }, { facet: "serviceaccount" }],
       },
       permissions: {
         read: {
-          type: 'union',
-          operations: [{ relation: 'reader' }, { relation: 'admin' }],
+          type: "union",
+          operations: [{ relation: "reader" }, { relation: "admin" }],
         },
         write: {
-          type: 'union',
-          operations: [{ relation: 'writer' }, { relation: 'admin' }],
+          type: "union",
+          operations: [{ relation: "writer" }, { relation: "admin" }],
         },
       },
     },
   },
   host: {
-    'http.127.0.0.1.nip.io:8443': {
-      '': {
+    "http.127.0.0.1.nip.io:8443": {
+      "": {
         permission: {
           GET: null,
         },
       },
       flasgger_static: {
         children: {
-          '#': {
-            entity: 'static',
+          "#": {
+            entity: "static",
             relations: [],
             permission: {
               GET: null,
             },
             children: {
-              '#': {
-                entity: 'lib',
+              "#": {
+                entity: "lib",
                 relations: [],
                 permission: {
                   GET: null,
@@ -141,7 +138,7 @@ const initialData = {
           },
         },
       },
-      'spec.json': {
+      "spec.json": {
         permission: {
           GET: null,
         },
@@ -173,28 +170,28 @@ const initialData = {
       },
       status: {
         children: {
-          '#': {
-            entity: 'code',
+          "#": {
+            entity: "code",
             permission: {
               GET: {
-                entity: 'code',
-                type: 'read',
+                entity: "code",
+                type: "read",
               },
               POST: {
-                entity: 'code',
-                type: 'write',
+                entity: "code",
+                type: "write",
               },
               PATCH: {
-                entity: 'code',
-                type: 'write',
+                entity: "code",
+                type: "write",
               },
               PUT: {
-                entity: 'code',
-                type: 'write',
+                entity: "code",
+                type: "write",
               },
               DELETE: {
-                entity: 'code',
-                type: 'admin',
+                entity: "code",
+                type: "admin",
               },
             },
           },
@@ -215,7 +212,7 @@ const initialData = {
           GET: {},
         },
       },
-      'user-agent': {
+      "user-agent": {
         permission: {
           GET: {},
         },
@@ -229,8 +226,8 @@ const initialData = {
           DELETE: {},
         },
         children: {
-          '#': {
-            entity: 'anything',
+          "#": {
+            entity: "anything",
             permission: {
               GET: {},
               POST: {},
@@ -251,7 +248,6 @@ const renderers = [
   { tester: authorizationControlTester, renderer: authorizationControl },
   { tester: metaDataControlTester, renderer: MetaDataControl },
 ];
-
 
 export default function Ruleset() {
   const [isLoading, setIsLoading] = useState(true);
@@ -314,10 +310,12 @@ export default function Ruleset() {
 
   const handleSubmit = async () => {
     try {
+      const companyName = "company1";
+      const appId = "qNdPP5Qy1kP";
       const payload = {
         ruleset_json: formData, // Wrap formData inside the "ruleset_json" key
       };
-      await RulesetDataService.createRuleset(payload, "companyName", "appId");
+      await RulesetDataService.createRuleset(payload, companyName, appId);
       console.log("Ruleset created successfully");
     } catch (error) {
       console.error("Error creating ruleset:", error);
@@ -330,7 +328,6 @@ export default function Ruleset() {
         <Loading />
       ) : (
         <div className="flex justify-between gap-4">
-
           {/* <Form
             className="flex flex-col bg-[#FFFFFFFF] p-4 rounded-lg w-1/2"
             schema={schema}
@@ -342,15 +339,20 @@ export default function Ruleset() {
             onError={log("errors")}
             formData={formData}
           /> */}
+          <div>
+            <JsonForms
+              schema={schema}
+              uischema={uischema}
+              data={formData}
+              renderers={renderers}
+              cells={vanillaCells}
+              onChange={(formData: { data: any }) => setFormData(formData.data)}
+            />
 
-          <JsonForms
-            schema={schema}
-            uischema={uischema}
-            data={formData}
-            renderers={renderers}
-            cells={vanillaCells}
-            onChange={(formData: { data: any; }) => setFormData(formData.data)}
-          />
+            <button type="button" onClick={handleSubmit}>
+              Submit
+            </button>
+          </div>
 
           <CodeMirror
             value={textAreaValue}
