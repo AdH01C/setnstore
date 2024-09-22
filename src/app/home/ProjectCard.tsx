@@ -36,7 +36,9 @@ export default function ProjectCard({
   return (
     <div
       className="flex flex-col justify-between bg-secondary rounded-lg p-4 hover:border-4 hover:cursor-pointer transition-transform duration-300 ease-out transform hover:scale-105"
-      onClick={() => setCurrentlySelected("Ruleset Management")}
+      onClick={() =>
+        setCurrentlySelected({ type: "Ruleset Management", companyName, appId })
+      }
     >
       <div className="flex flex-col gap-4">
         <h1 className="text-white text-2xl font-bold text-center">

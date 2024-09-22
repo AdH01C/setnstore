@@ -1,3 +1,11 @@
-import { atom } from 'jotai'
+import { atom } from "jotai";
 
-export const currentlySelectedAtom = atom<string>('Dashboard')
+export type CurrentlySelected = {
+  type: string;
+  appId?: string;
+  companyName?: string;
+};
+
+export const currentlySelectedAtom = atom<CurrentlySelected>({
+  type: "Dashboard",
+});

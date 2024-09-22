@@ -248,7 +248,13 @@ const renderers = [
   { tester: metaDataControlTester, renderer: MetaDataControl },
 ];
 
-export default function Ruleset() {
+export default function Ruleset({
+  companyName,
+  appId,
+}: {
+  companyName: string;
+  appId: string;
+}) {
   const [isLoading, setIsLoading] = useState(true);
   // const [formData, setFormData] = useState<any>(hostJSON);
   const [formData, setFormData] = useState<any>(initialData);
@@ -309,27 +315,23 @@ export default function Ruleset() {
 
   const handleSubmit = async () => {
     try {
-      const companyName = "company1"; // Replace with actual company name
-      const appId = "qNdPP5Qy1kP"; // Replace with actual app ID
-      const rulesetId = "IPYCw0KjNqA"; // Replace with actual ruleset ID
       const payload = {
-        ruleset_json: formData, // Wrap formData inside the "ruleset_json" key
+        ruleset_json: formData,
       };
 
       // Check if the ruleset exists
-      const existingRuleset = await RulesetDataService.getRulesetByRulesetId(
+      const rulesets = await RulesetDataService.getRulesetsByAppId(
         companyName,
-        appId,
-        rulesetId // Replace with actual ruleset ID
+        appId
       );
 
-      if (existingRuleset) {
+      if (rulesets.data.length != 0) {
         // Update the existing ruleset
         await RulesetDataService.updateRuleset(
           payload,
           companyName,
           appId,
-          rulesetId
+          rulesets.data[0]
         );
         console.log("Ruleset updated successfully");
       } else {
