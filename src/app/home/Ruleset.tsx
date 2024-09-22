@@ -27,22 +27,27 @@ import authorizationControl from '@/app/components/renderer/AuthorizationControl
 
 
 // Ant Design Icons
-import { AppstoreOutlined, MailOutlined, SettingOutlined } from '@ant-design/icons';
-import type { MenuProps } from 'antd';
-import { Menu } from 'antd';
+import {
+  AppstoreOutlined,
+  MailOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
+import type { MenuProps } from "antd";
+import { Menu } from "antd";
+
+// Backend Hooks
+import RulesetDataService from "@/app/services/RulesetDataService";
 
 // Antd Sidebar
 type MenuItem = Required<MenuProps>['items'][number];
 
 const items: MenuItem[] = [
   {
-    key: '1',
+    key: "1",
     icon: <MailOutlined />,
-    label: 'http.127.0.0.1.nip.io:8443',
-    children: [
-      { key: '11', label: '/' },
-    ],
-  }
+    label: "http.127.0.0.1.nip.io:8443",
+    children: [{ key: "11", label: "/" }],
+  },
 ];
 
 interface LevelKeysProps {
@@ -250,7 +255,7 @@ const renderers = [
 
 export default function Ruleset() {
   const [isLoading, setIsLoading] = useState(true);
-  // const [formData, setFormData] = useState<any>( hostJSON );
+  // const [formData, setFormData] = useState<any>(hostJSON);
   const [formData, setFormData] = useState<any>(initialData);
   const [textAreaValue, setTextAreaValue] = useState<string>("");
 
@@ -269,10 +274,12 @@ export default function Ruleset() {
     setTextAreaValue(JSON.stringify(formData, null, 2));
   }, [formData]);
 
-  const [stateOpenKeys, setStateOpenKeys] = useState(['1']);
+  const [stateOpenKeys, setStateOpenKeys] = useState(["1"]);
 
-  const onOpenChange: MenuProps['onOpenChange'] = (openKeys) => {
-    const currentOpenKey = openKeys.find((key) => stateOpenKeys.indexOf(key) === -1);
+  const onOpenChange: MenuProps["onOpenChange"] = (openKeys) => {
+    const currentOpenKey = openKeys.find(
+      (key) => stateOpenKeys.indexOf(key) === -1
+    );
     // open
     if (currentOpenKey !== undefined) {
       const repeatIndex = openKeys
@@ -284,7 +291,7 @@ export default function Ruleset() {
           // remove repeat key
           .filter((_, index) => index !== repeatIndex)
           // remove current level all child
-          .filter((key) => levelKeys[key] <= levelKeys[currentOpenKey]),
+          .filter((key) => levelKeys[key] <= levelKeys[currentOpenKey])
       );
     } else {
       // close
@@ -305,9 +312,17 @@ export default function Ruleset() {
     }
   };
 
-  const handleSubmit = () => { 
-    console.log('submit', formData);
-  }
+  const handleSubmit = async () => {
+    try {
+      const payload = {
+        ruleset_json: formData, // Wrap formData inside the "ruleset_json" key
+      };
+      await RulesetDataService.createRuleset(payload, "companyName", "appId");
+      console.log("Ruleset created successfully");
+    } catch (error) {
+      console.error("Error creating ruleset:", error);
+    }
+  };
 
   return (
     <div className="flex flex-col justify-center items-center w-full h-full text-4xl font-bold">
@@ -324,7 +339,7 @@ export default function Ruleset() {
               setFormData({ ...formData, ...e.formData });
             }}
             onSubmit={handleSubmit}
-            onError={log('errors')}
+            onError={log("errors")}
             formData={formData}
           /> */}
 
@@ -342,12 +357,10 @@ export default function Ruleset() {
             extensions={[
               javascript(), // JavaScript mode for syntax highlighting
               keymap.of(defaultKeymap), // Add key bindings for basic text editing
-
             ]}
             onChange={handleCodeMirrorChange}
-            theme={barf} 
+            theme={barf}
             className="w-1/2 h-full rounded-lg text-sm"
-            
           />
         </div>
       )}
