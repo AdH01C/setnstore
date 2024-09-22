@@ -32,7 +32,6 @@ import type { MenuProps } from "antd";
 import { Menu } from "antd";
 
 // Backend Hooks
-import ApplicationDataService from "@/app/services/ApplicationDataService";
 import RulesetDataService from "@/app/services/RulesetDataService";
 
 // Antd Sidebar
@@ -349,7 +348,11 @@ export default function Ruleset() {
               onChange={(formData: { data: any }) => setFormData(formData.data)}
             />
 
-            <button type="button" onClick={handleSubmit}>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="mt-4 bg-blue-500 text-white p-2 rounded"
+            >
               Submit
             </button>
           </div>
