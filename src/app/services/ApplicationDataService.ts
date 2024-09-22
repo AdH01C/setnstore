@@ -2,23 +2,23 @@ import http from "@/app/http-common";
 
 class ApplicationDataService {
   getAllApplicationsByCompanyName(companyName: string): Promise<any> {
-    return http.get(`/applications/${companyName}`);
+    return http.get(`/v0/company/${companyName}/applications`);
   }
 
   getApplicationByAppId(appId: string): Promise<any> {
     return http.get(`/applicationsById/${appId}`);
   }
 
-  createApplication(data: any): Promise<any> {
-    return http.post("/applications", data);
+  createApplication(data: any, companyName: string): Promise<any> {
+    return http.post(`/v0/company/${companyName}/applications`, data);
   }
 
   updateApplication(data: any): Promise<any> {
     return http.post("/applicationsUpdate", data);
   }
 
-  deleteApplication(appId: string): Promise<any> {
-    return http.delete(`/applications/${appId}`);
+  deleteApplication(companyName: string, appId: string): Promise<any> {
+    return http.delete(`/v0/company/${companyName}/applications/${appId}`);
   }
 }
 
