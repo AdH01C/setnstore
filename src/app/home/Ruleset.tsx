@@ -261,6 +261,28 @@ export default function Ruleset({
   const [textAreaValue, setTextAreaValue] = useState<string>("");
 
   useEffect(() => {
+    // Load ruleset data from the backend
+    const fetchRuleset = async () => {
+      try {
+        const rulesets = await RulesetDataService.getRulesetsByAppId(
+          companyName,
+          appId
+        );
+        if (rulesets.data.length != 0) {
+          const ruleset = await RulesetDataService.getRulesetByRulesetId(
+            companyName,
+            appId,
+            rulesets.data[0]
+          );
+          setFormData(ruleset.ruleset_json);
+        }
+      } catch (error) {
+        console.error("Error fetching ruleset:", error);
+      }
+    };
+
+    fetchRuleset();
+
     // Allow time for render
     const timer = setTimeout(() => {
       setIsLoading(false);
@@ -331,7 +353,7 @@ export default function Ruleset({
           payload,
           companyName,
           appId,
-          rulesets.data[0]
+          rulesets.data[1]
         );
         console.log("Ruleset updated successfully");
       } else {
@@ -350,6 +372,14 @@ export default function Ruleset({
         <Loading />
       ) : (
         <div className="flex justify-between gap-4">
+          <Menu
+            mode="inline"
+            openKeys={stateOpenKeys}
+            onOpenChange={onOpenChange}
+            style={{ width: 256 }}
+            items={items}
+            className="rounded-lg bg-[#E9E9E9]"
+          />
           {/* <Form
             className="flex flex-col bg-[#FFFFFFFF] p-4 rounded-lg w-1/2"
             schema={schema}
