@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Loading from "@/app/components/Loading";
+import Sidebar from "@/app/components/Sidebar";
 
 // Code mirror
 import CodeMirror from "@uiw/react-codemirror";
@@ -372,14 +373,15 @@ export default function Ruleset({
         <Loading />
       ) : (
         <div className="flex justify-between gap-4">
-          <Menu
+          <Sidebar />
+          {/* <Menu
             mode="inline"
             openKeys={stateOpenKeys}
             onOpenChange={onOpenChange}
             style={{ width: 256 }}
             items={items}
             className="rounded-lg bg-[#E9E9E9]"
-          />
+          /> */}
           {/* <Form
             className="flex flex-col bg-[#FFFFFFFF] p-4 rounded-lg w-1/2"
             schema={schema}
