@@ -9,22 +9,18 @@ import { defaultKeymap } from "@codemirror/commands"; // Default key bindings
 import { barf } from "thememirror"; // Import the specific theme
 
 // JSON Schema Form
-import { JsonForms } from '@jsonforms/react';
-import {
-  vanillaCells,
-  vanillaRenderers,
-} from '@jsonforms/vanilla-renderers';
-import schema from '@/app/schema.json';
-import uischema from '@/app/uischema.json';
-import metaDataControlTester from '@/app/components/renderer/MetaDataControlTester';
-import MetaDataControl from '@/app/components/renderer/MetaDataControl';
-import authorizationControlTester from '@/app/components/renderer/AuthorizationControlTester';
-import authorizationControl from '@/app/components/renderer/AuthorizationControl';
-import hostControlTester from '@/app/components/renderer/HostControlTester';
-import hostControl from '@/app/components/renderer/HostControl';
-import allowedOriginsTester from '@/app/components/renderer/AllowedOriginsTester';
-import allowedOriginsControl from '@/app/components/renderer/AllowedOriginsControl';
-
+import { JsonForms } from "@jsonforms/react";
+import { vanillaCells, vanillaRenderers } from "@jsonforms/vanilla-renderers";
+import schema from "@/app/schema.json";
+import uischema from "@/app/uischema.json";
+import metaDataControlTester from "@/app/components/renderer/MetaDataControlTester";
+import MetaDataControl from "@/app/components/renderer/MetaDataControl";
+import authorizationControlTester from "@/app/components/renderer/AuthorizationControlTester";
+import authorizationControl from "@/app/components/renderer/AuthorizationControl";
+import hostControlTester from "@/app/components/renderer/HostControlTester";
+import hostControl from "@/app/components/renderer/HostControl";
+import allowedOriginsTester from "@/app/components/renderer/AllowedOriginsTester";
+import allowedOriginsControl from "@/app/components/renderer/AllowedOriginsControl";
 
 // Ant Design Icons
 import {
@@ -360,7 +356,7 @@ export default function Ruleset({
           payload,
           companyName,
           appId,
-          rulesets.data[1]
+          rulesets.data[0]
         );
         console.log("Ruleset updated successfully");
       } else {
@@ -424,9 +420,8 @@ export default function Ruleset({
               keymap.of(defaultKeymap), // Add key bindings for basic text editing
             ]}
             onChange={handleCodeMirrorChange}
-            theme={barf} 
+            theme={barf}
             className="w-[512px] h-full rounded-lg text-sm"
-            
           />
         </div>
       )}
