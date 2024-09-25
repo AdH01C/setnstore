@@ -9,18 +9,22 @@ import { defaultKeymap } from "@codemirror/commands"; // Default key bindings
 import { barf } from "thememirror"; // Import the specific theme
 
 // JSON Schema Form
-import { JsonForms } from "@jsonforms/react";
+import { JsonForms } from '@jsonforms/react';
 import {
-  materialCells,
-  materialRenderers,
-} from "@jsonforms/material-renderers";
-import { vanillaCells, vanillaRenderers } from "@jsonforms/vanilla-renderers";
-import schema from "@/app/schema.json";
-import uischema from "@/app/uischema.json";
-import metaDataControlTester from "@/app/components/renderer/MetaDataControlTester";
-import MetaDataControl from "@/app/components/renderer/MetaDataControl";
-import authorizationControlTester from "@/app/components/renderer/AuthorizationControlTester";
-import authorizationControl from "@/app/components/renderer/AuthorizationControl";
+  vanillaCells,
+  vanillaRenderers,
+} from '@jsonforms/vanilla-renderers';
+import schema from '@/app/schema.json';
+import uischema from '@/app/uischema.json';
+import metaDataControlTester from '@/app/components/renderer/MetaDataControlTester';
+import MetaDataControl from '@/app/components/renderer/MetaDataControl';
+import authorizationControlTester from '@/app/components/renderer/AuthorizationControlTester';
+import authorizationControl from '@/app/components/renderer/AuthorizationControl';
+import hostControlTester from '@/app/components/renderer/HostControlTester';
+import hostControl from '@/app/components/renderer/HostControl';
+import allowedOriginsTester from '@/app/components/renderer/AllowedOriginsTester';
+import allowedOriginsControl from '@/app/components/renderer/AllowedOriginsControl';
+
 
 // Ant Design Icons
 import {
@@ -239,13 +243,16 @@ const initialData = {
       },
     },
   },
+  allowedOrigins: ["http://an-allowed-origin"],
 };
 
 const renderers = [
   ...vanillaRenderers,
   //register custom renderers
-  { tester: authorizationControlTester, renderer: authorizationControl },
   { tester: metaDataControlTester, renderer: MetaDataControl },
+  { tester: authorizationControlTester, renderer: authorizationControl },
+  { tester: hostControlTester, renderer: hostControl },
+  { tester: allowedOriginsTester, renderer: allowedOriginsControl },
 ];
 
 export default function Ruleset({
@@ -417,8 +424,9 @@ export default function Ruleset({
               keymap.of(defaultKeymap), // Add key bindings for basic text editing
             ]}
             onChange={handleCodeMirrorChange}
-            theme={barf}
-            className="w-1/2 h-full rounded-lg text-sm"
+            theme={barf} 
+            className="w-[512px] h-full rounded-lg text-sm"
+            
           />
         </div>
       )}

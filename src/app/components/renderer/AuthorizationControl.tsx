@@ -67,13 +67,13 @@ function Authorization({ id, value, updateValue }: AuthorizationProps) {
     <Collapse defaultActiveKey={['1']} className="bg-white w-[750px] text-sm">
       <Panel header="Authorization" key="1">
         
-        <Collapse defaultActiveKey={Object.keys(value)[0]} className='w-full bg-white border-none' expandIconPosition='right'>
+        <Collapse className='w-full bg-white border-none' expandIconPosition='right'>
           { Object.keys(value).map((entity) => {
             return (
               <>
                 <Typography.Text className='border-none'>Entity: </Typography.Text>
                 <button 
-                  className='text-red-500 border border-dotted border-gray-300 rounded-md p-2'
+                  className='text-red-500 rounded-md p-2'
                   onClick={() => {
                   const newValue = { ...value };
                   delete newValue[entity];
@@ -169,7 +169,9 @@ function Authorization({ id, value, updateValue }: AuthorizationProps) {
                           title: 'Delete',
                           key: 'delete',
                           render: (_, record) => (
-                          <Typography.Link
+                          <Button
+                            danger
+                            type="text"
                             onClick={() => {
                               const newRelations = { ...value[entity].relations };
                               newRelations[record.relation] = newRelations[record.relation].filter(
@@ -191,7 +193,7 @@ function Authorization({ id, value, updateValue }: AuthorizationProps) {
                             }}
                           >
                           Delete
-                          </Typography.Link>
+                          </Button>
                         ),
                         },
                       ]}
@@ -256,7 +258,7 @@ function Authorization({ id, value, updateValue }: AuthorizationProps) {
                             dataIndex: 'type',
                             key: 'type',
                             render: (text, record) => (
-                              <select
+                              <Select
                                 defaultValue={text}
                                 onChange={(e) => {
                                   const newPermissions = { ...value[entity].permissions };
@@ -270,11 +272,12 @@ function Authorization({ id, value, updateValue }: AuthorizationProps) {
                                   });
                                 }}
                               >
-                                <option value="noop">noop</option>
-                                <option value="union">union</option>
-                                <option value="intersect">intersect</option>
-                                <option value="except">except</option>
-                              </select>
+                                <Select.Option value="single">single</Select.Option>
+                                <Select.Option value="noop">noop</Select.Option>
+                                <Select.Option value="union">union</Select.Option>
+                                <Select.Option value="intersect">intersect</Select.Option>
+                                <Select.Option value="except">except</Select.Option>
+                              </Select>
                               ),
                           },
                             // Relations
@@ -313,7 +316,9 @@ function Authorization({ id, value, updateValue }: AuthorizationProps) {
                             title: 'Delete',
                             key: 'delete',
                             render: (_, record) => (
-                                <Typography.Link
+                                <Button
+                                danger
+                                type="text"
                                 onClick={() => {
                                   const newPermissions = { ...value[entity].permissions };
                                   delete newPermissions[record.permission];
@@ -328,7 +333,7 @@ function Authorization({ id, value, updateValue }: AuthorizationProps) {
                                 style={{ whiteSpace: 'nowrap' }}
                                 >
                                 Delete
-                                </Typography.Link>
+                                </Button>
                             ),
                           },
                         ]}

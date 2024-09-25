@@ -1,4 +1,5 @@
 import { withJsonFormsControlProps } from '@jsonforms/react';
+import { Collapse, Divider, Input, Select, Typography } from 'antd';
 
 interface MetaDataControlProps {
   data: MetaDataValue;
@@ -41,76 +42,81 @@ export default withJsonFormsControlProps(MetaDataControl);
 
 function MetaData({ id, value, updateValue }: MetaDataProps) {
   return (
-    <div>
-      <div>
-        <label>Trailing Slash Mode:</label>
-        <select
-          value={value.trailingSlashMode || ''}
-          onChange={e =>
-            updateValue({
-              ...value,
-              trailingSlashMode: e.target.value as TrailingSlashMode,
-            })
-          }>
-          <option value="strict">Strict</option>
-          <option value="fallback">Fallback</option>
-        </select>
-      </div>
-
-      <div>
-        <label>Redirect Slashes:</label>
-        <select
-          value={value.redirectSlashes || ''}
-          onChange={e =>
-            updateValue({
-              ...value,
-              redirectSlashes: e.target.value as RedirectSlashes,
-            })
-          }>
-          <option value=""></option>
-          <option value="ignore">Ignore</option>
-          <option value="strip">Strip</option>
-          <option value="append">Append</option>
-        </select>
-      </div>
-
-      <div>
-        <label>Case Sensitive:</label>
-        <input
-          type="checkbox"
-          checked={value.caseSensitive ?? false}
-          onChange={e =>
-            updateValue({ ...value, caseSensitive: e.target.checked })
-          }
-        />
-      </div>
-
-      <div>
-        <label>Entity Case Value:</label>
-        <select
-          value={value.entityValueCase || ''}
-          onChange={e =>
-            updateValue({
-              ...value,
-              entityValueCase: e.target.value as EntityCase,
-            })
-          }>
-          <option value="none">None</option>
-          <option value="lowercase">Lowercase</option>
-          <option value="uppercase">Uppercase</option>
-        </select>
-      </div>
-
-      <div>
-        <label>Options Passthrough:</label>
-        <input
-          type="checkbox"
-          checked={value.optionsPassthrough ?? false}
-          onChange={e =>
-            updateValue({ ...value, optionsPassthrough: e.target.checked })
-          }
-        />
-      </div>
-    </div>
+    <Collapse defaultActiveKey={['1']} className="bg-white w-[750px] text-sm">
+      <Collapse.Panel header="Metadata" key="1">
+        <div className="flex flex-col p-4">
+          {/* Trailing Slash */}
+          <div className="flex items-center justify-between">
+            <Typography.Text>Trailing Slash Mode</Typography.Text>
+            <Select
+              value={value.trailingSlashMode}
+              onChange={(val) =>
+              updateValue({ ...value, trailingSlashMode: val as TrailingSlashMode })
+              }
+              className='w-1/6'
+            >
+              <Select.Option value="strict">Strict</Select.Option>
+              <Select.Option value="fallback">Fallback</Select.Option>
+            </Select>
+          </div>
+          <Divider />
+          {/* Redirect Slashes */}
+          <div className="flex items-center justify-between">
+            <Typography.Text>Redirect Slashes</Typography.Text>
+            <Select
+              value={value.redirectSlashes}
+              onChange={(val) =>
+              updateValue({ ...value, redirectSlashes: val as RedirectSlashes })
+              }
+              className='w-1/6'
+            >
+              <Select.Option value="ignore">Ignore</Select.Option>
+              <Select.Option value="strip">Strip</Select.Option>
+              <Select.Option value="append">Append</Select.Option>
+            </Select>
+          </div>
+          <Divider />
+          {/* Case Sensitive */}
+          <div className="flex items-center justify-between">
+            <Typography.Text>Case Sensitive</Typography.Text>
+            <div className="w-16">
+              <Input
+              type="checkbox"
+              checked={value.caseSensitive}
+              onChange={(e) => updateValue({ ...value, caseSensitive: e.target.checked })}
+              />
+            </div>
+          </div>
+          <Divider />
+          {/* Entity Value Case */}
+          <div className="flex items-center justify-between">
+            <Typography.Text>Entity Value Case</Typography.Text>
+            <Select
+              value={value.entityValueCase}
+              onChange={(val) =>
+              updateValue({ ...value, entityValueCase: val as EntityCase })
+              }
+              className='w-1/6'
+            >
+              <Select.Option value="none">None</Select.Option>
+              <Select.Option value="lowercase">Lowercase</Select.Option>
+              <Select.Option value="uppercase">Uppercase</Select.Option>
+            </Select>
+          </div>
+          <Divider />
+          {/* Options Passthrough */}
+          <div className="flex items-center justify-between">
+            <Typography.Text>Options Passthrough</Typography.Text>
+            <div className="w-16">
+              <Input
+                type="checkbox"
+                checked={value.optionsPassthrough}
+                onChange={(e) => updateValue({ ...value, optionsPassthrough: e.target.checked })}
+              />
+            </div>
+          </div>
+        </div>
+      </Collapse.Panel>
+    </Collapse>
   );
 }
