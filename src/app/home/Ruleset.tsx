@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Loading from "@/app/components/Loading";
-import Sidebar from "@/app/components/Sidebar";
 
 // Code mirror
 import CodeMirror from "@uiw/react-codemirror";
@@ -35,17 +34,48 @@ import { Menu } from "antd";
 // Backend Hooks
 import RulesetDataService from "@/app/services/RulesetDataService";
 
+interface Project {
+  name: string;
+  rulesets: string[];
+}
+
+// Sample projects array
+const projects: Project[] = [
+  {
+    name: "App 1",
+    rulesets: ["Ruleset #1", "Ruleset #2", "Ruleset #3"],
+  },
+  {
+    name: "Sample Application",
+    rulesets: ["My Test Ruleset"],
+  },
+  {
+    name: "Petstore Application",
+    rulesets: ["Petstore API", "Petstore Frontend"],
+  },
+];
+
 // Antd Sidebar
 type MenuItem = Required<MenuProps>["items"][number];
 
-const items: MenuItem[] = [
-  {
-    key: "1",
-    icon: <MailOutlined />,
-    label: "http.127.0.0.1.nip.io:8443",
-    children: [{ key: "11", label: "/" }],
-  },
-];
+// const items: MenuItem[] = [
+//   {
+//     key: "1",
+//     icon: <MailOutlined />,
+//     label: "http.127.0.0.1.nip.io:8443",
+//     children: [{ key: "11", label: "/" }],
+//   },
+// ];
+
+const items: MenuItem[] = projects.map((project, index) => ({
+  key: `${index + 1}`,
+  icon: <MailOutlined />, // Example icon
+  label: project.name,
+  children: project.rulesets.map((ruleset, childIndex) => ({
+    key: `${index + 1}-${childIndex + 1}`,
+    label: ruleset,
+  })),
+}));
 
 interface LevelKeysProps {
   key?: string;
@@ -373,15 +403,15 @@ export default function Ruleset({
         <Loading />
       ) : (
         <div className="flex justify-between gap-4">
-          <Sidebar />
-          {/* <Menu
+          {/* <Sidebar /> */}
+          <Menu
             mode="inline"
             openKeys={stateOpenKeys}
             onOpenChange={onOpenChange}
             style={{ width: 256 }}
             items={items}
             className="rounded-lg bg-[#E9E9E9]"
-          /> */}
+          />
           {/* <Form
             className="flex flex-col bg-[#FFFFFFFF] p-4 rounded-lg w-1/2"
             schema={schema}
