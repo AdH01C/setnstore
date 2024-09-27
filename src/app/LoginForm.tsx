@@ -2,6 +2,7 @@
 
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Form, Flex, Checkbox, Button, Input } from "antd";
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Loading from '@/app/components/Loading';
@@ -9,10 +10,29 @@ import Loading from '@/app/components/Loading';
 export default function LoginForm() {
     const router = useRouter();
 
-    const onLogin = (values: any) => {
-        console.log('Received values of form: ', values);
-        router.push('/home');
+    const onLogin = async (values: any) => {
+        // console.log('Received values of form: ', values);
+        // router.push('/home');
+        const result = await signIn('credentials', {
+            redirect: false,
+            username: values.username,
+            password: values.password,
+        });
+
+        if (result?.error) {
+            console.error("Login error: ", result.error)
+        } else {
+            router.push('/home');
+        }
     };
+
+    const onGoogleLogin = () => {
+        signIn('google', { callbackUrl: '/home'}).then(() => {
+            router.push('/home');
+        }).catch(e => {
+            console.error("Google login error", e);
+        })
+    }
 
         
     const [isLoading, setIsLoading] = useState(true);
@@ -71,6 +91,11 @@ export default function LoginForm() {
                     </Button>
                     </Form.Item>
                 </Form>
+
+                {/* Google OAuth button */}
+                <Button block type="default" onClick={onGoogleLogin}>
+                    Log in with Google
+                </Button>
             </>
         )}
         
