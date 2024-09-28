@@ -12,8 +12,8 @@ import { barf } from "thememirror"; // Import the specific theme
 import { initialFormData } from "@/app/data/initialFormData";
 import { JsonForms } from "@jsonforms/react";
 import { vanillaCells, vanillaRenderers } from "@jsonforms/vanilla-renderers";
-import schema from "@/app/schema.json";
-import uischema from "@/app/uischema.json";
+import schema from "@/app/json/schema.json";
+import uischema from "@/app/json/uischema.json";
 import metaDataControlTester from "@/app/components/renderer/MetaDataControlTester";
 import MetaDataControl from "@/app/components/renderer/MetaDataControl";
 import authorizationControlTester from "@/app/components/renderer/AuthorizationControlTester";
