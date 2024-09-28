@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.4.0",
+    "@ant-design/nextjs-registry": "^1.0.1",
     "@codemirror/lang-javascript": "^6.2.2",
     "@json-editor/json-editor": "^2.15.1",
     "@jsonforms/core": "^3.4.0",
