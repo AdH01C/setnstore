@@ -142,7 +142,13 @@ export default function NestedApplicationTable({
       key: "operation",
       render: () => (
         <Space size="middle">
-          <a>Add Ruleset</a>
+          <a
+            onClick={() => {
+              router.push(`/applications/${application.appID}/rulesets/new`);
+            }}
+          >
+            Add Ruleset
+          </a>
           <a onClick={handleApplicationDelete}>Delete</a>
         </Space>
       ),
@@ -150,7 +156,7 @@ export default function NestedApplicationTable({
   ];
 
   useEffect(() => {
-    console.log(application)
+    console.log(application);
     const fetchApplications = async () => {
       try {
         const rulesetsID = await rulesetDataService.getRulesetsByAppId(
