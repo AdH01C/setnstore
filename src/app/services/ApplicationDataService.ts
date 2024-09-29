@@ -5,8 +5,8 @@ class ApplicationDataService {
     return http.get(`/v0/company/${companyName}/applications`);
   }
 
-  getApplicationByAppId(appId: string): Promise<any> {
-    return http.get(`/applicationsById/${appId}`);
+  getApplicationByAppId(companyName: string, appId: string): Promise<any> {
+    return http.get(`/v0/company/${companyName}/applications/${appId}`);
   }
 
   createApplication(data: any, companyName: string): Promise<any> {
