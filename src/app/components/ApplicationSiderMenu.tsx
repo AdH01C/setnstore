@@ -10,9 +10,11 @@ import { PieChartOutlined } from "@ant-design/icons";
 export default function ApplicationSiderMenu({
   company,
   appID,
+  rulesetID,
 }: {
   company: string;
   appID: string;
+  rulesetID?: string;
 }) {
   const router = useRouter();
 
@@ -98,7 +100,7 @@ export default function ApplicationSiderMenu({
     <Sider width={200}>
       <Menu
         mode="inline"
-        defaultSelectedKeys={[appID]}
+        defaultSelectedKeys={[appID, rulesetID ?? ""]}
         defaultOpenKeys={[appID]}
         style={{ height: "100%", borderRight: 0 }}
         items={items}
