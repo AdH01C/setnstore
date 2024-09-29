@@ -195,11 +195,11 @@ export default function NestedApplicationTable({
     fetchApplications();
   }, [company]);
 
-  const expandedRowRender = (row: Application) => {
+  const expandedRowRender = (row: any) => {
     return (
       <Table<RulesetTableType>
         columns={expandColumns}
-        dataSource={row.rulesets.map((app) => ({
+        dataSource={row.rulesets.map((app: any) => ({
           ...app,
           key: app.rulesetID,
         }))}

@@ -44,14 +44,14 @@ export default function ApplicationSiderMenu({
           appID
         );
 
-        const menuItems: MenuItem[] = applications.data.map((app) => {
+        const menuItems: MenuItem[] = applications.data.map((app: any) => {
           if (app.id === appID) {
             return getItem(
               app.app_name,
               appID,
               <PieChartOutlined />,
               rulesetsID.data.length > 0
-                ? rulesetsID.data.map((rulesetID) =>
+                ? rulesetsID.data.map((rulesetID: string) =>
                     getItem(
                       rulesetID,
                       rulesetID,
