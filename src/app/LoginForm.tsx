@@ -12,8 +12,8 @@ export default function LoginForm() {
 
   const onLogin = (values: any) => {
     console.log("Received values of form: ", values);
-    // expire in 60 seconds
-    setCookie("username", values.username, { maxAge: 60 });
+    // expire in 30 minutes
+    setCookie("username", values.username, { maxAge: 60 * 30 });
     router.push("/dashboard");
   };
 
