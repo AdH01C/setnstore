@@ -351,7 +351,7 @@ export default function Ruleset({
             extensions={[javascript(), keymap.of(defaultKeymap)]}
             onChange={handleCodeMirrorChange}
             theme={barf}
-            className="w-[512px] h-full rounded-lg text-sm"
+            className="h-full rounded-lg text-sm"
           />
         </div>
       )}

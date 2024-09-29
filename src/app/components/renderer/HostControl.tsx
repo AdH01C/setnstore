@@ -349,7 +349,7 @@ function Host({ id, value, updateValue }: HostProps) {
     const relations = Object.keys(ctx.core?.data?.authorization || {});
 
     return (
-    <Collapse defaultActiveKey={['1']} className="bg-white w-[750px] text-sm">
+    <Collapse defaultActiveKey={['1']} className="text-sm">
         {Object.keys(value).map((host, index) => (
             <Collapse.Panel header={host} key={host+index}>
                 <div className="flex flex-col p-4">

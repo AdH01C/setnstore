@@ -97,7 +97,7 @@ export default function ApplicationSiderMenu({
     fetchMenuItems();
   }, [company]);
   return (
-    <Sider width={200}>
+    <Sider width={220}>
       <Menu
         mode="inline"
         defaultSelectedKeys={[appID, rulesetID ?? ""]}

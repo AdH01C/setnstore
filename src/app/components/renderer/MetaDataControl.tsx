@@ -1,5 +1,5 @@
-import { withJsonFormsControlProps } from '@jsonforms/react';
-import { Collapse, Divider, Input, Select, Typography } from 'antd';
+import { withJsonFormsControlProps } from "@jsonforms/react";
+import { Collapse, Divider, Input, Select, Typography } from "antd";
 
 interface MetaDataControlProps {
   data: MetaDataValue;
@@ -21,9 +21,9 @@ interface MetaDataProps {
   updateValue: (newValue: MetaDataValue) => void;
 }
 
-type EntityCase = 'none' | 'lowercase' | 'uppercase';
-type RedirectSlashes = 'ignore' | 'strip' | 'append' | '';
-type TrailingSlashMode = 'strict' | 'fallback';
+type EntityCase = "none" | "lowercase" | "uppercase";
+type RedirectSlashes = "ignore" | "strip" | "append" | "";
+type TrailingSlashMode = "strict" | "fallback";
 
 const MetaDataControl = ({
   data,
@@ -42,7 +42,7 @@ export default withJsonFormsControlProps(MetaDataControl);
 
 function MetaData({ id, value, updateValue }: MetaDataProps) {
   return (
-    <Collapse defaultActiveKey={['1']} className="bg-white w-[750px] text-sm">
+    <Collapse defaultActiveKey={["1"]} className="text-sm">
       <Collapse.Panel header="Metadata" key="1">
         <div className="flex flex-col p-4">
           {/* Trailing Slash */}
@@ -51,9 +51,12 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
             <Select
               value={value.trailingSlashMode}
               onChange={(val) =>
-              updateValue({ ...value, trailingSlashMode: val as TrailingSlashMode })
+                updateValue({
+                  ...value,
+                  trailingSlashMode: val as TrailingSlashMode,
+                })
               }
-              className='w-1/6'
+              className="w-1/6"
             >
               <Select.Option value="strict">Strict</Select.Option>
               <Select.Option value="fallback">Fallback</Select.Option>
@@ -66,9 +69,12 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
             <Select
               value={value.redirectSlashes}
               onChange={(val) =>
-              updateValue({ ...value, redirectSlashes: val as RedirectSlashes })
+                updateValue({
+                  ...value,
+                  redirectSlashes: val as RedirectSlashes,
+                })
               }
-              className='w-1/6'
+              className="w-1/6"
             >
               <Select.Option value="ignore">Ignore</Select.Option>
               <Select.Option value="strip">Strip</Select.Option>
@@ -81,9 +87,11 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
             <Typography.Text>Case Sensitive</Typography.Text>
             <div className="w-16">
               <Input
-              type="checkbox"
-              checked={value.caseSensitive}
-              onChange={(e) => updateValue({ ...value, caseSensitive: e.target.checked })}
+                type="checkbox"
+                checked={value.caseSensitive}
+                onChange={(e) =>
+                  updateValue({ ...value, caseSensitive: e.target.checked })
+                }
               />
             </div>
           </div>
@@ -94,9 +102,9 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
             <Select
               value={value.entityValueCase}
               onChange={(val) =>
-              updateValue({ ...value, entityValueCase: val as EntityCase })
+                updateValue({ ...value, entityValueCase: val as EntityCase })
               }
-              className='w-1/6'
+              className="w-1/6"
             >
               <Select.Option value="none">None</Select.Option>
               <Select.Option value="lowercase">Lowercase</Select.Option>
@@ -111,7 +119,12 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
               <Input
                 type="checkbox"
                 checked={value.optionsPassthrough}
-                onChange={(e) => updateValue({ ...value, optionsPassthrough: e.target.checked })}
+                onChange={(e) =>
+                  updateValue({
+                    ...value,
+                    optionsPassthrough: e.target.checked,
+                  })
+                }
               />
             </div>
           </div>
