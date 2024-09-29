@@ -5,12 +5,15 @@ import { Form, Flex, Checkbox, Button, Input } from "antd";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Loading from "@/app/components/Loading";
+import { setCookie } from "cookies-next";
 
 export default function LoginForm() {
   const router = useRouter();
 
   const onLogin = (values: any) => {
     console.log("Received values of form: ", values);
+    // expire in 60 seconds
+    setCookie("username", values.username, { maxAge: 60 });
     router.push("/dashboard");
   };
 

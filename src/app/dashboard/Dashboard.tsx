@@ -4,6 +4,7 @@ import Loading from "../components/Loading";
 import ApplicationDataService from "../services/ApplicationDataService";
 import ProjectCard from "./ProjectCard";
 import CreateProjectCard from "./CreateProjectCard";
+import { getCookie } from "cookies-next";
 
 interface Application {
   app_name: string;
@@ -14,12 +15,15 @@ interface Application {
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [applications, setApplications] = useState<Application[]>([]);
+  let companyName = getCookie("username") as string;
 
   useEffect(() => {
     // Fetch all applications by company name
     const fetchApplications = async () => {
+      if (companyName === "admin") {
+        companyName = "null";
+      }
       try {
-        const companyName = "null"; // Replace with dynamic company name if available
         const response =
           await ApplicationDataService.getAllApplicationsByCompanyName(
             companyName
