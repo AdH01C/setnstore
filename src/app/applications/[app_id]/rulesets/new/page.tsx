@@ -1,14 +1,14 @@
 import { Layout } from "antd";
 import { Header, Footer } from "antd/es/layout/layout";
 import React from "react";
-import NewRulesetCreator from "./NewRulesetCreator";
+import RulesetCreator from "./RulesetCreator";
 
-export default function NewRulesetEditor() {
+export default function Page() {
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Header className="flex items-center"></Header>
       <Layout>
-        <NewRulesetCreator />
+        <RulesetCreator />
       </Layout>
       <Footer className="text-center">
         Inquisico ©{new Date().getFullYear()} Created by Adrians Worker

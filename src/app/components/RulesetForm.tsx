@@ -3,14 +3,14 @@ import { vanillaCells, vanillaRenderers } from "@jsonforms/vanilla-renderers";
 import CodeMirror, { keymap } from "@uiw/react-codemirror";
 import schema from "@/app/json/schema.json";
 import uischema from "@/app/json/uischema.json";
-import metaDataControlTester from "@/app/components/renderer/MetaDataControlTester";
-import MetaDataControl from "@/app/components/renderer/MetaDataControl";
-import authorizationControlTester from "@/app/components/renderer/AuthorizationControlTester";
-import authorizationControl from "@/app/components/renderer/AuthorizationControl";
-import hostControlTester from "@/app/components/renderer/HostControlTester";
-import hostControl from "@/app/components/renderer/HostControl";
-import allowedOriginsTester from "@/app/components/renderer/AllowedOriginsTester";
-import allowedOriginsControl from "@/app/components/renderer/AllowedOriginsControl";
+import metaDataControlTester from "@/app/components/renderer/metadata/MetaDataControlTester";
+import MetaDataControl from "@/app/components/renderer/metadata/MetaDataControl";
+import authorizationControlTester from "@/app/components/renderer/authorization/AuthorizationControlTester";
+import authorizationControl from "@/app/components/renderer/authorization/AuthorizationControl";
+import hostControlTester from "@/app/components/renderer/host/HostControlTester";
+import hostControl from "@/app/components/renderer/host/HostControl";
+import allowedOriginsTester from "@/app/components/renderer/allowedOrigins/AllowedOriginsTester";
+import allowedOriginsControl from "@/app/components/renderer/allowedOrigins/AllowedOriginsControl";
 import { useEffect, useState } from "react";
 import { javascript } from "@codemirror/lang-javascript";
 import { barf } from "thememirror";
@@ -19,12 +19,12 @@ import React from "react";
 import { Flex, Splitter } from "antd";
 import { EditorView } from "@codemirror/view";
 
-export default function NewRulesetForm({
+export default function RulesetForm({
   host,
   formData,
-  onFormChange
+  onFormChange,
 }: {
-  host: string;
+  host?: string;
   formData: any;
   onFormChange: (data: any) => void;
 }) {
@@ -69,7 +69,9 @@ export default function NewRulesetForm({
               data={formData}
               renderers={renderers}
               cells={vanillaCells}
-              onChange={(formData: { data: any }) => onFormChange(formData.data)}
+              onChange={(formData: { data: any }) =>
+                onFormChange(formData.data)
+              }
             />
           </Splitter.Panel>
           <Splitter.Panel collapsible>

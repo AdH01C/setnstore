@@ -15,13 +15,13 @@ import { vanillaCells, vanillaRenderers } from "@jsonforms/vanilla-renderers";
 import schema from "@/app/json/schema.json";
 import uischema from "@/app/json/uischema.json";
 import metaDataControlTester from "@/app/components/renderer/MetaDataControlTester";
-import MetaDataControl from "@/app/components/renderer/MetaDataControl";
+import MetaDataControl from "@/app/components/renderer/metadata/MetaDataControl";
 import authorizationControlTester from "@/app/components/renderer/AuthorizationControlTester";
-import authorizationControl from "@/app/components/renderer/AuthorizationControl";
+import authorizationControl from "@/app/components/renderer/authorization/AuthorizationControl";
 import hostControlTester from "@/app/components/renderer/HostControlTester";
-import hostControl from "@/app/components/renderer/HostControl";
+import hostControl from "@/app/components/renderer/host/HostControl";
 import allowedOriginsTester from "@/app/components/renderer/AllowedOriginsTester";
-import allowedOriginsControl from "@/app/components/renderer/AllowedOriginsControl";
+import allowedOriginsControl from "@/app/components/renderer/allowedOrigins/AllowedOriginsControl";
 
 // Ant Design Icons and Menu
 import type { MenuProps } from "antd";

@@ -7,7 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 import { getCookie } from "cookies-next";
 import ApplicationSiderMenu from "@/app/components/ApplicationSiderMenu";
 import { Content } from "antd/es/layout/layout";
-import NewRulesetForm from "./NewRulesetForm";
+import NewRulesetForm from "../../../../components/RulesetForm";
 import { initialFormData } from "@/app/data/initialFormData";
 import RulesetDataService from "@/app/services/RulesetDataService";
 
@@ -26,7 +26,7 @@ const steps = [
   },
 ];
 const { Option } = Select;
-export default function NewRulesetCreator() {
+export default function RulesetCreator() {
   const router = useRouter();
   const companyName = getCookie("username") as string;
   const params = useParams<{ app_id: string; ruleset_id: string }>();
