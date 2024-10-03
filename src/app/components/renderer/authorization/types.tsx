@@ -17,16 +17,18 @@ interface AuthorizationRelation {
 }
 
 interface AuthorizationPermissions {
-  [permission: string]: AuthorizationOperations | AuthorizationOperation;
+  [permission: string]: AuthorizationType;
 }
 
-type AuthorizationType = "noop" | "union" | "intersect" | "except";
+type AuthorizationType = AuthorizationOperations | AuthorizationRule
+
+type AuthorizationOperationType = "noop" | "union" | "intersect" | "except";
 
 interface AuthorizationOperations {
-  type: AuthorizationType;
-  operations: AuthorizationOperation[];
+  type: AuthorizationOperationType;
+  operations: AuthorizationRule[];
 }
 
-interface AuthorizationOperation {
+interface AuthorizationRule {
   relation: string;
 }

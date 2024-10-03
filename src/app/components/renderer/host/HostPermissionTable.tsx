@@ -12,7 +12,7 @@ interface PermissionTableDataType {
   permission: Requirement;
 }
 
-export const PermissionTable = ({
+export const HostPermissionTable = ({
   pathData,
   updateValue,
   authData,
@@ -105,8 +105,8 @@ export const PermissionTable = ({
   const dataSource: PermissionTableDataType[] =
     pathProperties && pathProperties.permission
       ? Object.entries(pathProperties.permission).map(
-          ([method, requirement], index) => ({
-            key: index.toString(),
+          ([method, requirement]) => ({
+            key: method,
             method: method,
             permission: requirement,
           })

@@ -60,3 +60,63 @@ export function getPermissionValue(requirement: Requirement) {
   }
   return "";
 }
+
+export function isAuthorizationOperations(
+  obj: AuthorizationType
+): obj is AuthorizationOperations {
+  return "operations" in obj;
+}
+
+export function isAuthorizationRule(
+  obj: AuthorizationType
+): obj is AuthorizationRule {
+  return "relation" in obj;
+}
+
+function capitalizeFirstLetter(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export function getAuthorizationTypeValue(type: AuthorizationType): string {
+  if (isAuthorizationOperations(type)) {
+    const capitalizedType = capitalizeFirstLetter(type.type);
+    return capitalizedType;
+  } else if (isAuthorizationRule(type)) {
+    return "Single";
+  }
+  return "Unknown Authorization Type";
+}
+
+export function getAuthorizationTypeObject(
+  typeString: string,
+  relationString: string = ""
+): AuthorizationType | undefined {
+  if (typeString === "single") {
+    return { relation: relationString } as AuthorizationRule;
+  }
+
+  if (
+    typeString === "union" ||
+    typeString === "intersect" ||
+    typeString === "except" ||
+    typeString === "noop"
+  ) {
+    return {
+      type: typeString,
+      operations: [],
+    } as AuthorizationOperations;
+  }
+  return undefined;
+}
+
+export function getAuthorizationOperationValue(type: AuthorizationOperations) {
+  return type.operations.map((rule: AuthorizationRule) => rule.relation);
+}
+
+export function getAuthorizationOperationObject(
+  relationList: string[]
+): AuthorizationRule[] {
+  return relationList.map((relation) => ({
+    relation: relation,
+  }));
+}

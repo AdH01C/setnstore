@@ -1,6 +1,6 @@
 import { Collapse, Form, Input, Typography } from "antd";
 import React from "react";
-import { PermissionTable } from "./PermissionTable";
+import { HostPermissionTable } from "./HostPermissionTable";
 import { EntitySettingsForm } from "./EntitySettingForm";
 
 interface PathProps {
@@ -45,7 +45,7 @@ export const Path: React.FC<PathProps> = ({
               relations={Object.keys(authData || {})}
             />
           )}
-          <PermissionTable
+          <HostPermissionTable
             pathData={pathData}
             updateValue={updateValue}
             authData={authData}
