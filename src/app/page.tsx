@@ -2,7 +2,7 @@ import LoginForm from "@/app/LoginForm";
 import { Layout } from "antd";
 import { Content, Footer } from "antd/es/layout/layout";
 
-export default function App() {
+export default function Page() {
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Content className="flex flex-col gap-4 items-center justify-center">

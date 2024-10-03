@@ -3,7 +3,7 @@ import { Header, Footer } from "antd/es/layout/layout";
 import React from "react";
 import AppDisplay from "./AppDisplay";
 
-export default function Dashboard() {
+export default function Page() {
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Header className="flex items-center"></Header>

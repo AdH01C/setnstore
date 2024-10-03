@@ -2,7 +2,7 @@ import { Layout } from "antd";
 import { Header, Content, Footer } from "antd/es/layout/layout";
 import Dashboard from "./Dashboard";
 
-export default function App() {
+export default function Page() {
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Header className="flex items-center"></Header>

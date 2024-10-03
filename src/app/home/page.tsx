@@ -1,7 +1,7 @@
 import Navbar from "@/app/components/Navbar";
 import Contents from "./Contents";
 
-export default function Home() {
+export default function Page() {
     
 
     return (

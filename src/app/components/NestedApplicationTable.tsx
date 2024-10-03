@@ -156,7 +156,6 @@ export default function NestedApplicationTable({
   ];
 
   useEffect(() => {
-    console.log(application);
     const fetchApplications = async () => {
       try {
         const rulesetsID = await rulesetDataService.getRulesetsByAppId(
@@ -193,7 +192,7 @@ export default function NestedApplicationTable({
     };
 
     fetchApplications();
-  }, [company]);
+  }, [company, application]);
 
   const expandedRowRender = (row: any) => {
     return (

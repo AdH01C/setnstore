@@ -7,7 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 import { getCookie } from "cookies-next";
 import ApplicationSiderMenu from "@/app/components/ApplicationSiderMenu";
 import { Content } from "antd/es/layout/layout";
-import NewRulesetForm from "../../../../components/RulesetForm";
+import RulesetForm from "../../../../components/RulesetForm";
 import { initialFormData } from "@/app/data/initialFormData";
 import RulesetDataService from "@/app/services/RulesetDataService";
 
@@ -29,7 +29,10 @@ const { Option } = Select;
 export default function RulesetCreator() {
   const router = useRouter();
   const companyName = getCookie("username") as string;
-  const params = useParams<{ app_id: string; ruleset_id: string }>();
+  const { app_id, ruleset_id } = useParams<{
+    app_id: string;
+    ruleset_id: string;
+  }>();
   const [current, setCurrent] = useState(0);
   const [formData, setFormData] = useState<any>(initialFormData);
   const [host, setHost] = useState("");
@@ -57,12 +60,10 @@ export default function RulesetCreator() {
       const newRuleset = await RulesetDataService.createRuleset(
         payload,
         companyName,
-        params.app_id
+        app_id
       );
 
-      router.push(
-        `/applications/${params.app_id}/rulesets/${newRuleset.data.id}`
-      );
+      router.push(`/applications/${app_id}/rulesets/${newRuleset.data.id}`);
     } catch (error) {
       console.error("Error submitting ruleset:", error);
     }
@@ -79,7 +80,7 @@ export default function RulesetCreator() {
     <>
       <ApplicationSiderMenu
         company={companyName}
-        appID={params.app_id}
+        appID={app_id}
         rulesetID="0"
       />
       <Layout style={{ padding: "0 0 0 20px" }}>
@@ -94,15 +95,13 @@ export default function RulesetCreator() {
             {
               title: "Application",
               onClick: () => {
-                router.push(`/applications/${params.app_id}`);
+                router.push(`/applications/${app_id}`);
               },
             },
             {
               title: "Ruleset",
               onClick: () => {
-                router.push(
-                  `/applications/${params.app_id}/rulesets/${params.ruleset_id}`
-                );
+                router.push(`/applications/${app_id}/rulesets/${ruleset_id}`);
               },
             },
             { title: "Edit" },
@@ -162,7 +161,7 @@ export default function RulesetCreator() {
               </>
             ) : current == 1 ? (
               <>
-                <NewRulesetForm
+                <RulesetForm
                   formData={formData}
                   onFormChange={handleFormChange}
                   host={host}
