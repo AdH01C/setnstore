@@ -52,29 +52,25 @@ const generatePathData = (
 
     const hasChildren = !!pathProperties.children;
 
-    const createNewPathValue = (newPath?: string) => {
-      const newPathValue = { ...value };
-      if (newPath) {
-        delete newPathValue[path];
-        newPathValue[newPath] = { ...pathProperties };
-      }
-      return newPathValue;
-    };
-
     const handleChildPathPropertyChange = (newPathProperties: PathValue) => {
       if (hasChildren) {
-        const newValue = createNewPathValue();
+        const newValue = { ...value };
+        delete newValue[path];
+        newValue[path] = { ...pathProperties };
         newValue[path].children = newPathProperties;
         updateValue(newValue);
       }
     };
 
     const handlePathRouteChange = (newPath: string) => {
-      updateValue(createNewPathValue(newPath));
+      const newValue = { ...value };
+      delete newValue[path];
+      newValue[newPath] = { ...pathProperties };
+      updateValue(newValue);
     };
 
     const handlePathPropertyChange = (newPathProperties: PathValue) => {
-      const newValue = createNewPathValue();
+      const newValue = { ...value };
       newValue[path] = newPathProperties[path];
       updateValue(newValue);
     };
@@ -93,7 +89,6 @@ const generatePathData = (
       key: `$${absolutePath}/${path}`,
       selectable: false,
       disableCheckbox: true,
-
       isLeaf: !hasChildren,
       children: hasChildren
         ? generatePathData(

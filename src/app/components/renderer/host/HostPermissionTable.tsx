@@ -44,9 +44,20 @@ export const HostPermissionTable = ({
 
   function handleMethodChange(oldMethod: string, newMethod: string) {
     const newValue = { ...pathProperties };
+
     if (newValue && newValue.permission) {
-      newValue.permission[newMethod] = newValue.permission[oldMethod];
-      delete newValue.permission[oldMethod];
+      const updatedPermissions: Permission = {};
+
+      for (const key in newValue.permission) {
+        if (key === oldMethod) {
+          updatedPermissions[newMethod] = newValue.permission[oldMethod];
+        } else {
+          updatedPermissions[key] = newValue.permission[key];
+        }
+      }
+
+      newValue.permission = updatedPermissions;
+
       updateValue({ [path]: newValue });
     }
   }
