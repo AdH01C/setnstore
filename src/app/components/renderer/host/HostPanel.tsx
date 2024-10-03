@@ -1,4 +1,4 @@
-import { Tree, TreeDataNode } from "antd";
+import { Button, Tree, TreeDataNode } from "antd";
 import { useMemo } from "react";
 import { Path } from "./Path";
 
@@ -13,10 +13,13 @@ export const HostPanel = ({
 }) => {
   const [host] = Object.keys(value);
 
-  const pathData = useMemo(
-    () => generatePathData(value[host], updateValue, authData),
-    [value, authData, host, updateValue]
-  );
+  const pathData = useMemo(() => {
+    const generatedData = generatePathData(value[host], updateValue, authData);
+    if (generatedData.length > 0) {
+      return [...generatedData, addPathButton(value[host], updateValue, host)];
+    }
+    return generatedData;
+  }, [value, authData, host, updateValue]);
   //   const pathData = generatePathData(value[host], updateValue, relations, host);
 
   return (
@@ -31,7 +34,19 @@ export const HostPanel = ({
           treeData={pathData}
         />
       ) : (
-        "No tree"
+        <Button
+          onClick={() => {
+            updateValue({
+              "": {
+                permission: {
+                  GET: null,
+                },
+              },
+            });
+          }}
+        >
+          Add Root Path
+        </Button>
       )}
     </>
   );
@@ -50,37 +65,59 @@ const generatePathData = (
       ? (untypedProperties as EntityPathSettings)
       : (untypedProperties as PathSettings);
 
-    const hasChildren = !!pathProperties.children;
+    const hasChildren = Boolean(pathProperties?.children);
+
+    const updateValueForPath = (newPathProperties: PathValue) => {
+      const newValue = { ...value, [path]: newPathProperties[path] };
+      updateValue(newValue);
+    };
 
     const handleChildPathPropertyChange = (newPathProperties: PathValue) => {
       if (hasChildren) {
-        const newValue = { ...value };
-        delete newValue[path];
-        newValue[path] = { ...pathProperties };
-        newValue[path].children = newPathProperties;
-        updateValue(newValue);
+        updateValue({
+          ...value,
+          [path]: { ...pathProperties, children: newPathProperties },
+        });
       }
     };
 
-    const handlePathRouteChange = (newPath: string) => {
+    const handlePathRouteChange = (newPath?: string) => {
       const newValue = { ...value };
       delete newValue[path];
-      newValue[newPath] = { ...pathProperties };
+      if (newPath !== undefined) {
+        newValue[newPath] = { ...pathProperties };
+      }
+
       updateValue(newValue);
+    };
+    const handleAddSiblingPath = (newPathProperties: PathValue) => {
+      updateValue({
+        ...value,
+        [path]: { ...pathProperties, children: newPathProperties },
+      });
     };
 
-    const handlePathPropertyChange = (newPathProperties: PathValue) => {
-      const newValue = { ...value };
-      newValue[path] = newPathProperties[path];
-      updateValue(newValue);
-    };
+    const childrenNodes = hasChildren
+      ? generatePathData(
+          pathProperties.children!,
+          handleChildPathPropertyChange,
+          authData,
+          `${absolutePath}/${path}`,
+          isEntityPath
+            ? [
+                ...ancestorEntities,
+                (pathProperties as EntityPathSettings).entity,
+              ]
+            : ancestorEntities
+        )
+      : [];
 
     return {
       title: () => (
         <Path
           pathData={{ [path]: pathProperties }}
           absolutePath={`${absolutePath}/${path}`}
-          updateValue={handlePathPropertyChange}
+          updateValue={updateValueForPath}
           updatePathRoute={handlePathRouteChange}
           authData={authData}
           ancestorEntities={ancestorEntities}
@@ -90,20 +127,47 @@ const generatePathData = (
       selectable: false,
       disableCheckbox: true,
       isLeaf: !hasChildren,
-      children: hasChildren
-        ? generatePathData(
-            pathProperties.children!,
-            handleChildPathPropertyChange,
-            authData,
-            `${absolutePath}/${path}`,
-            isEntityPath
-              ? [
-                  ...ancestorEntities,
-                  (pathProperties as EntityPathSettings).entity,
-                ]
-              : ancestorEntities
-          )
-        : undefined,
+      children: [
+        ...childrenNodes,
+        ...(childrenNodes.length > 0
+          ? [
+              addPathButton(
+                { ...value[path].children },
+                handleAddSiblingPath,
+                absolutePath,
+                path
+              ),
+            ]
+          : []),
+      ],
     };
   });
+};
+
+const addPathButton = (
+  value: PathValue,
+  updateValue: (newValue: PathValue) => void,
+  absolutePath: string,
+  path?: string
+): TreeDataNode => {
+  const handleAddSiblingPath = () => {
+    const newPathName = `untitled-${Date.now()}`;
+    const newValue = { ...value };
+
+    newValue[newPathName] = {
+      permission: {},
+    };
+
+    updateValue(newValue);
+  };
+
+  return {
+    title: () => (
+      <Button onClick={handleAddSiblingPath}>Add Sibling Path</Button>
+    ),
+    key: path ? `$${absolutePath}/${path}/end` : `${absolutePath}/end`,
+    selectable: false,
+    disableCheckbox: true,
+    isLeaf: true,
+  };
 };

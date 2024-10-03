@@ -1,4 +1,4 @@
-import { Collapse, Form, Input, Typography } from "antd";
+import { Button, Collapse, Form, Input, Typography } from "antd";
 import React from "react";
 import { HostPermissionTable } from "./HostPermissionTable";
 import { EntitySettingsForm } from "./EntitySettingForm";
@@ -7,7 +7,7 @@ interface PathProps {
   pathData: PathValue;
   absolutePath: string;
   updateValue: (newValue: PathValue) => void;
-  updatePathRoute: (newValue: string) => void;
+  updatePathRoute: (newValue?: string) => void;
   authData: AuthorizationValue;
   ancestorEntities: string[];
 }
@@ -23,9 +23,45 @@ export const Path: React.FC<PathProps> = ({
   const [path] = Object.keys(pathData);
   const isEntityPath = path === "#";
 
+  function handleAddChildPath() {
+    const newValue = { ...pathData };
+
+    const newChildrenPath = `untitled-${Date.now()}`;
+    const newChildren = {
+      [newChildrenPath]: {
+        permission: {},
+      },
+    };
+
+    if (newValue[path]?.children) {
+      newValue[path].children = { ...newValue[path].children, ...newChildren };
+    } else {
+      newValue[path].children = newChildren;
+    }
+
+    updateValue(newValue);
+  }
+
+  function handleDeletePath() {
+    updatePathRoute();
+  }
+
   return (
     <Collapse className="text-sm">
-      <Collapse.Panel header={absolutePath} key={absolutePath}>
+      <Collapse.Panel
+        header={
+          <>
+            {absolutePath}
+            {absolutePath !== "/" && (
+              <>
+                <Button onClick={handleAddChildPath}>Add Child Path</Button>{" "}
+                <Button onClick={handleDeletePath}>Delete Path</Button>
+              </>
+            )}
+          </>
+        }
+        key={absolutePath}
+      >
         <div className="flex flex-col w-full">
           <Typography>{absolutePath}</Typography>
           <Form.Item label="Route: ">

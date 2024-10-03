@@ -4,6 +4,7 @@ import {
   getPermissionValue,
   relationOptions,
   entityTypeOptions,
+  getAvailableMethod,
 } from "../util";
 
 interface PermissionTableDataType {
@@ -113,6 +114,18 @@ export const HostPermissionTable = ({
     }
   }
 
+  function handleAddPermission() {
+    const newValue = { ...pathProperties };
+    if (!newValue.permission) {
+      newValue.permission = {};
+    }
+    const method = getAvailableMethod(Object.keys(newValue.permission));
+    if (method) {
+      newValue.permission[method] = null;
+      updateValue({ [path]: newValue });
+    }
+  }
+
   const dataSource: PermissionTableDataType[] =
     pathProperties && pathProperties.permission
       ? Object.entries(pathProperties.permission).map(
@@ -216,10 +229,13 @@ export const HostPermissionTable = ({
   ];
 
   return (
-    <Table<PermissionTableDataType>
-      pagination={false}
-      dataSource={dataSource}
-      columns={columns}
-    />
+    <>
+      <Table<PermissionTableDataType>
+        pagination={false}
+        dataSource={dataSource}
+        columns={columns}
+      />
+      <Button onClick={handleAddPermission}>Add Permission</Button>
+    </>
   );
 };

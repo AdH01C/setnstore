@@ -120,3 +120,22 @@ export function getAuthorizationOperationObject(
     relation: relation,
   }));
 }
+export function getAvailableMethod(methodList: string[]): HttpMethod | null {
+  const validMethods: HttpMethod[] = [
+    "GET",
+    "POST",
+    "PATCH",
+    "PUT",
+    "DELETE",
+    "OPTIONS",
+  ];
+
+  for (const method of validMethods) {
+    // Check if the method is not in the valid methods
+    if (!methodList.includes(method)) {
+      return method as HttpMethod; // Return the first available value found
+    }
+  }
+
+  return null; // If all methods are valid, return null
+}
