@@ -6,6 +6,7 @@ import applicationDataService from "../services/ApplicationDataService";
 import RulesetDataService from "../services/RulesetDataService";
 import { useRouter } from "next/navigation";
 import { PieChartOutlined } from "@ant-design/icons";
+import Link from "next/link";
 
 export default function ApplicationSiderMenu({
   company,
@@ -17,23 +18,8 @@ export default function ApplicationSiderMenu({
   rulesetID?: string;
 }) {
   const router = useRouter();
-
   const [items, setItems] = useState<MenuItem[]>([]);
-  function getItem(
-    label: React.ReactNode,
-    key: React.Key,
-    icon?: React.ReactNode,
-    children?: MenuItem[],
-    onClick?: () => void
-  ): MenuItem {
-    return {
-      label,
-      key,
-      icon,
-      children,
-      onClick,
-    } as MenuItem;
-  }
+
   useEffect(() => {
     const fetchMenuItems = async () => {
       try {
@@ -57,11 +43,7 @@ export default function ApplicationSiderMenu({
                       rulesetID,
                       <PieChartOutlined />,
                       undefined,
-                      () => {
-                        router.push(
-                          `/applications/${appID}/rulesets/${rulesetID}`
-                        );
-                      }
+                      `/applications/${appID}/rulesets/${rulesetID}`
                     )
                   )
                 : [
@@ -70,9 +52,7 @@ export default function ApplicationSiderMenu({
                       "0",
                       <PieChartOutlined />,
                       undefined,
-                      () => {
-                        router.push(`/applications/${appID}/rulesets/new`);
-                      }
+                      `/applications/${appID}/rulesets/new`
                     ),
                   ]
             );
@@ -82,9 +62,7 @@ export default function ApplicationSiderMenu({
             app.id,
             <PieChartOutlined />,
             undefined,
-            () => {
-              router.push(`/applications/${app.id}`);
-            }
+            `/applications/${app.id}`
           );
         });
 
@@ -96,6 +74,7 @@ export default function ApplicationSiderMenu({
 
     fetchMenuItems();
   }, [company, appID, router]);
+
   return (
     <Sider width={220}>
       <Menu
@@ -107,4 +86,19 @@ export default function ApplicationSiderMenu({
       />
     </Sider>
   );
+}
+
+function getItem(
+  label: React.ReactNode,
+  key: React.Key,
+  icon?: React.ReactNode,
+  children?: MenuItem[],
+  url?: string
+): MenuItem {
+  return {
+    label: url ? <Link href={url}>{label}</Link> : <span>{label}</span>,
+    key,
+    icon,
+    children,
+  } as MenuItem;
 }
