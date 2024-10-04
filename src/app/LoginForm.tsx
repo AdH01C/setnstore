@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react'
 import { useState, useEffect } from 'react';
 import Loading from '@/app/components/Loading';
+import { setCookie } from "cookies-next";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -24,6 +25,7 @@ export default function LoginForm() {
         if (result?.error) {
             console.error("Login error:", result.error);
         } else {
+            setCookie("username", values.username, { maxAge: 60 * 30 });
             router.push('/dashboard');
         }
     };
