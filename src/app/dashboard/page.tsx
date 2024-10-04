@@ -1,8 +1,17 @@
 import { Layout } from "antd";
 import { Header, Content, Footer } from "antd/es/layout/layout";
 import Dashboard from "./Dashboard";
+import { getServerSession } from 'next-auth/next';
+import { options } from '../api/auth/[...nextauth]/options';
+import { redirect } from 'next/navigation';
 
-export default function App() {
+export default async function App() {
+  const session = await getServerSession(options);
+
+  if (!session) {
+    redirect('/');
+  }
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Header className="flex items-center"></Header>
