@@ -24,7 +24,7 @@ export default function LoginForm() {
         if (result?.error) {
             console.error("Login error:", result.error);
         } else {
-            router.push('/home');
+            router.push('/dashboard');
         }
     };
 

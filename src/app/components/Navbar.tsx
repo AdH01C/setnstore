@@ -4,6 +4,7 @@ import { UserOutlined } from "@ant-design/icons";
 import { useAtom } from 'jotai'
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 import type { MenuProps } from 'antd';
 import { Dropdown, Space } from 'antd';
 
@@ -48,7 +49,9 @@ export default function Navbar() {
           danger: true,
           label: 'Log out',
           onClick: () => {
-            Router.push('/');
+            signOut({
+              callbackUrl: '/',
+            });
           }
         },
       ];
