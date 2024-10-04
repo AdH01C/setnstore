@@ -1,4 +1,4 @@
-import { Button, Card, Collapse, Input, Table, Typography } from "antd";
+import { Button, Collapse, Input, Table } from "antd";
 import { withJsonFormsControlProps } from "@jsonforms/react";
 const { Panel } = Collapse;
 
@@ -28,7 +28,8 @@ const AllowedOriginsControl = ({
 export default withJsonFormsControlProps(AllowedOriginsControl);
 
 function AllowedOrigins({ id, value, updateValue }: AllowedOriginsProps) {
-  const dataSource = value.map((origin, index) => ({ key: index, origin }));
+ 
+  const dataSource = value === undefined ? [] : value.map((origin, index) => ({ key: index, origin }));
 
   return (
     <Collapse defaultActiveKey={["1"]} className="text-sm">

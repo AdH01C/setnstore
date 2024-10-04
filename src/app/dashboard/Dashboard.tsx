@@ -15,20 +15,17 @@ interface Application {
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [applications, setApplications] = useState<Application[]>([]);
-  let companyName = getCookie("username") as string;
+  const companyName = getCookie("username") as string;
 
   useEffect(() => {
     // Fetch all applications by company name
     const fetchApplications = async () => {
-      if (companyName === "admin") {
-        companyName = "null";
-      }
+      const company = companyName === "admin" ? "null" : companyName;
+
       try {
         const response =
-          await ApplicationDataService.getAllApplicationsByCompanyName(
-            companyName
-          );
-        setApplications(response.data); // Assuming response contains the data you need
+          await ApplicationDataService.getAllApplicationsByCompanyName(company);
+        setApplications(response.data);
       } catch (error) {
         console.error("Error fetching applications:", error);
       } finally {
@@ -37,7 +34,7 @@ export default function Dashboard() {
     };
 
     fetchApplications();
-  }, []);
+  }, [companyName]);
 
   // Function to remove a deleted application from the list
   const handleDelete = (appId: string) => {

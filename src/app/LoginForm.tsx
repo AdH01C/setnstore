@@ -10,10 +10,12 @@ import Loading from '@/app/components/Loading';
 export default function LoginForm() {
   const router = useRouter();
 
-    const onLogin = async (values: any) => {
-        // console.log('Received values of form: ', values);
-        // router.push('/home');
-        const result = await signIn('credentials', {
+  const onLogin = async (values: any) => {
+    console.log("Received values of form: ", values);
+    // expire in 30 minutes
+    // setCookie("username", values.username, { maxAge: 60 * 30 });
+    // router.push("/dashboard");
+    const result = await signIn('credentials', {
             redirect: false, // Prevent automatic redirection
             username: values.username,
             password: values.password,

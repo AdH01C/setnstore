@@ -8,12 +8,11 @@ import {
   Typography,
   Select,
   Table,
-  SelectProps,
   Button,
 } from "antd";
 const { Option } = Select;
 import { Modal } from "antd";
-import { Key, useState } from "react";
+import { Key } from "react";
 
 interface Permission {
   GET?: any;

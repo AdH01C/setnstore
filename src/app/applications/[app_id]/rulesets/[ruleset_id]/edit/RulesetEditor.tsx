@@ -7,7 +7,8 @@ import { Layout, Breadcrumb } from "antd";
 import { Content } from "antd/es/layout/layout";
 import { useEffect, useState } from "react";
 import rulesetDataService from "@/app/services/RulesetDataService";
-import RulesetForm from "./RulesetForm";
+import RulesetForm from "../../../../../components/RulesetForm";
+import RulesetDataService from "@/app/services/RulesetDataService";
 
 interface Ruleset {
   rulesetID: string;
@@ -16,18 +17,31 @@ interface Ruleset {
   ruleset: any;
 }
 
-export default function RulesetEdit() {
+export default function RulesetEditor() {
   const router = useRouter();
   const companyName = getCookie("username") as string;
-  const params = useParams<{ app_id: string; ruleset_id: string }>();
+  const { app_id, ruleset_id } = useParams<{
+    app_id: string;
+    ruleset_id: string;
+  }>();
   const [ruleset, setRuleset] = useState<Ruleset>();
+
+  const handleFormChange = (data: any) => {
+    setRuleset(
+      (prevRuleset) =>
+        ({
+          ...prevRuleset,
+          ruleset: data,
+        } as Ruleset)
+    );
+  };
 
   useEffect(() => {
     const fetchRuleset = async () => {
       const response = await rulesetDataService.getRulesetByRulesetId(
         companyName,
-        params.app_id,
-        params.ruleset_id
+        app_id,
+        ruleset_id
       );
 
       const ruleset: Ruleset = {
@@ -41,14 +55,33 @@ export default function RulesetEdit() {
     };
 
     fetchRuleset();
-  }, [companyName]);
+  }, [companyName, app_id, ruleset_id]);
+
+  const handleSubmit = async () => {
+    if (ruleset?.ruleset) {
+      const payload = { ruleset_json: ruleset.ruleset };
+
+      try {
+        // Update the existing ruleset
+        await RulesetDataService.updateRuleset(
+          payload,
+          companyName,
+          app_id,
+          ruleset.rulesetID
+        );
+        router.push(`/applications/${app_id}/rulesets/${ruleset.rulesetID}`);
+      } catch (error) {
+        console.error("Error submitting ruleset:", error);
+      }
+    }
+  };
 
   return (
     <>
       <ApplicationSiderMenu
         company={companyName}
-        appID={params.app_id}
-        rulesetID={params.ruleset_id}
+        appID={app_id}
+        rulesetID={ruleset_id}
       />
       <Layout style={{ padding: "0 0 0 20px" }}>
         <Breadcrumb
@@ -62,15 +95,13 @@ export default function RulesetEdit() {
             {
               title: "Application",
               onClick: () => {
-                router.push(`/applications/${params.app_id}`);
+                router.push(`/applications/${app_id}`);
               },
             },
             {
               title: "Ruleset",
               onClick: () => {
-                router.push(
-                  `/applications/${params.app_id}/rulesets/${params.ruleset_id}`
-                );
+                router.push(`/applications/${app_id}/rulesets/${ruleset_id}`);
               },
             },
             { title: "Edit" },
@@ -85,11 +116,20 @@ export default function RulesetEdit() {
           }}
         >
           {ruleset && (
-            <RulesetForm
-              company={companyName}
-              appID={params.app_id}
-              ruleset={ruleset}
-            />
+            <>
+              <RulesetForm
+                formData={ruleset.ruleset}
+                onFormChange={handleFormChange}
+              />
+              <button
+                className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition"
+                onClick={() => {
+                  handleSubmit();
+                }}
+              >
+                Save Changes
+              </button>
+            </>
           )}
         </Content>
       </Layout>

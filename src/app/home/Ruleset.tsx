@@ -14,14 +14,14 @@ import { JsonForms } from "@jsonforms/react";
 import { vanillaCells, vanillaRenderers } from "@jsonforms/vanilla-renderers";
 import schema from "@/app/json/schema.json";
 import uischema from "@/app/json/uischema.json";
-import metaDataControlTester from "@/app/components/renderer/MetaDataControlTester";
-import MetaDataControl from "@/app/components/renderer/MetaDataControl";
-import authorizationControlTester from "@/app/components/renderer/AuthorizationControlTester";
-import authorizationControl from "@/app/components/renderer/AuthorizationControl";
-import hostControlTester from "@/app/components/renderer/HostControlTester";
-import hostControl from "@/app/components/renderer/HostControl";
-import allowedOriginsTester from "@/app/components/renderer/AllowedOriginsTester";
-import allowedOriginsControl from "@/app/components/renderer/AllowedOriginsControl";
+import metaDataControlTester from "@/app/components/renderer/metadata/MetaDataControlTester";
+import MetaDataControl from "@/app/components/renderer/metadata/MetaDataControl";
+import authorizationControlTester from "@/app/components/renderer/authorization/AuthorizationControlTester";
+import authorizationControl from "@/app/components/renderer/authorization/AuthorizationControl";
+import hostControlTester from "@/app/components/renderer/host/HostControlTester";
+import hostControl from "@/app/components/renderer/host/HostControl";
+import allowedOriginsTester from "@/app/components/renderer/allowedOrigins/AllowedOriginsTester";
+import allowedOriginsControl from "@/app/components/renderer/allowedOrigins/AllowedOriginsControl";
 
 // Ant Design Icons and Menu
 import type { MenuProps } from "antd";
@@ -151,7 +151,7 @@ export default function Ruleset({
 
     // Cleanup the timer on component unmount
     return () => clearTimeout(timer);
-  }, []);
+  }, [companyName]);
 
   useEffect(() => {
     const fetchRuleset = async () => {

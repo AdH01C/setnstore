@@ -17,17 +17,17 @@ interface Application {
 export default function AppDisplay() {
   const router = useRouter();
   const companyName = getCookie("username") as string;
-  const params = useParams<{ app_id: string }>();
+  const { app_id } = useParams<{ app_id: string }>();
   const [application, setApplication] = useState<Application>();
 
   useEffect(() => {
     const fetchApplications = async () => {
       const response = await applicationDataService.getApplicationByAppId(
         companyName,
-        params.app_id
+        app_id
       );
       const application: Application = {
-        appID: params.app_id,
+        appID: app_id,
         applicationName: response.data.app_name,
         companyName: response.data.company_name,
         dateCreated: response.data.created_datetime,
@@ -35,11 +35,11 @@ export default function AppDisplay() {
       setApplication(application);
     };
     fetchApplications();
-  }, [companyName]);
+  }, [companyName, app_id]);
 
   return (
     <>
-      <ApplicationSiderMenu company={companyName} appID={params.app_id} />
+      <ApplicationSiderMenu company={companyName} appID={app_id} />
       <Layout style={{ padding: "0 24px 24px" }}>
         <Breadcrumb
           items={[

@@ -95,7 +95,7 @@ export default function ApplicationSiderMenu({
     };
 
     fetchMenuItems();
-  }, [company]);
+  }, [company, appID, router]);
   return (
     <Sider width={220}>
       <Menu

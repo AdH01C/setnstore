@@ -18,7 +18,10 @@ interface Ruleset {
 export default function RulesetDisplay() {
   const router = useRouter();
   const companyName = getCookie("username") as string;
-  const params = useParams<{ app_id: string; ruleset_id: string }>();
+  const { app_id, ruleset_id } = useParams<{
+    app_id: string;
+    ruleset_id: string;
+  }>();
   const [ruleset, setRuleset] = useState<Ruleset>();
 
   const handleRulesetDelete = async (
@@ -35,7 +38,7 @@ export default function RulesetDisplay() {
       //   rulesetID
       // );
       console.log(
-        `Ruleset with ID ${rulesetID} in application ${params.app_id} deleted successfully`
+        `Ruleset with ID ${rulesetID} in application ${app_id} deleted successfully`
       );
     } catch (error) {
       console.error("Error deleting application:", error);
@@ -46,8 +49,8 @@ export default function RulesetDisplay() {
     const fetchRuleset = async () => {
       const response = await rulesetDataService.getRulesetByRulesetId(
         companyName,
-        params.app_id,
-        params.ruleset_id
+        app_id,
+        ruleset_id
       );
 
       const ruleset: Ruleset = {
@@ -61,14 +64,14 @@ export default function RulesetDisplay() {
     };
 
     fetchRuleset();
-  }, [companyName]);
+  }, [companyName, app_id, ruleset_id]);
 
   return (
     <>
       <ApplicationSiderMenu
         company={companyName}
-        appID={params.app_id}
-        rulesetID={params.ruleset_id}
+        appID={app_id}
+        rulesetID={ruleset_id}
       />
       <Layout style={{ padding: "0 24px 24px" }}>
         <Breadcrumb
@@ -82,7 +85,7 @@ export default function RulesetDisplay() {
             {
               title: "Application",
               onClick: () => {
-                router.push(`/applications/${params.app_id}`);
+                router.push(`/applications/${app_id}`);
               },
             },
             { title: "Ruleset" },
@@ -105,7 +108,7 @@ export default function RulesetDisplay() {
                 className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition"
                 onClick={() => {
                   router.push(
-                    `/applications/${params.app_id}/rulesets/${params.ruleset_id}/edit`
+                    `/applications/${app_id}/rulesets/${ruleset_id}/edit`
                   );
                 }}
               >
