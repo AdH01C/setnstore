@@ -1,16 +1,16 @@
-import React, { createContext, useContext } from 'react';
+import { getCookie } from "cookies-next";
+import { useParams } from "next/navigation";
+import React, { createContext, useContext } from "react";
 
-// Define types for the context
 interface AppContextType {
   appID: string;
   companyName: string;
-  rulesetID?: string; // Optional
+  rulesetID?: string;
 }
 
 // Create the context
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-// Hook to use the context in child components
 export const useAppContext = () => {
   const context = useContext(AppContext);
   if (!context) {
@@ -19,10 +19,20 @@ export const useAppContext = () => {
   return context;
 };
 
-// Context provider component
-export const AppProvider: React.FC<{ appID: string; companyName: string; rulesetID?: string; children: React.ReactNode }> = ({ appID, companyName, rulesetID, children }) => {
+export const AppProvider: React.FC<{
+  children: React.ReactNode;
+}> = ({ children }) => {
+  const companyName = getCookie("username") as string;
+
+  const { app_id, ruleset_id } = useParams<{
+    app_id: string;
+    ruleset_id?: string;
+  }>();
+
   return (
-    <AppContext.Provider value={{ appID, companyName, rulesetID }}>
+    <AppContext.Provider
+      value={{ appID: app_id, companyName, rulesetID: ruleset_id }}
+    >
       {children}
     </AppContext.Provider>
   );

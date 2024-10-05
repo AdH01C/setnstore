@@ -3,50 +3,45 @@
 import { Breadcrumb, Layout } from "antd";
 import { Header, Footer, Content } from "antd/es/layout/layout";
 import ApplicationSiderMenu from "./ApplicationSiderMenu";
-import { useParams, usePathname } from "next/navigation";
-import { getCookie } from "cookies-next";
+import { usePathname } from "next/navigation";
 import { AppProvider } from "./AppContext";
 import Link from "next/link";
 import { ReactNode } from "react";
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const companyName = getCookie("username") as string;
-  const { app_id, ruleset_id } = useParams<{
-    app_id: string;
-    ruleset_id?: string;
-  }>();
+export default function AppLayout({
+  children,
+  contentPadding = "0 24px 24px",
+  hasSider = false,
+  hasBreadcrumb = false,
+}: {
+  children: React.ReactNode;
+  contentPadding?: string;
+  hasSider?: boolean;
+  hasBreadcrumb?: boolean;
+}) {
   const pathname = usePathname();
 
   return (
-    <AppProvider
-      appID={app_id}
-      companyName={companyName}
-      rulesetID={ruleset_id}
-    >
+    <AppProvider>
       <Layout style={{ minHeight: "100vh" }}>
         <Header className="flex items-center"></Header>
-        <Layout>
-          <ApplicationSiderMenu
-            company={companyName}
-            appID={app_id}
-            rulesetID={ruleset_id}
-          />
+        <Layout hasSider>
+          {hasSider && <ApplicationSiderMenu />}
           <Layout>
             <Content
               style={{
-                padding: "0 24px 24px",
+                padding: contentPadding,
                 margin: 0,
                 minHeight: 280,
               }}
             >
-              <Breadcrumb
-                itemRender={itemRender}
-                style={{ padding: "16px 0" }}
-                items={generateBreadCrumb(pathname).map((routeData) => ({
-                  title: routeData.title,
-                  href: routeData.route ? routeData.route : undefined,
-                }))}
-              />
+              {hasBreadcrumb && (
+                <Breadcrumb
+                  itemRender={itemRender}
+                  style={{ padding: "16px 0" }}
+                  items={generateBreadCrumb(pathname)}
+                />
+              )}
               {children}
             </Content>
           </Layout>
@@ -81,7 +76,7 @@ const generateBreadCrumb = (pathname: string) => {
   // Base item for Dashboard
   items.push({
     title: "Dashboard",
-    route: "/dashboard",
+    href: "/dashboard",
   });
 
   // Handle Applications segment
@@ -93,7 +88,7 @@ const generateBreadCrumb = (pathname: string) => {
 
     items.push({
       title: "Applications",
-      route: segments.length > 2 ? `/applications/${appID}` : undefined,
+      href: segments.length > 2 ? `/applications/${appID}` : undefined,
     });
 
     // Handle Ruleset segments
@@ -105,7 +100,7 @@ const generateBreadCrumb = (pathname: string) => {
         const rulesetID = rulesetAction;
         items.push({
           title: "Ruleset",
-          route:
+          href:
             segments.length > 4
               ? `/applications/${appID}/rulesets/${rulesetID}`
               : undefined,
@@ -115,7 +110,7 @@ const generateBreadCrumb = (pathname: string) => {
       const rulesetID = segments[3];
       items.push({
         title: "Ruleset",
-        route: `/applications/${appID}/rulesets/${rulesetID}`,
+        href: `/applications/${appID}/rulesets/${rulesetID}`,
       });
     }
 

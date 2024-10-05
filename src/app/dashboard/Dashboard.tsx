@@ -1,10 +1,11 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import Loading from "../components/Loading";
 import ApplicationDataService from "../services/ApplicationDataService";
 import ProjectCard from "./ProjectCard";
 import CreateProjectCard from "./CreateProjectCard";
-import { getCookie } from "cookies-next";
+import { useAppContext } from "../components/AppContext";
 
 interface Application {
   app_name: string;
@@ -15,7 +16,7 @@ interface Application {
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [applications, setApplications] = useState<Application[]>([]);
-  const companyName = getCookie("username") as string;
+  const { companyName } = useAppContext();
 
   useEffect(() => {
     // Fetch all applications by company name

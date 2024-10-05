@@ -7,26 +7,20 @@ import RulesetDataService from "../services/RulesetDataService";
 import { useRouter } from "next/navigation";
 import { PieChartOutlined } from "@ant-design/icons";
 import Link from "next/link";
+import { useAppContext } from "./AppContext";
 
-export default function ApplicationSiderMenu({
-  company,
-  appID,
-  rulesetID,
-}: {
-  company: string;
-  appID: string;
-  rulesetID?: string;
-}) {
+export default function ApplicationSiderMenu() {
   const router = useRouter();
+  const { appID, companyName, rulesetID } = useAppContext();
   const [items, setItems] = useState<MenuItem[]>([]);
 
   useEffect(() => {
     const fetchMenuItems = async () => {
       try {
         const applications =
-          await applicationDataService.getAllApplicationsByCompanyName(company);
+          await applicationDataService.getAllApplicationsByCompanyName(companyName);
         const rulesetsID = await RulesetDataService.getRulesetsByAppId(
-          company,
+          companyName,
           appID
         );
 
@@ -73,7 +67,7 @@ export default function ApplicationSiderMenu({
     };
 
     fetchMenuItems();
-  }, [company, appID, router]);
+  }, [companyName, appID, router]);
 
   return (
     <Sider width={220}>
