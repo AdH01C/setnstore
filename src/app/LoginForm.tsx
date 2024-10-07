@@ -1,9 +1,9 @@
 "use client";
 
-import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import { LockOutlined, UserOutlined, GoogleOutlined } from "@ant-design/icons";
 import { Form, Flex, Checkbox, Button, Input } from "antd";
 import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react'
+import { getSession, signIn } from 'next-auth/react'
 import { useState, useEffect } from 'react';
 import Loading from '@/app/components/Loading';
 import { setCookie } from "cookies-next";
@@ -12,7 +12,6 @@ export default function LoginForm() {
   const router = useRouter();
 
   const onLogin = async (values: any) => {
-    console.log("Received values of form: ", values);
     // expire in 30 minutes
     // setCookie("username", values.username, { maxAge: 60 * 30 });
     // router.push("/dashboard");
@@ -30,8 +29,26 @@ export default function LoginForm() {
         }
     };
 
-    const onGoogleLogin = () => {
-        signIn('google', { callbackUrl: '/home' });
+    const onGoogleLogin = async () => {
+      signIn('google', { callbackUrl: '/dashboard' });
+      // const result = await signIn('google', { redirect: false });
+
+      // if (result?.error) {
+      //   console.error("Google login error:", result.error);
+      // } else {
+      //   // Wait for the session to be available
+      //   const session = await getSession();
+
+      //   if (session?.user?.name) {
+      //     // Set the cookie with the user's name from Google login
+      //     setCookie("username", session.user.name, { maxAge: 60 * 30 });
+          
+      //     // Redirect to the dashboard
+      //     router.push('/dashboard');
+      //   } else {
+      //     console.error("Session not established after Google login.");
+      //   }
+      // }
     };
 
     const [isLoading, setIsLoading] = useState(true);
@@ -97,11 +114,24 @@ export default function LoginForm() {
                         Log in
                     </Button>
                     </Form.Item>
+
+                    <Form.Item>
+                      <Button
+                        block
+                        icon={<GoogleOutlined />}
+                        type="primary"
+                        style={{
+                          backgroundColor: "#fa3452",
+                          borderColor: "#fa3452",
+                          color: "white",
+                        }}
+                        onClick={onGoogleLogin}
+                      >
+                        Log in with Google
+                      </Button>
+                    </Form.Item>
                 </Form>
 
-                <Button block type="default" onClick={onGoogleLogin}>
-                    Log in with Google
-                </Button>
             </>
         )}
         

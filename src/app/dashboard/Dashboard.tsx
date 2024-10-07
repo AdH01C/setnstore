@@ -4,7 +4,8 @@ import Loading from "../components/Loading";
 import ApplicationDataService from "../services/ApplicationDataService";
 import ProjectCard from "./ProjectCard";
 import CreateProjectCard from "./CreateProjectCard";
-import { getCookie } from "cookies-next";
+import { getCookie, setCookie } from "cookies-next";
+import { getSession } from "next-auth/react";
 
 interface Application {
   app_name: string;
@@ -15,7 +16,37 @@ interface Application {
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [applications, setApplications] = useState<Application[]>([]);
+  // const [companyName, setCompanyName] = useState<string | null>(null);
   const companyName = getCookie("username") as string;
+  // useEffect(() => {
+  //   // Check for existing cookies or fetch session
+  //   const checkAuthAndSetCookie = async () => {
+  //     const existingCookie = getCookie("username");
+
+  //     if (existingCookie) {
+  //       // If cookie already exists, use it
+  //       setCompanyName(existingCookie as string);
+  //     } else {
+  //       // Fetch session (for Google login)
+  //       const session = await getSession();
+  //       if (session?.user?.name) {
+  //         // If logged in via Google, set cookie with session.user.name
+  //         setCookie("username", session.user.name, { maxAge: 60 * 30 });
+  //         setCompanyName(session.user.name);
+  //       } else {
+  //         // Handle credentials login (if applicable)
+  //         // If you had stored username from credentials login elsewhere,
+  //         // you could set it here or redirect to login if no user is found
+  //         // For now, assume no cookie means redirect or handle anonymous session.
+  //         console.error("No user found. Redirecting to login.");
+  //         // Redirect logic here if necessary
+  //       }
+  //     }
+  //   };
+
+  //   // Call the function to check and set cookies
+  //   checkAuthAndSetCookie();
+  // }, []);
 
   useEffect(() => {
     // Fetch all applications by company name
