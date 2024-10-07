@@ -1,8 +1,7 @@
 import { TableColumnsType, Space, Table } from "antd";
 import { useState, useEffect } from "react";
-import applicationDataService from "../services/ApplicationDataService";
-import rulesetDataService from "../services/RulesetDataService";
-import ApplicationDataService from "../services/ApplicationDataService";
+import rulesetDataService from "../../services/RulesetDataService";
+import ApplicationDataService from "../../services/ApplicationDataService";
 import { useRouter } from "next/navigation";
 
 interface RulesetTableType extends Ruleset {
@@ -31,7 +30,7 @@ interface Ruleset {
   dateLastModified: Date;
 }
 
-export default function NestedApplicationTable({
+export default function ApplicationTable({
   company,
   application,
 }: {

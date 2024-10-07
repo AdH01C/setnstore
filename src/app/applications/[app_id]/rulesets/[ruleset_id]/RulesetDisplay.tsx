@@ -1,12 +1,9 @@
-"use client";
+"use client"
 
-import ApplicationSiderMenu from "@/app/components/ApplicationSiderMenu";
-import { useParams, useRouter } from "next/navigation";
-import { getCookie } from "cookies-next";
-import { Layout, Breadcrumb } from "antd";
-import { Content } from "antd/es/layout/layout";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import rulesetDataService from "@/app/services/RulesetDataService";
+import { useAppContext } from "@/app/components/AppContext";
 
 interface Ruleset {
   rulesetID: string;
@@ -17,11 +14,7 @@ interface Ruleset {
 
 export default function RulesetDisplay() {
   const router = useRouter();
-  const companyName = getCookie("username") as string;
-  const { app_id, ruleset_id } = useParams<{
-    app_id: string;
-    ruleset_id: string;
-  }>();
+  const { appID, companyName, rulesetID } = useAppContext();
   const [ruleset, setRuleset] = useState<Ruleset>();
 
   const handleRulesetDelete = async (
@@ -38,7 +31,7 @@ export default function RulesetDisplay() {
       //   rulesetID
       // );
       console.log(
-        `Ruleset with ID ${rulesetID} in application ${app_id} deleted successfully`
+        `Ruleset with ID ${rulesetID} in application ${appID} deleted successfully`
       );
     } catch (error) {
       console.error("Error deleting application:", error);
@@ -47,10 +40,14 @@ export default function RulesetDisplay() {
 
   useEffect(() => {
     const fetchRuleset = async () => {
+      if (!rulesetID) {
+        return;
+      }
+
       const response = await rulesetDataService.getRulesetByRulesetId(
         companyName,
-        app_id,
-        ruleset_id
+        appID,
+        rulesetID
       );
 
       const ruleset: Ruleset = {
@@ -64,68 +61,33 @@ export default function RulesetDisplay() {
     };
 
     fetchRuleset();
-  }, [companyName, app_id, ruleset_id]);
+  }, [companyName, appID, rulesetID]);
 
   return (
     <>
-      <ApplicationSiderMenu
-        company={companyName}
-        appID={app_id}
-        rulesetID={ruleset_id}
-      />
-      <Layout style={{ padding: "0 24px 24px" }}>
-        <Breadcrumb
-          items={[
-            {
-              title: "Dashboard",
-              onClick: () => {
-                router.push(`/dashboard`);
-              },
-            },
-            {
-              title: "Application",
-              onClick: () => {
-                router.push(`/applications/${app_id}`);
-              },
-            },
-            { title: "Ruleset" },
-          ]}
-          style={{ margin: "16px 0" }}
-        />
-        <Content
-          style={{
-            padding: 24,
-            margin: 0,
-            minHeight: 280,
-          }}
-        >
-          {ruleset && (
-            <div className="flex items-start space-x-4">
-              <pre className="flex-grow">
-                {JSON.stringify(ruleset.ruleset, null, 2)}
-              </pre>
-              <button
-                className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition"
-                onClick={() => {
-                  router.push(
-                    `/applications/${app_id}/rulesets/${ruleset_id}/edit`
-                  );
-                }}
-              >
-                Edit ruleset
-              </button>
-              <button
-                className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition"
-                onClick={(e) => {
-                  handleRulesetDelete(e, ruleset.rulesetID);
-                }}
-              >
-                Delete ruleset
-              </button>
-            </div>
-          )}
-        </Content>
-      </Layout>
+      {ruleset && (
+        <div className="flex items-start space-x-4">
+          <pre className="flex-grow">
+            {JSON.stringify(ruleset.ruleset, null, 2)}
+          </pre>
+          <button
+            className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition"
+            onClick={() => {
+              router.push(`/applications/${appID}/rulesets/${rulesetID}/edit`);
+            }}
+          >
+            Edit ruleset
+          </button>
+          <button
+            className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition"
+            onClick={(e) => {
+              handleRulesetDelete(e, ruleset.rulesetID);
+            }}
+          >
+            Delete ruleset
+          </button>
+        </div>
+      )}
     </>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ApplicationDataService from "@/app/services/ApplicationDataService";
 import { set } from "react-hook-form";
+import { getCookie } from "cookies-next";
 
 interface CreateProjectCardProps {
   onCreate: (newApp: any) => void; // The function to call when a new app is created
@@ -9,7 +10,7 @@ interface CreateProjectCardProps {
 export default function CreateProjectCard({
   onCreate,
 }: CreateProjectCardProps) {
-  const [companyName, setCompanyName] = useState("");
+  const companyName = getCookie("username") as string;
   const [appName, setAppName] = useState("");
 
   const handleCreateApplication = async () => {
@@ -19,14 +20,13 @@ export default function CreateProjectCard({
         payload,
         companyName
       );
-      console.log("Application created successfully");
+      console.log("Application created successfully", response);
       const newApp = {
-        id: response.id,
+        id: response.data.id,
         company_name: companyName,
         app_name: appName,
       };
       onCreate(newApp);
-      setCompanyName("");
       setAppName("");
     } catch (error) {
       console.error("Error creating application:", error);
@@ -36,16 +36,6 @@ export default function CreateProjectCard({
   return (
     <div className="flex flex-col gap-4 bg-gray-800 rounded-lg p-4 hover:border-4 hover:cursor-pointer transition-transform duration-300 ease-out transform hover:scale-105">
       <h1 className="text-gray-600 text-2xl font-bold">Create New Project</h1>
-
-      {/* Input for company name */}
-      <input
-        type="text"
-        placeholder="Company Name"
-        value={companyName}
-        onChange={(e) => setCompanyName(e.target.value)}
-        className="p-2 rounded bg-gray-700 text-white"
-      />
-
       {/* Input for app name */}
       <input
         type="text"

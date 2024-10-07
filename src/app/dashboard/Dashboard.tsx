@@ -1,10 +1,12 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import Loading from "../components/Loading";
 import ApplicationDataService from "../services/ApplicationDataService";
 import ProjectCard from "./ProjectCard";
 import CreateProjectCard from "./CreateProjectCard";
 import { getCookie, setCookie } from "cookies-next";
+import { useAppContext } from "../components/AppContext";
 import { getSession } from "next-auth/react";
 
 interface Application {
@@ -16,9 +18,10 @@ interface Application {
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [applications, setApplications] = useState<Application[]>([]);
-  // const [companyName, setCompanyName] = useState<string | null>(null);
   const companyName = getCookie("username") as string;
-  // useEffect(() => {
+    // const [companyName, setCompanyName] = useState<string | null>(null);
+
+    // useEffect(() => {
   //   // Check for existing cookies or fetch session
   //   const checkAuthAndSetCookie = async () => {
   //     const existingCookie = getCookie("username");
