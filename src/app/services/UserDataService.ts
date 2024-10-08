@@ -10,12 +10,12 @@ class UserDataService {
   }
 
   createUser(data: any): Promise<any> {
-        return http.post(`/v0/user`, data);
-    }
+    return http.post(`/v0/user`, data);
+  }
 
-    getUserById(userId: string): Promise<any> {
-        return http.get(`/v0/user/${userId}`);
-    }
+  getUserById(userId: string): Promise<any> {
+    return http.get(`/v0/user/${userId}`);
+  }
 }
 
 const userDataService = new UserDataService();

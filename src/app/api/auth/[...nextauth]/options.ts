@@ -71,14 +71,12 @@ export const options: NextAuthOptions = {
             if (account) {
                 token.accessToken = account.access_token;
             }
-            console.log('token: ', token);
             return token;
         },
         async session({ session, token }) {
             // Send properties to the client
             session.accessToken = token.accessToken;
             session.user.sub = token.sub;
-            console.log('session', session);
             return session;
         },
     },

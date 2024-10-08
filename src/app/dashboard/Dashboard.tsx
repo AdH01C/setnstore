@@ -3,13 +3,9 @@
 import { useEffect, useState } from "react";
 import Loading from "../components/Loading";
 import ApplicationDataService from "../services/ApplicationDataService";
-import UserDataService from "../services/UserDataService";
-import CompanyDataService from "../services/CompanyDataService";
 import ProjectCard from "./ProjectCard";
 import CreateProjectCard from "./CreateProjectCard";
-import { getCookie, setCookie } from "cookies-next";
 import { useAppContext } from "../components/AppContext";
-import { getSession } from "next-auth/react";
 
 interface Application {
   app_name: string;
@@ -22,44 +18,10 @@ export default function Dashboard() {
   const [applications, setApplications] = useState<Application[]>([]);
   const { companyName, companyId } = useAppContext();
 
-  const checkAndSetUser = async () => {
-    try {
-      const session = await getSession();
-      if (session?.user?.email) {
-        const email = session.user.email;
-        const googleId = session.user.sub;
-        // const accessToken = session.accessToken;
-
-        const existingUser = await UserDataService.getUserByUsername(email);
-
-        if (!existingUser.data) {
-          const newUser = {
-            username: email,
-            email: email,
-            full_name: session.user.name,
-            google_id: googleId,
-            password: "",
-          };
-          await UserDataService.createUser(newUser);
-        }
-
-        setCookie("username", email, { maxAge: 60 * 30 });
-        return email;
-      } else {
-        console.error("No session or email found. Redirect to login.");
-      }
-    } catch(error) {
-      console.error("Error during user check/creation:", error);
-      throw error;
-    }
-  };
   useEffect(() => {
     // Fetch all applications by company name
     const fetchApplications = async () => {
-      const company = companyName === "admin" ? "null" : companyName;
-
       try {
-        await checkAndSetUser();
         const response =
           await ApplicationDataService.getAllApplicationsByCompanyId(companyId);
         setApplications(response.data);
