@@ -3,7 +3,7 @@ import { useAtom } from "jotai";
 
 import ApplicationDataService from "@/app/services/ApplicationDataService";
 import { useRouter } from "next/navigation";
-import { Button, Card, Typography } from "antd";
+import { Button, Card, Modal, Typography } from "antd";
 
 interface ProjectCardProps {
   appId: string;
@@ -27,13 +27,20 @@ export default function ProjectCard({
     // Prevent the card click event from firing when delete is clicked
     e.stopPropagation();
 
-    try {
-      await ApplicationDataService.deleteApplication(companyName, appId);
-      console.log(`Application with ID ${appId} deleted successfully`);
-      onDelete(appId);
-    } catch (error) {
-      console.error("Error deleting application:", error);
-    }
+    Modal.confirm({
+      title: "Delete Application",
+      content: "Are you sure you want to delete this application?",
+      onOk: async () => {
+        try {
+          await ApplicationDataService.deleteApplication(companyName, appId);
+          console.log(`Application with ID ${appId} deleted successfully`);
+          onDelete(appId);
+        } catch (error) {
+          console.error("Error deleting application:", error);
+        }
+      },
+    });
+
   };
 
   return (

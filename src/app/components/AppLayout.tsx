@@ -1,12 +1,15 @@
 "use client";
 
-import { Breadcrumb, Layout } from "antd";
+import { Breadcrumb, Dropdown, Layout, MenuProps, Space } from "antd";
 import { Header, Footer, Content } from "antd/es/layout/layout";
 import ApplicationSiderMenu from "./ApplicationSiderMenu";
 import { usePathname } from "next/navigation";
 import { AppProvider } from "./AppContext";
 import Link from "next/link";
 import { ReactNode } from "react";
+import { UserOutlined } from "@ant-design/icons";
+import { useRouter } from "next/navigation";
+import { cookies } from "next/headers";
 
 export default function AppLayout({
   children,
@@ -20,14 +23,47 @@ export default function AppLayout({
   hasBreadcrumb?: boolean;
 }) {
   const pathname = usePathname();
+  const Router = useRouter();
+
+  
+  const items: MenuProps["items"] = [
+    {
+      key: "1",
+      label: <a>Profile</a>,
+    },
+    {
+      key: "2",
+      label: <a>Permissions</a>,
+      disabled: true,
+    },
+    {
+      key: "3",
+      label: <a>Settings</a>,
+      disabled: true,
+    },
+    {
+      key: "4",
+      danger: true,
+      label: "Log out",
+      onClick: () => {
+        Router.push("/");
+      },
+    },
+  ];
 
   return (
     <AppProvider>
       <Layout style={{ minHeight: "100vh" }}>
-        <Header className="flex items-center">
+        <Header className="flex items-center justify-between">
           <Link href="/dashboard" className="text-white text-2xl font-bold">
             Inquisico
           </Link>
+
+          <Dropdown menu={{ items }}>
+            <a onClick={(e) => e.preventDefault()}>  
+              <UserOutlined className="text-2xl hover:cursor-pointer" />
+            </a>
+          </Dropdown>
         </Header>
         <Layout hasSider>
           {hasSider && <ApplicationSiderMenu />}
