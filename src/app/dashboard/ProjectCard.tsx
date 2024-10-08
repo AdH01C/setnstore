@@ -3,7 +3,7 @@ import { useAtom } from "jotai";
 
 import ApplicationDataService from "@/app/services/ApplicationDataService";
 import { useRouter } from "next/navigation";
-import { Button, Card } from "antd";
+import { Button, Card, Typography } from "antd";
 
 interface ProjectCardProps {
   appId: string;
@@ -43,8 +43,7 @@ export default function ProjectCard({
       hoverable
       style={{width: 300}}
     >
-      <p>{companyName}</p>
-
+      <Typography.Text type="secondary">A sample description</Typography.Text>
       <div className="flex justify-between">
         <Button
           type="primary"
