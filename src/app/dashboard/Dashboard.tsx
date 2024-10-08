@@ -25,7 +25,6 @@ export default function Dashboard() {
   const checkAndSetUser = async () => {
     try {
       const session = await getSession();
-
       if (session?.user?.email) {
         const email = session.user.email;
         const googleId = session.user.sub;
@@ -41,11 +40,7 @@ export default function Dashboard() {
             google_id: googleId,
             password: "",
           };
-          const newCompany = {
-            companyName: email
-          };
           await UserDataService.createUser(newUser);
-          await CompanyDataService.createCompany(googleId, newCompany);
         }
 
         setCookie("username", email, { maxAge: 60 * 30 });
@@ -61,10 +56,10 @@ export default function Dashboard() {
   useEffect(() => {
     // Fetch all applications by company name
     const fetchApplications = async () => {
-      // const company = companyName === "admin" ? "null" : companyName;
+      const company = companyName === "admin" ? "null" : companyName;
 
       try {
-        const company = await checkAndSetUser();
+        await checkAndSetUser();
         const response =
           await ApplicationDataService.getAllApplicationsByCompanyId(companyId);
         setApplications(response.data);
