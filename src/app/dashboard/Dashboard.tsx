@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Loading from "../components/Loading";
 import ApplicationDataService from "../services/ApplicationDataService";
+import UserDataService from "../services/UserDataService";
+import CompanyDataService from "../services/CompanyDataService";
 import ProjectCard from "./ProjectCard";
 import CreateProjectCard from "./CreateProjectCard";
 import { getCookie, setCookie } from "cookies-next";
@@ -19,44 +21,50 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [applications, setApplications] = useState<Application[]>([]);
   const companyName = getCookie("username") as string;
-    // const [companyName, setCompanyName] = useState<string | null>(null);
 
-    // useEffect(() => {
-  //   // Check for existing cookies or fetch session
-  //   const checkAuthAndSetCookie = async () => {
-  //     const existingCookie = getCookie("username");
+  const checkAndSetUser = async () => {
+    try {
+      const session = await getSession();
 
-  //     if (existingCookie) {
-  //       // If cookie already exists, use it
-  //       setCompanyName(existingCookie as string);
-  //     } else {
-  //       // Fetch session (for Google login)
-  //       const session = await getSession();
-  //       if (session?.user?.name) {
-  //         // If logged in via Google, set cookie with session.user.name
-  //         setCookie("username", session.user.name, { maxAge: 60 * 30 });
-  //         setCompanyName(session.user.name);
-  //       } else {
-  //         // Handle credentials login (if applicable)
-  //         // If you had stored username from credentials login elsewhere,
-  //         // you could set it here or redirect to login if no user is found
-  //         // For now, assume no cookie means redirect or handle anonymous session.
-  //         console.error("No user found. Redirecting to login.");
-  //         // Redirect logic here if necessary
-  //       }
-  //     }
-  //   };
+      if (session?.user?.email) {
+        const email = session.user.email;
+        const googleId = session.user.sub;
+        // const accessToken = session.accessToken;
 
-  //   // Call the function to check and set cookies
-  //   checkAuthAndSetCookie();
-  // }, []);
+        const existingUser = await UserDataService.getUserByUsername(email);
+
+        if (!existingUser.data) {
+          const newUser = {
+            username: email,
+            email: email,
+            full_name: session.user.name,
+            google_id: googleId,
+            password: "",
+          };
+          const newCompany = {
+            companyName: email
+          };
+          await UserDataService.createUser(newUser);
+          await CompanyDataService.createCompany(googleId, newCompany);
+        }
+
+        setCookie("username", email, { maxAge: 60 * 30 });
+        return email;
+      } else {
+        console.error("No session or email found. Redirect to login.");
+      }
+    } catch(error) {
+      console.error("Error during user check/creation:", error);
+      throw error;
+    }
+  };
 
   useEffect(() => {
     // Fetch all applications by company name
     const fetchApplications = async () => {
-      const company = companyName === "admin" ? "null" : companyName;
-
+      // const company = companyName === "admin" ? "null" : companyName;
       try {
+        const company = await checkAndSetUser();
         const response =
           await ApplicationDataService.getAllApplicationsByCompanyName(company);
         setApplications(response.data);

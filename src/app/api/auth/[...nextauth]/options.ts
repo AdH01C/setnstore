@@ -77,6 +77,7 @@ export const options: NextAuthOptions = {
         async session({ session, token }) {
             // Send properties to the client
             session.accessToken = token.accessToken;
+            session.user.sub = token.sub;
             console.log('session', session);
             return session;
         },
