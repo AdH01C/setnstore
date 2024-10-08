@@ -1,18 +1,18 @@
 import http from "@/app/http-common";
 
 class RulesetDataService {
-  getRulesetsByAppId(companyName: string, appId: string): Promise<any> {
-    return http.get(`v0/company/${companyName}/applications/${appId}/rulesets`);
+  getRulesetsByAppId(companyId: string, appId: string): Promise<any> {
+    return http.get(`v0/company/${companyId}/applications/${appId}/rulesets`);
   }
 
   async getRulesetByRulesetId(
-    companyName: string,
+    companyId: string,
     appId: string,
     rulesetId: string
   ): Promise<any | null> {
     try {
       const response = await http.get(
-        `/v0/company/${companyName}/applications/${appId}/rulesets/${rulesetId}`
+        `/v0/company/${companyId}/applications/${appId}/rulesets/${rulesetId}`
       );
 
       return response.data; // Return the ruleset data if found
@@ -24,21 +24,21 @@ class RulesetDataService {
     }
   }
 
-  createRuleset(data: any, companyName: string, appId: string): Promise<any> {
+  createRuleset(data: any, companyId: string, appId: string): Promise<any> {
     return http.post(
-      `/v0/company/${companyName}/applications/${appId}/rulesets`,
+      `/v0/company/${companyId}/applications/${appId}/rulesets`,
       data
     );
   }
 
   updateRuleset(
     data: any,
-    companyName: string,
+    companyId: string,
     appId: string,
     rulesetId: string
   ): Promise<any> {
     return http.put(
-      `v0/company/${companyName}/applications/${appId}/rulesets/${rulesetId}`,
+      `v0/company/${companyId}/applications/${appId}/rulesets/${rulesetId}`,
       data
     );
   }
@@ -47,8 +47,24 @@ class RulesetDataService {
     return http.delete(`/rulesets/${appId}`);
   }
 
-  deleteRulesetByRulesetId(rulesetId: string): Promise<any> {
-    return http.delete(`/rulesetByRulesetId/${rulesetId}`);
+  deleteRulesetByRulesetId(
+    companyId: string,
+    appId: string,
+    rulesetId: string
+  ): Promise<any> {
+    return http.delete(
+      `v0/company/${companyId}/applications/${appId}/rulesets/${rulesetId}`
+    );
+  }
+
+  getHostByRulesetId(
+    companyId: string,
+    appId: string,
+    rulesetId: string
+  ): Promise<any> {
+    return http.get(
+      `v0/company/${companyId}/applications/${appId}/rulesets/${rulesetId}/host`
+    );
   }
 }
 

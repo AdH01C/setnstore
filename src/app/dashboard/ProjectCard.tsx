@@ -8,6 +8,7 @@ interface ProjectCardProps {
   appId: string;
   appName: string;
   companyName: string;
+  companyId: string;
   onDelete: (appId: string) => void;
 }
 
@@ -15,6 +16,7 @@ export default function ProjectCard({
   appId,
   appName,
   companyName,
+  companyId,
   onDelete,
 }: ProjectCardProps) {
   const [currentlySelected, setCurrentlySelected] = useAtom(
@@ -27,7 +29,7 @@ export default function ProjectCard({
     e.stopPropagation();
 
     try {
-      await ApplicationDataService.deleteApplication(companyName, appId);
+      await ApplicationDataService.deleteApplication(companyId, appId);
       console.log(`Application with ID ${appId} deleted successfully`);
       onDelete(appId);
     } catch (error) {

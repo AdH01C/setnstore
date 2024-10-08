@@ -16,16 +16,14 @@ interface Application {
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [applications, setApplications] = useState<Application[]>([]);
-  const { companyName } = useAppContext();
+  const { companyName, companyId } = useAppContext();
 
   useEffect(() => {
     // Fetch all applications by company name
     const fetchApplications = async () => {
-      const company = companyName === "admin" ? "null" : companyName;
-
       try {
         const response =
-          await ApplicationDataService.getAllApplicationsByCompanyName(company);
+          await ApplicationDataService.getAllApplicationsByCompanyId(companyId);
         setApplications(response.data);
       } catch (error) {
         console.error("Error fetching applications:", error);
@@ -35,7 +33,7 @@ export default function Dashboard() {
     };
 
     fetchApplications();
-  }, [companyName]);
+  }, [companyId]);
 
   // Function to remove a deleted application from the list
   const handleDelete = (appId: string) => {
@@ -58,7 +56,8 @@ export default function Dashboard() {
               key={application.id} // Ensure each card has a unique key
               appId={application.id}
               appName={application.app_name}
-              companyName={application.company_name}
+              companyName={companyName}
+              companyId={companyId}
               onDelete={handleDelete}
             />
           ))}
