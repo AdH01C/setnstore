@@ -35,7 +35,7 @@ function Authorization({ id, value, updateValue }: AuthorizationProps) {
   return (
     <Collapse className="text-sm">
       <Panel header="Authorization" key="1">
-        <Collapse className="w-full border-none" expandIconPosition="right">
+        <Collapse className="w-full border-none flex flex-col" expandIconPosition="right">
           {Object.entries(value).map(([entity, entityAuthData]) => {
             function handleAuthorizationValueChange(
               newAuth: AuthorizationDefinition

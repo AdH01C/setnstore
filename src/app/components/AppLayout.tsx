@@ -24,7 +24,11 @@ export default function AppLayout({
   return (
     <AppProvider>
       <Layout style={{ minHeight: "100vh" }}>
-        <Header className="flex items-center"></Header>
+        <Header className="flex items-center">
+          <Link href="/dashboard" className="text-white text-2xl font-bold">
+            Inquisico
+          </Link>
+        </Header>
         <Layout hasSider>
           {hasSider && <ApplicationSiderMenu />}
           <Layout>

@@ -3,6 +3,7 @@ import { useAtom } from "jotai";
 
 import ApplicationDataService from "@/app/services/ApplicationDataService";
 import { useRouter } from "next/navigation";
+import { Button, Card } from "antd";
 
 interface ProjectCardProps {
   appId: string;
@@ -36,22 +37,31 @@ export default function ProjectCard({
   };
 
   return (
-    <div
-      className="flex flex-col justify-between bg-secondary rounded-lg p-4 hover:border-4 hover:cursor-pointer transition-transform duration-300 ease-out transform hover:scale-105"
-      onClick={() => router.push(`/applications/${appId}`)}
+    <Card
+      title={appName}
+      bordered={false}
+      hoverable
+      style={{width: 300}}
     >
-      <div className="flex flex-col gap-4">
-        <h1 className="text-white text-2xl font-bold text-center">
-          {companyName}
-        </h1>
-        <h1 className="text-white text-4xl font-bold text-center">{appName}</h1>
+      <p>{companyName}</p>
+
+      <div className="flex justify-between">
+        <Button
+          type="primary"
+          onClick={() => router.push(`/applications/${appId}`)}
+          style={{marginTop: "1rem"}}
+        >
+          View
+        </Button>
+        <Button
+          danger
+          onClick={handleDelete}
+          style={{marginTop: "1rem"}}
+        >
+          Delete
+        </Button>
       </div>
-      <button
-        className="mt-4 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition"
-        onClick={handleDelete}
-      >
-        Delete
-      </button>
-    </div>
+
+    </Card>
   );
 }

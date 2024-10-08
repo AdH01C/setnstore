@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ApplicationDataService from "@/app/services/ApplicationDataService";
 import { set } from "react-hook-form";
 import { getCookie } from "cookies-next";
+import { Button, Card, Input } from "antd";
 
 interface CreateProjectCardProps {
   onCreate: (newApp: any) => void; // The function to call when a new app is created
@@ -34,24 +35,27 @@ export default function CreateProjectCard({
   };
 
   return (
-    <div className="flex flex-col gap-4 bg-gray-800 rounded-lg p-4 hover:border-4 hover:cursor-pointer transition-transform duration-300 ease-out transform hover:scale-105">
-      <h1 className="text-gray-600 text-2xl font-bold">Create New Project</h1>
-      {/* Input for app name */}
-      <input
-        type="text"
+    <Card
+      title="Create New Project"
+      bordered={false}
+      hoverable
+      style={{ width: 300 }}
+    >
+      <Input
         placeholder="App Name"
         value={appName}
         onChange={(e) => setAppName(e.target.value)}
-        className="p-2 rounded bg-gray-700 text-white"
       />
 
-      {/* Button to trigger createApplication */}
-      <button
+      <Button
+        type="primary"
         onClick={handleCreateApplication}
-        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+        style={{ marginTop: "1rem" }}
       >
-        Create Application
-      </button>
-    </div>
+        Create
+      </Button>
+
+    </Card>
   );
+
 }

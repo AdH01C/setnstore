@@ -148,6 +148,7 @@ export const HostPermissionTable = ({
             onChange={(newMethod) => {
               handleMethodChange(record.method, newMethod);
             }}
+            className="w-[104px]"
           >
             {pathProperties.permission &&
               methodOptions(Object.keys(pathProperties.permission))}
@@ -165,6 +166,7 @@ export const HostPermissionTable = ({
             onChange={(selectedPermissionType) => {
               handlePermissionChange(record.method, selectedPermissionType);
             }}
+            className="w-[300px]"
           >
             <Select.Option value="authentication_only">
               Only Authentication
@@ -183,10 +185,10 @@ export const HostPermissionTable = ({
       render: (permission, record) => {
         if (permission && "entity" in permission && "type" in permission) {
           return (
-            <>
+            <div className="flex flex-col w-[128px] gap-2">
               <Select
                 defaultValue={
-                  permission && "entity" in permission ? permission.entity : ""
+                  permission && "entity" in permission ? permission.entity : "Entity"
                 }
                 onChange={(selectedEntity) =>
                   handleEntitySettingsChange(record.method, selectedEntity)
@@ -197,7 +199,7 @@ export const HostPermissionTable = ({
               </Select>
               <Select
                 value={
-                  permission && "type" in permission ? permission.type : ""
+                  permission && "type" in permission ? permission.type : "Permission"
                 }
                 onChange={(selectedType) =>
                   handleTypeSettingsChange(record.method, selectedType)
@@ -206,7 +208,7 @@ export const HostPermissionTable = ({
               >
                 {entityTypeOptions(authData, permission.entity)}
               </Select>
-            </>
+            </div>
           );
         }
       },
