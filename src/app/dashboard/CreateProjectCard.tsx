@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import ApplicationDataService from "@/app/services/ApplicationDataService";
-import { set } from "react-hook-form";
-import { getCookie } from "cookies-next";
+import { useAppContext } from "../components/AppContext";
 
 interface CreateProjectCardProps {
   onCreate: (newApp: any) => void; // The function to call when a new app is created
@@ -10,7 +9,7 @@ interface CreateProjectCardProps {
 export default function CreateProjectCard({
   onCreate,
 }: CreateProjectCardProps) {
-  const companyName = getCookie("username") as string;
+  const { companyName, companyId } = useAppContext();
   const [appName, setAppName] = useState("");
 
   const handleCreateApplication = async () => {
@@ -18,7 +17,7 @@ export default function CreateProjectCard({
       const payload = { app_name: appName };
       const response = await ApplicationDataService.createApplication(
         payload,
-        companyName
+        companyId
       );
       console.log("Application created successfully", response);
       const newApp = {

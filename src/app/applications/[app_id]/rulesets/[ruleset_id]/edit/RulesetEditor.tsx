@@ -16,7 +16,7 @@ interface Ruleset {
 
 export default function RulesetEditor() {
   const router = useRouter();
-  const { appID, companyName, rulesetID } = useAppContext();
+  const { appID, companyId, rulesetID } = useAppContext();
   const [ruleset, setRuleset] = useState<Ruleset>();
 
   const handleFormChange = (data: any) => {
@@ -36,7 +36,7 @@ export default function RulesetEditor() {
       }
 
       const response = await rulesetDataService.getRulesetByRulesetId(
-        companyName,
+        companyId,
         appID,
         rulesetID
       );
@@ -52,7 +52,7 @@ export default function RulesetEditor() {
     };
 
     fetchRuleset();
-  }, [companyName, appID, rulesetID]);
+  }, [companyId, appID, rulesetID]);
 
   const handleSubmit = async () => {
     if (ruleset?.ruleset) {
@@ -62,7 +62,7 @@ export default function RulesetEditor() {
         // Update the existing ruleset
         await RulesetDataService.updateRuleset(
           payload,
-          companyName,
+          companyId,
           appID,
           ruleset.rulesetID
         );

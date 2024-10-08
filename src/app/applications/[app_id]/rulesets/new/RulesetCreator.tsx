@@ -27,7 +27,7 @@ const steps = [
 
 export default function RulesetCreator() {
   const router = useRouter();
-  const { appID, companyName } = useAppContext();
+  const { appID, companyId } = useAppContext();
   const [current, setCurrent] = useState(0);
   const [formData, setFormData] = useState<any>(initialFormData);
   const [host, setHost] = useState("");
@@ -55,7 +55,7 @@ export default function RulesetCreator() {
       // Update the existing ruleset
       const newRuleset = await RulesetDataService.createRuleset(
         payload,
-        companyName,
+        companyId,
         appID
       );
 
