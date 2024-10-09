@@ -12,8 +12,8 @@ export default async function Page() {
   }
 
   return (
-      <AppLayout>
-        <Dashboard />
-      </AppLayout>
+    <AppLayout>
+      <Dashboard />
+    </AppLayout>
   );
 }

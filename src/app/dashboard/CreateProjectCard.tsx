@@ -53,8 +53,6 @@ export default function CreateProjectCard({
       >
         Create
       </Button>
-
     </Card>
   );
-
 }

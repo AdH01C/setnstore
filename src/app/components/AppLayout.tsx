@@ -1,19 +1,15 @@
 "use client";
 
-import { Breadcrumb, Dropdown, Layout, MenuProps, Space } from "antd";
+import { signOut } from "next-auth/react";
+import { Breadcrumb, Dropdown, Layout, MenuProps } from "antd";
 import { Header, Footer, Content } from "antd/es/layout/layout";
 import ApplicationSiderMenu from "./ApplicationSiderMenu";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
 import { UserOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import { cookies } from "next/headers";
 import { AppProvider } from "../components/AppContext";
-import userDataService from "../services/UserDataService";
-import companyDataService from "../services/CompanyDataService";
-import { getSession } from "next-auth/react";
-import { redirect } from "next/navigation";
 
 export default function AppLayout({
   children,
@@ -29,7 +25,6 @@ export default function AppLayout({
   const pathname = usePathname();
   const Router = useRouter();
 
-  
   const items: MenuProps["items"] = [
     {
       key: "1",
@@ -50,82 +45,13 @@ export default function AppLayout({
       danger: true,
       label: "Log out",
       onClick: () => {
-        Router.push("/");
+        signOut({ callbackUrl: "/" });
       },
     },
   ];
 
-  const [companyId, setCompanyId] = useState<string>("");
-  const [companyName, setCompanyName] = useState<string>("");
-
-  useEffect(() => {
-    const checkAndSetUser = async () => {
-      const session = await getSession();
-      try {
-        if (session?.user?.email) {
-          const email = session.user.email;
-          const googleId = session.user.sub;
-
-          // Try fetching the existing user
-          let existingUser;
-          try {
-            existingUser = await userDataService.getUserByUsername(email);
-          } catch (error: any) {
-            // Check if the error is a 404 (user not found)
-            if (error.response && error.response.status === 404) {
-              // No existing user, proceed to create one
-              const newUser = {
-                username: email,
-                email: email,
-                full_name: session.user.name,
-                google_id: googleId,
-                password: "password",
-              };
-              const userResponse = await userDataService.createUser(newUser);
-              console.log(userResponse);
-
-              // Create a company for the new user
-              const companyData = {
-                company_name: session.user.name + "'s company",
-              };
-              const companyResponse = await companyDataService.createCompany(
-                userResponse.data.id,
-                companyData
-              );
-              console.log(companyResponse);
-
-              // Store company details in state
-              setCompanyId(companyResponse.data.id);
-              setCompanyName(companyResponse.data.company_name);
-            } else {
-              // If the error is not 404, rethrow it to be caught by the outer catch
-              throw error;
-            }
-          }
-
-          // If user exists, get company information
-          if (existingUser?.data) {
-            const companyResponse = await userDataService.getCompanyByUserId(
-              existingUser.data.id
-            );
-            setCompanyId(companyResponse.data.id);
-            setCompanyName(companyResponse.data.company_name);
-          }
-        } else {
-          console.error("No session or email found. Redirect to login.");
-          redirect("/");
-        }
-      } catch (error) {
-        console.error("Error during user check/creation:", error);
-        throw error;
-      }
-    };
-
-    checkAndSetUser();
-  }, [companyId, companyName]);
-
   return (
-    <AppProvider companyId={companyId} companyName={companyName}>
+    <AppProvider>
       <Layout style={{ minHeight: "100vh" }}>
         <Header className="flex items-center justify-between">
           <Link href="/dashboard" className="text-white text-2xl font-bold">
@@ -133,7 +59,7 @@ export default function AppLayout({
           </Link>
 
           <Dropdown menu={{ items }}>
-            <a onClick={(e) => e.preventDefault()}>  
+            <a onClick={(e) => e.preventDefault()}>
               <UserOutlined className="text-2xl hover:cursor-pointer" />
             </a>
           </Dropdown>

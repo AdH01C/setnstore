@@ -74,6 +74,22 @@ export default function ApplicationTable({
       console.log(
         `Ruleset with ID ${rulesetID} in application ${application.appID} deleted successfully`
       );
+
+      // Update the tableData to remove the deleted ruleset
+      setTableData((prevTableData) => {
+        return prevTableData.map((app) => {
+          if (app.appID === application.appID) {
+            return {
+              ...app,
+              rulesets: app.rulesets.filter(
+                (ruleset) => ruleset.rulesetID !== rulesetID
+              ),
+              rulesetCount: app.rulesetCount - 1, // Decrease the ruleset count
+            };
+          }
+          return app;
+        });
+      });
     } catch (error) {
       console.error("Error deleting application:", error);
     }
@@ -170,14 +186,12 @@ export default function ApplicationTable({
                 application.appID,
                 rulesetID
               );
-            // const hostResponse = await rulesetDataService.getHostByRulesetId(
-            //   companyId,
-            //   application.appID,
-            //   rulesetID
-            // );
-            const hostResponse =
-              "to implement getHostByRulesetID eg. www.host.com";
-            return { ...rulesetResponse, host: hostResponse };
+            const hostResponse = await rulesetDataService.getHostByRulesetId(
+              companyId,
+              application.appID,
+              rulesetID
+            );
+            return { ...rulesetResponse, host: hostResponse.data.host };
           })
         );
 

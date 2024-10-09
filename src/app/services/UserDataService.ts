@@ -2,7 +2,7 @@ import http from "@/app/http-common";
 
 class UserDataService {
   getUserByUsername(username: string): Promise<any> {
-    return http.get(`/v0/user/${username}`);
+    return http.get(`/v0/user/name/${username}`);
   }
 
   getCompanyByUserId(username: string): Promise<any> {

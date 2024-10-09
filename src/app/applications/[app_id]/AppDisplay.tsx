@@ -13,7 +13,7 @@ interface Application {
 export default function AppDisplay() {
   const { appID, companyId } = useAppContext();
   const [application, setApplication] = useState<Application>();
-
+  
   useEffect(() => {
     const fetchApplications = async () => {
       const response = await applicationDataService.getApplicationByAppId(

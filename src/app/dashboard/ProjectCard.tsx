@@ -42,34 +42,25 @@ export default function ProjectCard({
         }
       },
     });
-
   };
 
   return (
-    <Card
-      title={appName}
-      bordered={false}
-      hoverable
-      style={{width: 300}}
-    >
+    <Card title={appName} bordered={false} hoverable style={{ width: 300 }}>
       <Typography.Text type="secondary">A sample description</Typography.Text>
       <div className="flex justify-between">
         <Button
           type="primary"
-          onClick={() => router.push(`/applications/${appId}`)}
-          style={{marginTop: "1rem"}}
+          onClick={() => {
+            router.push(`/applications/${appId}`);
+          }}
+          style={{ marginTop: "1rem" }}
         >
           View
         </Button>
-        <Button
-          danger
-          onClick={handleDelete}
-          style={{marginTop: "1rem"}}
-        >
+        <Button danger onClick={handleDelete} style={{ marginTop: "1rem" }}>
           Delete
         </Button>
       </div>
-
     </Card>
   );
 }
