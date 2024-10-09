@@ -9,6 +9,7 @@ interface ProjectCardProps {
   appId: string;
   appName: string;
   companyName: string;
+  companyId: string;
   onDelete: (appId: string) => void;
 }
 
@@ -16,6 +17,7 @@ export default function ProjectCard({
   appId,
   appName,
   companyName,
+  companyId,
   onDelete,
 }: ProjectCardProps) {
   const [currentlySelected, setCurrentlySelected] = useAtom(
@@ -32,7 +34,7 @@ export default function ProjectCard({
       content: "Are you sure you want to delete this application?",
       onOk: async () => {
         try {
-          await ApplicationDataService.deleteApplication(companyName, appId);
+          await ApplicationDataService.deleteApplication(companyId, appId);
           console.log(`Application with ID ${appId} deleted successfully`);
           onDelete(appId);
         } catch (error) {
@@ -40,34 +42,25 @@ export default function ProjectCard({
         }
       },
     });
-
   };
 
   return (
-    <Card
-      title={appName}
-      bordered={false}
-      hoverable
-      style={{width: 300}}
-    >
+    <Card title={appName} bordered={false} hoverable style={{ width: 300 }}>
       <Typography.Text type="secondary">A sample description</Typography.Text>
       <div className="flex justify-between">
         <Button
           type="primary"
-          onClick={() => router.push(`/applications/${appId}`)}
-          style={{marginTop: "1rem"}}
+          onClick={() => {
+            router.push(`/applications/${appId}`);
+          }}
+          style={{ marginTop: "1rem" }}
         >
           View
         </Button>
-        <Button
-          danger
-          onClick={handleDelete}
-          style={{marginTop: "1rem"}}
-        >
+        <Button danger onClick={handleDelete} style={{ marginTop: "1rem" }}>
           Delete
         </Button>
       </div>
-
     </Card>
   );
 }

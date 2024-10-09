@@ -8,33 +8,33 @@ interface Application {
   appID: string;
   applicationName: string;
   dateCreated: Date;
-  companyName: string;
+  companyId: string;
 }
 export default function AppDisplay() {
-  const { appID, companyName } = useAppContext();
+  const { appID, companyId } = useAppContext();
   const [application, setApplication] = useState<Application>();
-
+  
   useEffect(() => {
     const fetchApplications = async () => {
       const response = await applicationDataService.getApplicationByAppId(
-        companyName,
+        companyId,
         appID
       );
       const application: Application = {
         appID: appID,
         applicationName: response.data.app_name,
-        companyName: response.data.company_name,
+        companyId: response.data.company_id,
         dateCreated: response.data.created_datetime,
       };
       setApplication(application);
     };
     fetchApplications();
-  }, [companyName, appID]);
+  }, [companyId, appID]);
 
   return (
     <>
       {application && (
-        <ApplicationTable company={companyName} application={application} />
+        <ApplicationTable companyId={companyId} application={application} />
       )}
     </>
   );

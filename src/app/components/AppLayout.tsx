@@ -1,15 +1,15 @@
 "use client";
 
-import { Breadcrumb, Dropdown, Layout, MenuProps, Space } from "antd";
+import { signOut } from "next-auth/react";
+import { Breadcrumb, Dropdown, Layout, MenuProps } from "antd";
 import { Header, Footer, Content } from "antd/es/layout/layout";
 import ApplicationSiderMenu from "./ApplicationSiderMenu";
 import { usePathname } from "next/navigation";
-import { AppProvider } from "./AppContext";
 import Link from "next/link";
 import { ReactNode } from "react";
 import { UserOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import { cookies } from "next/headers";
+import { AppProvider } from "../components/AppContext";
 
 export default function AppLayout({
   children,
@@ -25,7 +25,6 @@ export default function AppLayout({
   const pathname = usePathname();
   const Router = useRouter();
 
-  
   const items: MenuProps["items"] = [
     {
       key: "1",
@@ -46,7 +45,7 @@ export default function AppLayout({
       danger: true,
       label: "Log out",
       onClick: () => {
-        Router.push("/");
+        signOut({ callbackUrl: "/" });
       },
     },
   ];
@@ -60,7 +59,7 @@ export default function AppLayout({
           </Link>
 
           <Dropdown menu={{ items }}>
-            <a onClick={(e) => e.preventDefault()}>  
+            <a onClick={(e) => e.preventDefault()}>
               <UserOutlined className="text-2xl hover:cursor-pointer" />
             </a>
           </Dropdown>

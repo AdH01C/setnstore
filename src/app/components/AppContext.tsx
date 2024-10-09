@@ -1,10 +1,19 @@
-import { getCookie } from "cookies-next";
+import {
+  createContext,
+  useContext,
+  useState,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+} from "react";
 import { useParams } from "next/navigation";
-import React, { createContext, useContext } from "react";
 
 interface AppContextType {
   appID: string;
   companyName: string;
+  setCompanyName: Dispatch<SetStateAction<string>>;
+  companyId: string;
+  setCompanyId: Dispatch<SetStateAction<string>>;
   rulesetID?: string;
 }
 
@@ -22,18 +31,48 @@ export const useAppContext = () => {
 export const AppProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
-  const companyName = getCookie("username") as string;
-
   const { app_id, ruleset_id } = useParams<{
     app_id: string;
     ruleset_id?: string;
   }>();
 
-  return (
-    <AppContext.Provider
-      value={{ appID: app_id, companyName, rulesetID: ruleset_id }}
-    >
-      {children}
-    </AppContext.Provider>
-  );
+  // Load initial values from local storage
+  const [companyId, setCompanyId] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("companyId") || "";
+    }
+    return "";
+  });
+
+  const [companyName, setCompanyName] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("companyName") || "";
+    }
+    return "";
+  });
+
+  // Save values to local storage whenever they change
+  useEffect(() => {
+    if (companyId) {
+      localStorage.setItem("companyId", companyId);
+    }
+  }, [companyId]);
+
+  useEffect(() => {
+    if (companyName) {
+      localStorage.setItem("companyName", companyName);
+    }
+  }, [companyName]);
+
+  // Values provided by the context
+  const value = {
+    companyId,
+    setCompanyId,
+    companyName,
+    setCompanyName,
+    appID: app_id,
+    rulesetID: ruleset_id,
+  };
+
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

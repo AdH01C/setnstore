@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -14,7 +14,7 @@ interface Ruleset {
 
 export default function RulesetDisplay() {
   const router = useRouter();
-  const { appID, companyName, rulesetID } = useAppContext();
+  const { appID, companyId, rulesetID } = useAppContext();
   const [ruleset, setRuleset] = useState<Ruleset>();
 
   const handleRulesetDelete = async (
@@ -25,14 +25,15 @@ export default function RulesetDisplay() {
     e.stopPropagation();
 
     try {
-      // await rulesetDataService.deleteRulesetByRulesetId(
-      //   company,
-      //   appID,
-      //   rulesetID
-      // );
+      await rulesetDataService.deleteRulesetByRulesetId(
+        companyId,
+        appID,
+        rulesetID
+      );
       console.log(
         `Ruleset with ID ${rulesetID} in application ${appID} deleted successfully`
       );
+      router.push(`/applications/${appID}`);
     } catch (error) {
       console.error("Error deleting application:", error);
     }
@@ -45,7 +46,7 @@ export default function RulesetDisplay() {
       }
 
       const response = await rulesetDataService.getRulesetByRulesetId(
-        companyName,
+        companyId,
         appID,
         rulesetID
       );
@@ -61,7 +62,7 @@ export default function RulesetDisplay() {
     };
 
     fetchRuleset();
-  }, [companyName, appID, rulesetID]);
+  }, [companyId, appID, rulesetID]);
 
   return (
     <>

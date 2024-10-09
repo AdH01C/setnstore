@@ -1,20 +1,31 @@
 "use client";
 
-import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import { LockOutlined, UserOutlined, GoogleOutlined } from "@ant-design/icons";
 import { Form, Flex, Checkbox, Button, Input } from "antd";
 import { useRouter } from "next/navigation";
+import { getSession, signIn } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Loading from "@/app/components/Loading";
-import { setCookie } from "cookies-next";
 
 export default function LoginForm() {
   const router = useRouter();
 
-  const onLogin = (values: any) => {
-    console.log("Received values of form: ", values);
-    // expire in 30 minutes
-    setCookie("username", values.username, { maxAge: 60 * 30 * 60 });
-    router.push("/dashboard");
+  const onLogin = async (values: any) => {
+    const result = await signIn("credentials", {
+      redirect: false, // Prevent automatic redirection
+      username: values.username,
+      password: values.password,
+    });
+
+    if (result?.error) {
+      console.error("Login error:", result.error);
+    } else {
+      router.push("/dashboard");
+    }
+  };
+
+  const onGoogleLogin = async () => {
+    signIn("google", { callbackUrl: "/dashboard" });
   };
 
   const [isLoading, setIsLoading] = useState(true);
@@ -83,6 +94,22 @@ export default function LoginForm() {
                 className="bg-secondary"
               >
                 Log in
+              </Button>
+            </Form.Item>
+
+            <Form.Item>
+              <Button
+                block
+                icon={<GoogleOutlined />}
+                type="primary"
+                style={{
+                  backgroundColor: "#fa3452",
+                  borderColor: "#fa3452",
+                  color: "white",
+                }}
+                onClick={onGoogleLogin}
+              >
+                Log in with Google
               </Button>
             </Form.Item>
           </Form>

@@ -16,7 +16,7 @@ interface Application {
   appID: string;
   applicationName: string;
   dateCreated: Date;
-  companyName: string;
+  companyId: string;
 }
 
 interface ApplicationWithRulesets extends Application {
@@ -31,10 +31,10 @@ interface Ruleset {
 }
 
 export default function ApplicationTable({
-  company,
+  companyId,
   application,
 }: {
-  company: string;
+  companyId: string;
   application: Application;
 }) {
   const [tableData, setTableData] = useState<ApplicationWithRulesets[]>([]);
@@ -46,12 +46,13 @@ export default function ApplicationTable({
 
     try {
       await ApplicationDataService.deleteApplication(
-        company,
+        companyId,
         application.appID
       );
       console.log(
         `Application with ID ${application.appID} deleted successfully`
       );
+      router.push(`/dashboard`);
     } catch (error) {
       console.error("Error deleting application:", error);
     }
@@ -65,14 +66,30 @@ export default function ApplicationTable({
     e.stopPropagation();
 
     try {
-      // await rulesetDataService.deleteRulesetByRulesetId(
-      //   company,
-      //   appID,
-      //   rulesetID
-      // );
+      await rulesetDataService.deleteRulesetByRulesetId(
+        companyId,
+        application.appID,
+        rulesetID
+      );
       console.log(
         `Ruleset with ID ${rulesetID} in application ${application.appID} deleted successfully`
       );
+
+      // Update the tableData to remove the deleted ruleset
+      setTableData((prevTableData) => {
+        return prevTableData.map((app) => {
+          if (app.appID === application.appID) {
+            return {
+              ...app,
+              rulesets: app.rulesets.filter(
+                (ruleset) => ruleset.rulesetID !== rulesetID
+              ),
+              rulesetCount: app.rulesetCount - 1, // Decrease the ruleset count
+            };
+          }
+          return app;
+        });
+      });
     } catch (error) {
       console.error("Error deleting application:", error);
     }
@@ -158,18 +175,23 @@ export default function ApplicationTable({
     const fetchApplications = async () => {
       try {
         const rulesetsID = await rulesetDataService.getRulesetsByAppId(
-          company,
+          companyId,
           application.appID
         );
         const rulesetsData = await Promise.all(
           rulesetsID.data.map(async (rulesetID: string) => {
             const rulesetResponse =
               await rulesetDataService.getRulesetByRulesetId(
-                company,
+                companyId,
                 application.appID,
                 rulesetID
               );
-            return rulesetResponse;
+            const hostResponse = await rulesetDataService.getHostByRulesetId(
+              companyId,
+              application.appID,
+              rulesetID
+            );
+            return { ...rulesetResponse, host: hostResponse.data.host };
           })
         );
 
@@ -179,7 +201,7 @@ export default function ApplicationTable({
           rulesets: rulesetsData.map((ruleset) => {
             return {
               rulesetID: ruleset.id,
-              host: "to implement getHostByRulesetID eg. www.host.com",
+              host: ruleset.host,
               dateLastModified: ruleset.last_modified_datetime,
             };
           }),
@@ -191,7 +213,7 @@ export default function ApplicationTable({
     };
 
     fetchApplications();
-  }, [company, application]);
+  }, [companyId, application]);
 
   const expandedRowRender = (row: any) => {
     return (

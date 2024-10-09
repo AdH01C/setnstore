@@ -11,16 +11,16 @@ import { useAppContext } from "./AppContext";
 
 export default function ApplicationSiderMenu() {
   const router = useRouter();
-  const { appID, companyName, rulesetID } = useAppContext();
+  const { appID, companyId, rulesetID } = useAppContext();
   const [items, setItems] = useState<MenuItem[]>([]);
 
   useEffect(() => {
     const fetchMenuItems = async () => {
       try {
         const applications =
-          await applicationDataService.getAllApplicationsByCompanyName(companyName);
+          await applicationDataService.getAllApplicationsByCompanyId(companyId);
         const rulesetsID = await RulesetDataService.getRulesetsByAppId(
-          companyName,
+          companyId,
           appID
         );
 
@@ -67,7 +67,7 @@ export default function ApplicationSiderMenu() {
     };
 
     fetchMenuItems();
-  }, [companyName, appID, router]);
+  }, [companyId, appID, router]);
 
   return (
     <Sider width={220}>
