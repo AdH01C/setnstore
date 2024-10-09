@@ -46,7 +46,7 @@ export default function LoginForm() {
         <Loading />
       ) : (
         <>
-          <h1 className="text-[50px] font-bold text-primary">Inquisito</h1>
+          <h1 className="text-[50px] font-bold text-primary">Inquisico</h1>
           <Form
             name="login"
             initialValues={{ remember: true }}

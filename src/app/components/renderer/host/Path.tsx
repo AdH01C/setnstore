@@ -47,7 +47,7 @@ export const Path: React.FC<PathProps> = ({
   }
 
   return (
-    <Collapse className="text-sm">
+    <Collapse className="text-sm w-[768px]">
       <Collapse.Panel
         header={
           <>
@@ -61,8 +61,9 @@ export const Path: React.FC<PathProps> = ({
           </>
         }
         key={absolutePath}
+        className="w-full"
       >
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col">
           <Typography>{absolutePath}</Typography>
           <Form.Item label="Route: ">
             <Input

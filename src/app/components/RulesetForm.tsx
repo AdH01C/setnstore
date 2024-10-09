@@ -31,10 +31,10 @@ export default function RulesetForm({
   const renderers = [
     ...vanillaRenderers,
     //register custom renderers
-    { tester: metaDataControlTester, renderer: MetaDataControl },
     { tester: authorizationControlTester, renderer: authorizationControl },
     { tester: hostControlTester, renderer: hostControl },
     { tester: allowedOriginsTester, renderer: allowedOriginsControl },
+    { tester: metaDataControlTester, renderer: MetaDataControl },
   ];
 
   const [textAreaValue, setTextAreaValue] = useState<string>("");
