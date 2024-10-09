@@ -1,8 +1,7 @@
-import type { NextAuthOptions } from "next-auth";
+import type { NextAuthOptions, Session } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import bcrypt from "bcryptjs";
-import UserDataService from "@/app/services/UserDataService";
+
 
 export const options: NextAuthOptions = {
   providers: [
@@ -23,33 +22,6 @@ export const options: NextAuthOptions = {
         },
       },
       async authorize(credentials, req) {
-        // try {
-        //     const res = await UserDataService.getUserByUsername(credentials?.username);
-
-        //     const user = await res.json();
-
-        //     if (!res.ok || !user) {
-        //         return null;
-        //     }
-
-        //     const hashedPassword = user.Password;
-
-        //     const isPasswordValid = await bcrypt.compare(credentials?.password, hashedPassword);
-
-        //     if (isPasswordValid) {
-        //         return {
-        //             id: user.id,
-        //             name: user.username
-        //         };
-        //     } else {
-        //         return null;
-        //     }
-        // } catch (error) {
-        //     console.error("Error authorizing user:", error);
-        //     return null;
-        // }
-
-        //dummy user
         const user = { username: "test", password: "test" };
 
         if (
@@ -57,6 +29,7 @@ export const options: NextAuthOptions = {
           credentials?.password === user.password
         ) {
           return {
+            id: "1", // Dummy id
             name: credentials?.username,
           };
         } else {
@@ -70,20 +43,19 @@ export const options: NextAuthOptions = {
   },
   callbacks: {
     async jwt({ token, account }) {
-      // Persist the OAuth access_token and token for the session
       if (account) {
         token.accessToken = account.access_token;
       }
       return token;
     },
     async session({ session, token }) {
-      // Send properties to the client
-      session.accessToken = token.accessToken;
-      session.user.sub = token.sub;
+      // Check if session.user exists
+      if (session.user) {
+        session.accessToken = token.accessToken;
+        session.user.sub = token.sub;
+      }
       return session;
-    },
+    }    
   },
-  // pages: {
-  //     signIn: 'auth/login'
-  // },
 };
+
