@@ -22,7 +22,7 @@ interface AuthorizationPermissions {
 
 type AuthorizationType = AuthorizationOperations | AuthorizationRule
 
-type AuthorizationOperationType = "noop" | "union" | "intersect" | "except";
+type AuthorizationOperationType = "union" | "intersect" | "except";
 
 interface AuthorizationOperations {
   type: AuthorizationOperationType;

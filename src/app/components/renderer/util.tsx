@@ -98,8 +98,7 @@ export function getAuthorizationTypeObject(
   if (
     typeString === "union" ||
     typeString === "intersect" ||
-    typeString === "except" ||
-    typeString === "noop"
+    typeString === "except"
   ) {
     return {
       type: typeString,
