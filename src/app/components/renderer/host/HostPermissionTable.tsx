@@ -25,6 +25,12 @@ export const HostPermissionTable = ({
   ancestorEntities: string[];
 }) => {
   const [[path, pathProperties]] = Object.entries(pathData);
+  const connectedEntities = [
+    ...ancestorEntities,
+    ...(pathProperties && (pathProperties as EntityPathSettings).entity
+      ? [(pathProperties as EntityPathSettings).entity]
+      : []),
+  ];
 
   function handleDeletePermission(method: string) {
     Modal.confirm({
@@ -172,7 +178,10 @@ export const HostPermissionTable = ({
               Only Authentication
             </Select.Option>
             <Select.Option value="public_access">Public Access</Select.Option>
-            <Select.Option value="authentication_and_authorization">
+            <Select.Option
+              disabled={connectedEntities.length === 0}
+              value="authentication_and_authorization"
+            >
               Both Authentication and Authorization
             </Select.Option>
           </Select>
@@ -197,13 +206,7 @@ export const HostPermissionTable = ({
                 }
                 placeholder="Entity"
               >
-                {relationOptions([
-                  ...ancestorEntities,
-                  ...(pathProperties &&
-                  (pathProperties as EntityPathSettings).entity
-                    ? [(pathProperties as EntityPathSettings).entity]
-                    : []),
-                ])}
+                {relationOptions(connectedEntities)}
               </Select>
               <Select
                 value={
