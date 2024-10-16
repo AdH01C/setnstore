@@ -116,7 +116,7 @@ export default function Dashboard() {
 
   // Function to add a new application to the list
   const handleCreate = (newApp: Application) => {
-    setApplications((prevApps) => [...prevApps, newApp]); // Append the new application
+    setApplications((prevApps = []) => [...prevApps, newApp]); // Append the new application
   };
 
   return (
@@ -125,16 +125,17 @@ export default function Dashboard() {
         <Loading />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-3/4">
-          {applications.map((application) => (
-            <ProjectCard
-              key={application.id} // Ensure each card has a unique key
-              appId={application.id}
-              appName={application.app_name}
-              companyName={companyName}
-              companyId={companyId}
-              onDelete={handleDelete}
-            />
-          ))}
+          {applications &&
+            applications.map((application) => (
+              <ProjectCard
+                key={application.id} // Ensure each card has a unique key
+                appId={application.id}
+                appName={application.app_name}
+                companyName={companyName}
+                companyId={companyId}
+                onDelete={handleDelete}
+              />
+            ))}
 
           <CreateProjectCard onCreate={handleCreate} />
         </div>

@@ -23,7 +23,6 @@ export default function AppLayout({
   hasBreadcrumb?: boolean;
 }) {
   const pathname = usePathname();
-  const Router = useRouter();
 
   const items: MenuProps["items"] = [
     {

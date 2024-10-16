@@ -34,7 +34,7 @@ export default function Step2({
             next();
           }}
         >
-          Save Changes
+          Next
         </Button>
       </div>
     </>
