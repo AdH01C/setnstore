@@ -1,7 +1,6 @@
 import { Form, Select } from "antd";
 import { useState } from "react";
 import { relationOptions } from "../util";
-const { Option } = Select;
 
 export const EntitySettingsForm = ({
   pathData,
@@ -96,9 +95,9 @@ export const EntitySettingsForm = ({
               onChange={handleRelationTypeChange}
               placeholder="Relation Type"
             >
-              <Option value={"Default"}>Default</Option>
-              <Option value={"No Relation"}>No Relation</Option>
-              <Option value={"Custom"}>Custom</Option>
+              <Select.Option value={"Default"}>Default</Select.Option>
+              <Select.Option value={"No Relation"}>No Relation</Select.Option>
+              <Select.Option value={"Custom"}>Custom</Select.Option>
             </Select>
             {toggleCustomRelation && (
               <Select

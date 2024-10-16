@@ -1,12 +1,10 @@
 import { Select } from "antd";
 
-const { Option } = Select;
-
 export function relationOptions(relations: string[]) {
   return relations.map((relation: string, index: number) => (
-    <Option key={relation + index} value={relation}>
+    <Select.Option key={relation + index} value={relation}>
       {relation}
-    </Option>
+    </Select.Option>
   ));
 }
 
@@ -32,9 +30,9 @@ export function entityTypeOptions(
     if (authProperties.permissions && entityKey === entity) {
       result.push(
         ...Object.keys(authProperties.permissions).map((type) => (
-          <Option key={`${entity}_${type}`} value={type}>
+          <Select.Option key={`${entity}_${type}`} value={type}>
             {type}
-          </Option>
+          </Select.Option>
         ))
       );
     }
@@ -42,9 +40,9 @@ export function entityTypeOptions(
     if (authProperties.relations && entityKey === entity) {
       result.push(
         ...Object.keys(authProperties.relations).map((type) => (
-          <Option key={`${entity}_${type}`} value={type}>
+          <Select.Option key={`${entity}_${type}`} value={type}>
             {type}
-          </Option>
+          </Select.Option>
         ))
       );
     }
