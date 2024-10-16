@@ -27,15 +27,29 @@ export function entityTypeOptions(
   entity: string
 ) {
   return Object.entries(authData).map(([entityKey, authProperties]) => {
+    const result = [];
+
     if (authProperties.permissions && entityKey === entity) {
-      return Object.keys(authProperties.permissions).map((type) => {
-        return (
+      result.push(
+        ...Object.keys(authProperties.permissions).map((type) => (
           <Option key={`${entity}_${type}`} value={type}>
             {type}
           </Option>
-        );
-      });
+        ))
+      );
     }
+
+    if (authProperties.relations && entityKey === entity) {
+      result.push(
+        ...Object.keys(authProperties.relations).map((type) => (
+          <Option key={`${entity}_${type}`} value={type}>
+            {type}
+          </Option>
+        ))
+      );
+    }
+
+    return result;
   });
 }
 
