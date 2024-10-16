@@ -1,8 +1,8 @@
 // JSON Forms
 export const initialFormData = {
   metadata: {
-    trailingSlashMode: "strict",
-    redirectSlashes: "",
+    trailingSlashMode: "fallback",
+    redirectSlashes: "strip",
     caseSensitive: true,
     entityValueCase: "none",
     optionsPassthrough: true,
