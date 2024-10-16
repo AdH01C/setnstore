@@ -7,17 +7,22 @@ export const EntitySettingsForm = ({
   pathData,
   updateValue,
   relations,
-  ancestorEntities
+  ancestorEntities,
 }: {
   pathData: PathValue;
   updateValue: (newValue: PathValue) => void;
   relations: string[];
   ancestorEntities: string[];
 }) => {
-  const [toggleCustomRelation, setToggleCustomRelation] =
-    useState<boolean>(false);
-
   const [[path, untypedProperties]] = Object.entries(pathData);
+  const pathProperties = untypedProperties as EntityPathSettings;
+
+  const relationType = getRelationTypeValue(pathProperties);
+  const relationValue = getRelationValue(pathProperties);
+
+  const [toggleCustomRelation, setToggleCustomRelation] = useState<boolean>(
+    relationType === "Custom" ? true : false
+  );
 
   function handleEntityChange(entity: string) {
     const newValue = { ...pathProperties } as EntityPathSettings;
@@ -72,8 +77,6 @@ export const EntitySettingsForm = ({
     updateValue({ [path]: newValue });
   }
 
-  const pathProperties = untypedProperties as EntityPathSettings;
-
   return (
     <>
       {pathProperties && (
@@ -89,7 +92,7 @@ export const EntitySettingsForm = ({
           </Form.Item>
           <Form.Item label="Relations: ">
             <Select
-              defaultValue={getRelationTypeValue(pathProperties)}
+              defaultValue={relationType}
               onChange={handleRelationTypeChange}
               placeholder="Relation Type"
             >
@@ -100,7 +103,7 @@ export const EntitySettingsForm = ({
             {toggleCustomRelation && (
               <Select
                 mode="multiple"
-                defaultValue={getRelationValue(pathProperties)}
+                defaultValue={relationValue}
                 onChange={handleRelationChange}
                 placeholder="Select relations"
               >
