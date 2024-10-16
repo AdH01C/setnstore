@@ -20,11 +20,9 @@ import { Flex, Splitter } from "antd";
 import { EditorView } from "@codemirror/view";
 
 export default function RulesetForm({
-  host,
   formData,
   onFormChange,
 }: {
-  host?: string;
   formData: any;
   onFormChange: (data: any) => void;
 }) {
