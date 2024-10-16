@@ -80,6 +80,7 @@ export const Path: React.FC<PathProps> = ({
               pathData={pathData}
               updateValue={updateValue}
               relations={Object.keys(authData || {})}
+              ancestorEntities={ancestorEntities}
             />
           )}
           <HostPermissionTable

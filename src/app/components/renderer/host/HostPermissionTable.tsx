@@ -188,18 +188,28 @@ export const HostPermissionTable = ({
             <div className="flex flex-col w-[128px] gap-2">
               <Select
                 defaultValue={
-                  permission && "entity" in permission ? permission.entity : "Entity"
+                  permission && "entity" in permission
+                    ? permission.entity
+                    : "Entity"
                 }
                 onChange={(selectedEntity) =>
                   handleEntitySettingsChange(record.method, selectedEntity)
                 }
                 placeholder="Entity"
               >
-                {relationOptions(ancestorEntities)}
+                {relationOptions([
+                  ...ancestorEntities,
+                  ...(pathProperties &&
+                  (pathProperties as EntityPathSettings).entity
+                    ? [(pathProperties as EntityPathSettings).entity]
+                    : []),
+                ])}
               </Select>
               <Select
                 value={
-                  permission && "type" in permission ? permission.type : "Permission"
+                  permission && "type" in permission
+                    ? permission.type
+                    : "Permission"
                 }
                 onChange={(selectedType) =>
                   handleTypeSettingsChange(record.method, selectedType)

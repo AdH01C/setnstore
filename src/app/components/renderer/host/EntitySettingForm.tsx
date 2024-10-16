@@ -7,10 +7,12 @@ export const EntitySettingsForm = ({
   pathData,
   updateValue,
   relations,
+  ancestorEntities
 }: {
   pathData: PathValue;
   updateValue: (newValue: PathValue) => void;
   relations: string[];
+  ancestorEntities: string[];
 }) => {
   const [toggleCustomRelation, setToggleCustomRelation] =
     useState<boolean>(false);
@@ -102,7 +104,7 @@ export const EntitySettingsForm = ({
                 onChange={handleRelationChange}
                 placeholder="Select relations"
               >
-                {relationOptions(relations)}
+                {relationOptions(ancestorEntities)}
               </Select>
             )}
           </Form.Item>
