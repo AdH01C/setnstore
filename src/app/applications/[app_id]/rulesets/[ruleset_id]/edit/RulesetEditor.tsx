@@ -6,6 +6,7 @@ import rulesetDataService from "@/app/services/RulesetDataService";
 import RulesetForm from "../../../../../components/RulesetForm";
 import RulesetDataService from "@/app/services/RulesetDataService";
 import { useAppContext } from "@/app/components/AppContext";
+import { Button } from "antd";
 
 interface Ruleset {
   rulesetID: string;
@@ -81,14 +82,14 @@ export default function RulesetEditor() {
             formData={ruleset.ruleset}
             onFormChange={handleFormChange}
           />
-          <button
-            className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition"
+          <Button
+            type="primary"
             onClick={() => {
               handleSubmit();
             }}
           >
             Save Changes
-          </button>
+          </Button>
         </>
       )}
     </>
