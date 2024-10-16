@@ -8,6 +8,7 @@ import RulesetForm from "../../../../components/RulesetForm";
 import { initialFormData } from "@/app/data/initialFormData";
 import RulesetDataService from "@/app/services/RulesetDataService";
 import { useAppContext } from "@/app/components/AppContext";
+import RulesetDetail from "@/app/components/RulesetDetail";
 const { Option } = Select;
 
 const steps = [
@@ -147,11 +148,7 @@ export default function RulesetCreator() {
           </>
         ) : current == 2 ? (
           <>
-            <div className="flex items-start space-x-4">
-              <pre className="flex-grow">
-                {JSON.stringify(formData, null, 2)}
-              </pre>
-            </div>
+            <RulesetDetail ruleset={formData} />
             <div style={{ marginTop: 24 }}>
               <Button
                 type="primary"

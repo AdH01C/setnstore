@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import rulesetDataService from "@/app/services/RulesetDataService";
 import { useAppContext } from "@/app/components/AppContext";
+import RulesetDetail from "@/app/components/RulesetDetail";
 
 interface Ruleset {
   rulesetID: string;
@@ -17,13 +18,7 @@ export default function RulesetDisplay() {
   const { appID, companyId, rulesetID } = useAppContext();
   const [ruleset, setRuleset] = useState<Ruleset>();
 
-  const handleRulesetDelete = async (
-    e: React.MouseEvent,
-    rulesetID: string
-  ) => {
-    // Prevent the card click event from firing when delete is clicked
-    e.stopPropagation();
-
+  const handleRulesetDelete = async (rulesetID: string) => {
     try {
       await rulesetDataService.deleteRulesetByRulesetId(
         companyId,
@@ -67,27 +62,17 @@ export default function RulesetDisplay() {
   return (
     <>
       {ruleset && (
-        <div className="flex items-start space-x-4">
-          <pre className="flex-grow">
-            {JSON.stringify(ruleset.ruleset, null, 2)}
-          </pre>
-          <button
-            className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition"
-            onClick={() => {
-              router.push(`/applications/${appID}/rulesets/${rulesetID}/edit`);
-            }}
-          >
-            Edit ruleset
-          </button>
-          <button
-            className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition"
-            onClick={(e) => {
-              handleRulesetDelete(e, ruleset.rulesetID);
-            }}
-          >
-            Delete ruleset
-          </button>
-        </div>
+        <RulesetDetail
+          ruleset={ruleset.ruleset}
+          isEditable
+          isDeletable
+          onEdit={() => {
+            router.push(`/applications/${appID}/rulesets/${rulesetID}/edit`);
+          }}
+          onDelete={() => {
+            handleRulesetDelete(ruleset.rulesetID);
+          }}
+        />
       )}
     </>
   );
