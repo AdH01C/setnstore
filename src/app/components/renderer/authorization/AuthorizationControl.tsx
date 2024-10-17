@@ -1,8 +1,7 @@
-import { Button, Collapse, Form, Input, Select, Table, Typography } from "antd";
+import { Collapse } from "antd";
 import { withJsonFormsControlProps } from "@jsonforms/react";
-import { AuthPermissionTable } from "./AuthorizationPermissionTable";
-import { AuthRelationTable } from "./AuthorizationRelationTable";
 import { AuthPanel } from "./AuthorizationPanel";
+import { PermissionRow, RelationRow } from "../util";
 const { Panel } = Collapse;
 
 interface AuthorizationControlProps {
@@ -32,10 +31,39 @@ interface AuthorizationProps {
 
 function Authorization({ id, value, updateValue }: AuthorizationProps) {
   const entityList = Object.keys(value);
+
+  let relationList: RelationRow[] = [];
+  for (const key in value) {
+    if (value[key].relations) {
+      for (const relationKey in value[key].relations) {
+        relationList.push({
+          parentEntity: key,
+          relationName: relationKey,
+          relatedEntity: value[key].relations[relationKey],
+        });
+      }
+    }
+  }
+
+  let permissionList: PermissionRow[] = [];
+  for (const key in value) {
+    if (value[key].permissions) {
+      for (const permissionKey in value[key].permissions) {
+        permissionList.push({
+          parentEntity: key,
+          permissionName: permissionKey,
+        });
+      }
+    }
+  }
+
   return (
     <Collapse className="text-sm">
       <Panel header="Authorization" key="1">
-        <Collapse className="w-full border-none flex flex-col" expandIconPosition="right">
+        <Collapse
+          className="w-full border-none flex flex-col"
+          expandIconPosition="right"
+        >
           {Object.entries(value).map(([entity, entityAuthData]) => {
             function handleAuthorizationValueChange(
               newAuth: AuthorizationDefinition
@@ -78,6 +106,8 @@ function Authorization({ id, value, updateValue }: AuthorizationProps) {
                   value={entityAuthData}
                   entity={entity}
                   entityList={entityList}
+                  relationList={relationList}
+                  permissionList={permissionList}
                   updateValue={handleAuthorizationValueChange}
                   updateEntityName={handleEntityNameChange}
                   deleteEntity={handleDeleteEntity}

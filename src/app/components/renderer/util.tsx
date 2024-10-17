@@ -8,6 +8,20 @@ export function relationOptions(relations: string[]) {
   ));
 }
 
+export function authRelationOptions(relations: RelationRow[]) {
+  return relations.map((relationObj: RelationRow) => {
+    const selectValue = relationObj.relationName || relationObj.parentEntity;
+
+    return {
+      value: JSON.stringify({
+        facet: relationObj.parentEntity,
+        relation: relationObj.relationName,
+      }),
+      label: <span>{selectValue}</span>,
+    };
+  });
+}
+
 const methods = ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"];
 
 export function methodOptions(permissions: string[]) {
@@ -120,17 +134,6 @@ export function getAuthorizationTypeObject(
   return undefined;
 }
 
-export function getAuthorizationOperationValue(type: AuthorizationOperations) {
-  return type.operations.map((rule: AuthorizationRule) => rule.relation);
-}
-
-export function getAuthorizationOperationObject(
-  relationList: string[]
-): AuthorizationRule[] {
-  return relationList.map((relation) => ({
-    relation: relation,
-  }));
-}
 export function getAvailableMethod(methodList: string[]): HttpMethod | null {
   const validMethods: HttpMethod[] = [
     "GET",
@@ -142,11 +145,21 @@ export function getAvailableMethod(methodList: string[]): HttpMethod | null {
   ];
 
   for (const method of validMethods) {
-    // Check if the method is not in the valid methods
     if (!methodList.includes(method)) {
-      return method as HttpMethod; // Return the first available value found
+      return method as HttpMethod;
     }
   }
 
-  return null; // If all methods are valid, return null
+  return null;
+}
+
+export interface RelationRow {
+  parentEntity: string;
+  relationName: string;
+  relatedEntity: AuthorizationRelation[];
+}
+
+export interface PermissionRow {
+  parentEntity: string;
+  permissionName: string;
 }

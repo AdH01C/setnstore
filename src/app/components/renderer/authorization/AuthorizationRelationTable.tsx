@@ -1,5 +1,5 @@
 import { Table, Select, Button, Input, TableColumnsType } from "antd";
-import { relationOptions } from "../util";
+import { RelationRow, authRelationOptions } from "../util";
 
 interface AuthRelationTableDataType {
   key: React.Key;
@@ -8,12 +8,16 @@ interface AuthRelationTableDataType {
 }
 
 export const AuthRelationTable = ({
+  entity,
   authData,
   entityList,
+  relationList,
   updateValue,
 }: {
+  entity: string;
   authData: AuthorizationDefinition;
   entityList: string[];
+  relationList: RelationRow[];
   updateValue: (newValue: AuthorizationRelations) => void;
 }) => {
   //   const permissionData = authData.permissions;
@@ -62,9 +66,11 @@ export const AuthRelationTable = ({
       [relation]: relationsData[relation],
     };
 
-    newRelations[relation] = selectedFacets.map((facet) => {
+    newRelations[relation] = selectedFacets.map((authRelation) => {
+      const jsonSelectedFacets = JSON.parse(authRelation);
       return {
-        facet: facet,
+        facet: jsonSelectedFacets.facet,
+        relation: jsonSelectedFacets.relation,
       };
     });
     updateValue(newRelations);
@@ -77,6 +83,7 @@ export const AuthRelationTable = ({
         facets: facetArray,
       }))
     : [];
+
   const columns: TableColumnsType<AuthRelationTableDataType> = [
     {
       title: "Relation",
@@ -96,21 +103,32 @@ export const AuthRelationTable = ({
       title: "Facet",
       dataIndex: "facets",
       render: (facets, record) => {
+        const facetOptions = authRelationOptions([
+          ...relationList.filter(
+            (authRelation) =>
+              authRelation.parentEntity !== entity &&
+              authRelation.relationName !== record.relation
+          ),
+        ]);
+
         return (
           <Select
             mode="tags"
-            defaultValue={
-              facets
-                ? facets.map((item: AuthorizationRelation) => item.facet)
-                : []
-            }
+            value={facets.map((authRelation: AuthorizationRelation) =>
+              JSON.stringify(authRelation)
+            )}
             onChange={(selectedRelations) => {
               handleAuthFacetsChange(record.relation, selectedRelations);
             }}
             placeholder="Select entities"
-          >
-            {relationOptions(entityList)}
-          </Select>
+            options={[
+              ...entityList.map((entity) => ({
+                value: JSON.stringify({ facet: entity }),
+                label: <span>{entity}</span>,
+              })),
+              ...facetOptions,
+            ]}
+          />
         );
       },
     },

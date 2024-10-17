@@ -31,4 +31,5 @@ interface AuthorizationOperations {
 
 interface AuthorizationRule {
   relation: string;
+  permission?: string;
 }
