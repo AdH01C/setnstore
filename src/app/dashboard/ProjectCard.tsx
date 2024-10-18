@@ -1,6 +1,3 @@
-import { currentlySelectedAtom } from "@/jotai/Navigation";
-import { useAtom } from "jotai";
-
 import ApplicationDataService from "@/app/services/ApplicationDataService";
 import { useRouter } from "next/navigation";
 import { Button, Card, Modal, Typography } from "antd";
@@ -16,13 +13,13 @@ interface ProjectCardProps {
 export default function ProjectCard({
   appId,
   appName,
-  companyName,
+  // companyName,
   companyId,
   onDelete,
 }: ProjectCardProps) {
-  const [currentlySelected, setCurrentlySelected] = useAtom(
-    currentlySelectedAtom
-  );
+  // const [currentlySelected, setCurrentlySelected] = useAtom(
+  //   currentlySelectedAtom
+  // );
   const router = useRouter();
 
   const handleDelete = async (e: React.MouseEvent) => {
