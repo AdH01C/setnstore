@@ -7,10 +7,11 @@ import ProjectCard from "./ProjectCard";
 import CreateProjectCard from "./CreateProjectCard";
 import { useAppContext } from "../components/AppContext";
 import { getSession } from "next-auth/react";
-import userDataService from "../services/UserDataService";
-import companyDataService from "../services/CompanyDataService";
+import userDataService from "../services/NewUserDataService";
+import oldCompanyDataService from "../services/CompanyDataService";
+import companyDataService from "../services/NewCompanyDataService";
 import { redirect } from "next/navigation";
-import { AppDetailsWithID } from "@inquisico/ruleset-editor-api";
+import { AppDetailsWithID, User } from "@inquisico/ruleset-editor-api";
 
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
@@ -34,11 +35,11 @@ export default function Dashboard() {
             // Check if the error is a 404 (user not found)
             if (error.response && error.response.status === 404) {
               // No existing user, proceed to create one
-              const newUser = {
+              const newUser: User = {
                 username: email,
                 email: email,
-                full_name: session.user.name,
-                google_id: googleId,
+                fullName: session.user.name!,
+                googleId: googleId!,
                 password: "password",
               };
               const userResponse = await userDataService.createUser(newUser);
@@ -47,8 +48,8 @@ export default function Dashboard() {
               const companyData = {
                 company_name: session.user.name + "'s company",
               };
-              const companyResponse = await companyDataService.createCompany(
-                userResponse.data.id,
+              const companyResponse = await oldCompanyDataService.createCompany(
+                userResponse.id,
                 companyData
               );
               // Store company details in state
@@ -64,16 +65,16 @@ export default function Dashboard() {
           }
 
           // If user exists, get company information
-          if (existingUser?.data) {
-            if (googleId !== existingUser.data.google_id) {
+          if (existingUser) {
+            if (googleId !== existingUser.googleId) {
               console.error("Google Id does not match session google Id");
               redirect("/");
             }
-            const companyResponse = await userDataService.getCompanyByUserId(
-              existingUser.data.id
+            const companyResponse = await companyDataService.getCompanyByUserId(
+              existingUser.id
             );
-            setCompanyId(companyResponse.data.id);
-            setCompanyName(companyResponse.data.company_name);
+            setCompanyId(companyResponse.id);
+            setCompanyName(companyResponse.companyName);
           }
         } else {
           console.error("No session or email found. Redirect to login.");
@@ -91,8 +92,9 @@ export default function Dashboard() {
     // Fetch all applications by company name
     const fetchApplications = async () => {
       try {
-        const response =
-          await ApplicationDataService.getApplications(companyId);
+        const response = await ApplicationDataService.getApplications(
+          companyId
+        );
         setApplications(response);
       } catch (error) {
         console.error("Error fetching applications:", error);

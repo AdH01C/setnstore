@@ -1,4 +1,4 @@
-import { HostApi } from "@inquisico/ruleset-editor-api";
+import { HostApi, RulesetJson } from "@inquisico/ruleset-editor-api";
 import configuration from "./apiConfig";
 
 class HostDataService {
@@ -22,6 +22,24 @@ class HostDataService {
       return response;
     } catch (error) {
       console.error("Error fetching ruleset by ID:", error);
+      throw error;
+    }
+  }
+
+  async getRulesetByHost(
+    companyId: string,
+    appId: string,
+    host: string
+  ): Promise<RulesetJson> {
+    try {
+      const response = await this.hostAPI.getRulesetByHost(
+        companyId,
+        appId,
+        host
+      );
+      return response;
+    } catch (error) {
+      console.error("Error fetching ruleset by host:", error);
       throw error;
     }
   }
