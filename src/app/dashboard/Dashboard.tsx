@@ -8,7 +8,7 @@ import CreateProjectCard from "./CreateProjectCard";
 import { useAppContext } from "../components/AppContext";
 import { getSession } from "next-auth/react";
 import userDataService from "../services/NewUserDataService";
-import oldCompanyDataService from "../services/CompanyDataService";
+import oldCompanyDataService from "../services/OldCompanyDataService";
 import companyDataService from "../services/NewCompanyDataService";
 import { redirect } from "next/navigation";
 import { AppDetailsWithID, User } from "@inquisico/ruleset-editor-api";
