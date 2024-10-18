@@ -1,6 +1,6 @@
 import { useAppContext } from "@/app/components/AppContext";
 import RulesetDetail from "@/app/components/RulesetDetail";
-import RulesetDataService from "@/app/services/RulesetDataService";
+import RulesetDataService from "@/app/services/NewRulesetDataService";
 import { Button } from "antd";
 import { useRouter } from "next/navigation";
 
@@ -14,16 +14,15 @@ export default function Step3({
   const router = useRouter();
   const { appID, companyId } = useAppContext();
   const handleSubmit = async () => {
-    const payload = { ruleset_json: ruleset };
     try {
       // Update the existing ruleset
       const newRuleset = await RulesetDataService.createRuleset(
-        payload,
         companyId,
-        appID
+        appID,
+        ruleset
       );
 
-      router.push(`/applications/${appID}/rulesets/${newRuleset.data.id}`);
+      router.push(`/applications/${appID}/rulesets/${newRuleset.id}`);
     } catch (error) {
       console.error("Error submitting ruleset:", error);
     }

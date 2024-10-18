@@ -1,21 +1,24 @@
 import {
   App,
-  AppDetails,
   AppDetailsWithID,
   ApplicationApi,
   ID,
 } from "@inquisico/ruleset-editor-api";
 import configuration from "./apiConfig";
 
-const appAPI = new ApplicationApi(configuration);
-
 class ApplicationDataService {
-  async getApplicationByAppID(
+  private appAPI: ApplicationApi;
+
+  constructor() {
+    this.appAPI = new ApplicationApi(configuration);
+  }
+
+  async getApplicationByID(
     companyID: string,
     appID: string
   ): Promise<AppDetailsWithID> {
     try {
-      const response = await appAPI.getApplicationById(companyID, appID);
+      const response = await this.appAPI.getApplicationById(companyID, appID);
       const appDetailsWithID: AppDetailsWithID = { ...response, id: appID };
       return appDetailsWithID;
     } catch (error) {
@@ -26,9 +29,11 @@ class ApplicationDataService {
 
   async createApplication(companyID: string, app: App): Promise<ID> {
     try {
-      const response = await appAPI.createApplication(companyID, app);
-      const appDetailsWithID: AppDetailsWithID =
-        await this.getApplicationByAppID(companyID, response.id);
+      const response = await this.appAPI.createApplication(companyID, app);
+      const appDetailsWithID: AppDetailsWithID = await this.getApplicationByID(
+        companyID,
+        response.id
+      );
       return appDetailsWithID;
     } catch (error) {
       console.error("Error creating application:", error);
@@ -36,31 +41,18 @@ class ApplicationDataService {
     }
   }
 
-  async deleteApplication(companyId: string, appId: string): Promise<void> {
+  async deleteApplication(companyID: string, appID: string): Promise<void> {
     try {
-      await appAPI.deleteApplication(companyId, appId);
+      await this.appAPI.deleteApplication(companyID, appID);
     } catch (error) {
       console.error("Error deleting application:", error);
       throw error;
     }
   }
 
-  async getApplicationById(
-    companyId: string,
-    appId: string
-  ): Promise<AppDetails> {
+  async getApplications(companyID: string): Promise<Array<AppDetailsWithID>> {
     try {
-      const response = await appAPI.getApplicationById(companyId, appId);
-      return response;
-    } catch (error) {
-      console.error("Error fetching application by ID:", error);
-      throw error;
-    }
-  }
-
-  async getApplications(companyId: string): Promise<Array<AppDetailsWithID>> {
-    try {
-      const response = await appAPI.getApplications(companyId);
+      const response = await this.appAPI.getApplications(companyID);
       return response;
     } catch (error) {
       console.error("Error fetching applications:", error);
@@ -69,12 +61,12 @@ class ApplicationDataService {
   }
 
   async updateApplication(
-    appId: string,
-    companyId: string,
+    appID: string,
+    companyID: string,
     app: App
   ): Promise<void> {
     try {
-      await appAPI.updateApplication(appId, companyId, app);
+      await this.appAPI.updateApplication(appID, companyID, app);
     } catch (error) {
       console.error("Error updating application:", error);
       throw error;
@@ -82,4 +74,6 @@ class ApplicationDataService {
   }
 }
 
-export default new ApplicationDataService();
+const applicationDataService = new ApplicationDataService();
+
+export default applicationDataService;

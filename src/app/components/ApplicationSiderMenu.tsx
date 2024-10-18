@@ -3,7 +3,7 @@ import Sider from "antd/es/layout/Sider";
 type MenuItem = Required<MenuProps>["items"][number];
 import { useEffect, useState } from "react";
 import applicationDataService from "../services/NewAppDataService";
-import RulesetDataService from "../services/RulesetDataService";
+import RulesetDataService from "../services/NewRulesetDataService";
 import { useRouter } from "next/navigation";
 import { PieChartOutlined } from "@ant-design/icons";
 import Link from "next/link";
@@ -21,7 +21,7 @@ export default function ApplicationSiderMenu() {
           companyId
         );
 
-        const rulesetsID = await RulesetDataService.getRulesetsByAppId(
+        const rulesetIDs = await RulesetDataService.getRulesets(
           companyId,
           appID
         );
@@ -32,8 +32,8 @@ export default function ApplicationSiderMenu() {
               app.app_name,
               appID,
               <PieChartOutlined />,
-              rulesetsID.data.length > 0
-                ? rulesetsID.data.map((rulesetID: string) =>
+              rulesetIDs.length > 0
+                ? rulesetIDs.map((rulesetID: string) =>
                     getItem(
                       rulesetID,
                       rulesetID,

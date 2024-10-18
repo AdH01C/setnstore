@@ -1,7 +1,8 @@
 import { TableColumnsType, Space, Table } from "antd";
 import { useState, useEffect } from "react";
-import rulesetDataService from "../../services/RulesetDataService";
+import RulesetDataService from "../../services/NewRulesetDataService";
 import ApplicationDataService from "../../services/NewAppDataService";
+import HostDataService from "../../services/HostDataService";
 import { useRouter } from "next/navigation";
 import { AppDetailsWithID } from "@inquisico/ruleset-editor-api";
 
@@ -55,7 +56,7 @@ export default function ApplicationTable({
     e.stopPropagation();
 
     try {
-      await rulesetDataService.deleteRulesetByRulesetId(
+      await RulesetDataService.deleteRulesetByID(
         companyId,
         application.id,
         rulesetID
@@ -168,24 +169,23 @@ export default function ApplicationTable({
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        const rulesetsID = await rulesetDataService.getRulesetsByAppId(
+        const rulesetsID = await RulesetDataService.getRulesets(
           companyId,
           application.id
         );
         const rulesetsData = await Promise.all(
-          rulesetsID.data.map(async (rulesetID: string) => {
-            const rulesetResponse =
-              await rulesetDataService.getRulesetByRulesetId(
-                companyId,
-                application.id,
-                rulesetID
-              );
-            const hostResponse = await rulesetDataService.getHostByRulesetId(
+          rulesetsID.map(async (rulesetID: string) => {
+            const rulesetResponse = await RulesetDataService.getRulesetByID(
               companyId,
               application.id,
               rulesetID
             );
-            return { ...rulesetResponse, host: hostResponse.data.host };
+            const hostResponse = await HostDataService.getHostByRulesetID(
+              companyId,
+              application.id,
+              rulesetID
+            );
+            return { ...rulesetResponse, host: hostResponse };
           })
         );
 
@@ -196,7 +196,7 @@ export default function ApplicationTable({
             return {
               rulesetID: ruleset.id,
               host: ruleset.host,
-              dateLastModified: ruleset.last_modified_datetime,
+              dateLastModified: ruleset.lastModifiedDatetime,
             };
           }),
         };

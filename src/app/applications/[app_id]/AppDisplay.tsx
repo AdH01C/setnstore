@@ -11,7 +11,7 @@ export default function AppDisplay() {
 
   useEffect(() => {
     const fetchApplications = async () => {
-      const response = await applicationDataService.getApplicationByAppID(
+      const response = await applicationDataService.getApplicationByID(
         companyId,
         appID
       );
