@@ -32,7 +32,7 @@ interface AuthorizationProps {
 function Authorization({ id, value, updateValue }: AuthorizationProps) {
   const entityList = Object.keys(value);
 
-  let relationList: RelationRow[] = [];
+  const relationList: RelationRow[] = [];
   for (const key in value) {
     if (value[key].relations) {
       for (const relationKey in value[key].relations) {
@@ -45,7 +45,7 @@ function Authorization({ id, value, updateValue }: AuthorizationProps) {
     }
   }
 
-  let permissionList: PermissionRow[] = [];
+  const permissionList: PermissionRow[] = [];
   for (const key in value) {
     if (value[key].permissions) {
       for (const permissionKey in value[key].permissions) {
