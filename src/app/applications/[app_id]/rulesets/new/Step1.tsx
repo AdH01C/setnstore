@@ -13,13 +13,6 @@ export default function Step1({
   const initialHost = Object.keys(ruleset.host)[0] || "";
   const [host, setHost] = useState(initialHost);
 
-  const selectBefore = (
-    <Select defaultValue="http://">
-      <Select.Option value="http://">http://</Select.Option>
-      <Select.Option value="https://">https://</Select.Option>
-    </Select>
-  );
-
   const handleHostChange = (e: {
     target: { value: React.SetStateAction<string> };
   }) => {
@@ -55,7 +48,6 @@ export default function Step1({
   return (
     <>
       <Input
-        addonBefore={selectBefore}
         placeholder="petstore.inquisico.com"
         onChange={handleHostChange}
         value={host}
