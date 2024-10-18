@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Loading from "../components/Loading";
-import ApplicationDataService from "../services/ApplicationDataService";
+import ApplicationDataService from "../services/NewAppDataService";
 import ProjectCard from "./ProjectCard";
 import CreateProjectCard from "./CreateProjectCard";
 import { useAppContext } from "../components/AppContext";
@@ -10,16 +10,11 @@ import { getSession } from "next-auth/react";
 import userDataService from "../services/UserDataService";
 import companyDataService from "../services/CompanyDataService";
 import { redirect } from "next/navigation";
-
-interface Application {
-  app_name: string;
-  company_name: string;
-  id: string;
-}
+import { AppDetailsWithID } from "@inquisico/ruleset-editor-api";
 
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
-  const [applications, setApplications] = useState<Application[]>([]);
+  const [applications, setApplications] = useState<AppDetailsWithID[]>([]);
   const { companyName, setCompanyName, companyId, setCompanyId } =
     useAppContext();
 
@@ -97,8 +92,8 @@ export default function Dashboard() {
     const fetchApplications = async () => {
       try {
         const response =
-          await ApplicationDataService.getAllApplicationsByCompanyId(companyId);
-        setApplications(response.data);
+          await ApplicationDataService.getApplications(companyId);
+        setApplications(response);
       } catch (error) {
         console.error("Error fetching applications:", error);
       } finally {
@@ -115,7 +110,7 @@ export default function Dashboard() {
   };
 
   // Function to add a new application to the list
-  const handleCreate = (newApp: Application) => {
+  const handleCreate = (newApp: AppDetailsWithID) => {
     setApplications((prevApps = []) => [...prevApps, newApp]); // Append the new application
   };
 
@@ -130,7 +125,7 @@ export default function Dashboard() {
               <ProjectCard
                 key={application.id} // Ensure each card has a unique key
                 appId={application.id}
-                appName={application.app_name}
+                appName={application.appName}
                 companyName={companyName}
                 companyId={companyId}
                 onDelete={handleDelete}
