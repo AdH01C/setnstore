@@ -22,7 +22,8 @@ interface MetaDataProps {
 }
 
 type EntityCase = "none" | "lowercase" | "uppercase";
-type RedirectSlashes = "ignore" | "strip" | "append" | "";
+// type RedirectSlashes = "ignore" | "strip" | "append" | "";
+type RedirectSlashes = "strip" | "append" | "";
 type TrailingSlashMode = "strict" | "fallback";
 
 const MetaDataControl = ({
@@ -46,7 +47,7 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
     { label: "Fallback", value: "fallback" },
   ];
   const redirectSlashesOptions = [
-    { label: "Ignore", value: "ignore" },
+    // { label: "Ignore", value: "ignore" },
     { label: "Strip", value: "strip" },
     { label: "Append", value: "append" },
   ];
