@@ -1,6 +1,6 @@
 import { Form, Select } from "antd";
 import { useState } from "react";
-import { relationOptions } from "../util";
+import { LabelManager } from "../util";
 
 export const EntitySettingsForm = ({
   pathData,
@@ -76,6 +76,12 @@ export const EntitySettingsForm = ({
     updateValue({ [path]: newValue });
   }
 
+  const relationTypeOptions = [
+    { label: "Default", value: "Default" },
+    { label: "No Relation", value: "No Relation" },
+    { label: "Custom", value: "Custom" },
+  ];
+  const labelManager = new LabelManager();
   return (
     <>
       {pathProperties && (
@@ -85,29 +91,34 @@ export const EntitySettingsForm = ({
               defaultValue={pathProperties.entity}
               onChange={handleEntityChange}
               placeholder="Entity"
-            >
-              {relationOptions(relations)}
-            </Select>
+              options={relations.map((relation) => ({
+                label: relation,
+                value: relation,
+              }))}
+            />
           </Form.Item>
           <Form.Item label="Relations: ">
             <Select
               defaultValue={relationType}
               onChange={handleRelationTypeChange}
               placeholder="Relation Type"
-            >
-              <Select.Option value={"Default"}>Default</Select.Option>
-              <Select.Option value={"No Relation"}>No Relation</Select.Option>
-              <Select.Option value={"Custom"}>Custom</Select.Option>
-            </Select>
+              options={relationTypeOptions}
+            />
             {toggleCustomRelation && (
               <Select
                 mode="multiple"
                 defaultValue={relationValue}
                 onChange={handleRelationChange}
                 placeholder="Select relations"
-              >
-                {relationOptions(ancestorEntities)}
-              </Select>
+                options={ancestorEntities.map((entity) => {
+                  const uniqueLabel = labelManager.getUniqueLabel(entity);
+                  return {
+                    key: uniqueLabel,
+                    label: uniqueLabel,
+                    value: entity,
+                  };
+                })}
+              />
             )}
           </Form.Item>
         </>

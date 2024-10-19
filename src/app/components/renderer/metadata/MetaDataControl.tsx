@@ -41,6 +41,20 @@ const MetaDataControl = ({
 export default withJsonFormsControlProps(MetaDataControl);
 
 function MetaData({ id, value, updateValue }: MetaDataProps) {
+  const trailingSlashModeOptions = [
+    { label: "Strict", value: "strict" },
+    { label: "Fallback", value: "fallback" },
+  ];
+  const redirectSlashesOptions = [
+    { label: "Ignore", value: "ignore" },
+    { label: "Strip", value: "strip" },
+    { label: "Append", value: "append" },
+  ];
+  const entityValueCaseOptions = [
+    { label: "None", value: "none" },
+    { label: "Lowercase", value: "lowercase" },
+    { label: "Uppercase", value: "uppercase" },
+  ];
   return (
     <Collapse defaultActiveKey={["1"]} className="text-sm">
       <Collapse.Panel header="Metadata" key="1">
@@ -57,10 +71,8 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
                 })
               }
               className="w-1/6"
-            >
-              <Select.Option value="strict">Strict</Select.Option>
-              <Select.Option value="fallback">Fallback</Select.Option>
-            </Select>
+              options={trailingSlashModeOptions}
+            />
           </div>
           <Divider />
           {/* Redirect Slashes */}
@@ -75,11 +87,8 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
                 })
               }
               className="w-1/6"
-            >
-              <Select.Option value="ignore">Ignore</Select.Option>
-              <Select.Option value="strip">Strip</Select.Option>
-              <Select.Option value="append">Append</Select.Option>
-            </Select>
+              options={redirectSlashesOptions}
+            />
           </div>
           <Divider />
           {/* Case Sensitive */}
@@ -105,11 +114,8 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
                 updateValue({ ...value, entityValueCase: val as EntityCase })
               }
               className="w-1/6"
-            >
-              <Select.Option value="none">None</Select.Option>
-              <Select.Option value="lowercase">Lowercase</Select.Option>
-              <Select.Option value="uppercase">Uppercase</Select.Option>
-            </Select>
+              options={entityValueCaseOptions}
+            />
           </div>
           <Divider />
           {/* Options Passthrough */}

@@ -11,7 +11,7 @@ import oldUserDataService from "../services/OldUserDataService";
 import oldCompanyDataService from "../services/OldCompanyDataService";
 import companyDataService from "../services/NewCompanyDataService";
 import { redirect } from "next/navigation";
-import { AppDetailsWithID, User } from "@inquisico/ruleset-editor-api";
+import { AppDetailsWithID } from "@inquisico/ruleset-editor-api";
 
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);

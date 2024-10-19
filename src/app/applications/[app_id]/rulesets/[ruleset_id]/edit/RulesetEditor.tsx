@@ -18,7 +18,7 @@ export default function RulesetEditor() {
       (prevRuleset) =>
         ({
           ...prevRuleset,
-          ruleset: data,
+          rulesetJson: data,
         } as RulesetWithRulesetJson)
     );
   };

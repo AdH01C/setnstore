@@ -1,4 +1,4 @@
-import { Button, Input, Select } from "antd";
+import { Button, Input } from "antd";
 import { useState } from "react";
 
 export default function Step1({

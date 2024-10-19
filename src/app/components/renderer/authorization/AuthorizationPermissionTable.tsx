@@ -112,6 +112,101 @@ export const AuthPermissionTable = ({
     updateValue(newPermissions);
   }
 
+  function renderSettings(record: AuthPermissionTableDataType) {
+    {
+      const entityRelations = relationList
+        .filter((authRelation) => authRelation.parentEntity === entity)
+        .map((authRelation) => ({
+          value: JSON.stringify({
+            relation: authRelation.relationName,
+          }),
+          label: <span>{authRelation.relationName}</span>,
+        }));
+
+      const entityPermissions = permissionList
+        .filter(
+          (authPermission) =>
+            authPermission.parentEntity === entity &&
+            authPermission.permissionName !== record.permission
+        )
+        .map((authPermission) => ({
+          value: JSON.stringify({
+            relation: authPermission.permissionName,
+          }),
+          label: <span>{authPermission.permissionName}</span>,
+        }));
+
+      const inheritedEntity = relationList
+        .filter((relationRow) => relationRow.parentEntity === entity)
+        .flatMap((relationRow) =>
+          relationRow.relatedEntity.map((authRelation) => ({
+            facet: authRelation.facet,
+            relationName: relationRow.relationName,
+            ...(authRelation.relation !== undefined && {
+              relation: authRelation.relation,
+            }),
+          }))
+        );
+
+      const resultArray = inheritedEntity.flatMap((authRelation) => {
+        const inheritedRelation = relationList
+          .filter((relation) => relation.parentEntity === authRelation.facet)
+          .map((relation) => relation.relationName);
+
+        const inheritedPermission = permissionList
+          .filter(
+            (permission) => permission.parentEntity === authRelation.facet
+          )
+          .map((permission) => permission.permissionName);
+
+        const combinedValues = [...inheritedRelation, ...inheritedPermission];
+
+        const valueLabelObjects = combinedValues.map((combinedValue) => ({
+          value: JSON.stringify({
+            relation: authRelation.relationName,
+            permission: combinedValue,
+          }),
+          label: authRelation.relationName + "->" + combinedValue,
+        }));
+
+        return valueLabelObjects;
+      });
+
+      if (isAuthorizationOperations(record.type)) {
+        return (
+          <Select
+            mode={"tags"}
+            value={record.type.operations.map((authOp) =>
+              JSON.stringify(authOp)
+            )}
+            onChange={(selectedRelations) => {
+              handleAuthOperationsChange(record.permission, selectedRelations);
+            }}
+            placeholder="Select relations"
+            options={[...entityRelations, ...entityPermissions, ...resultArray]}
+          />
+        );
+      }
+      if (isAuthorizationRule(record.type)) {
+        return (
+          <Select
+            value={
+              record.type &&
+              JSON.stringify(record.type) !== JSON.stringify({ relation: "" })
+                ? JSON.stringify(record.type)
+                : undefined
+            }
+            onChange={(selectedRelation) => {
+              handleAuthRuleChange(record.permission, selectedRelation);
+            }}
+            placeholder="Select relation"
+            options={[...entityRelations, ...entityPermissions, ...resultArray]}
+          />
+        );
+      }
+    }
+  }
+
   const dataSource: AuthPermissionTableDataType[] = permissionData
     ? Object.entries(permissionData).map(([permission, type]) => ({
         key: permission,
@@ -143,114 +238,20 @@ export const AuthPermissionTable = ({
             onChange={(selectedType) =>
               handleAuthTypeChange(record.permission, selectedType)
             }
-          >
-            <Select.Option value="single">Single</Select.Option>
-            <Select.Option value="union">Union</Select.Option>
-            <Select.Option value="intersect">Intersect</Select.Option>
-            <Select.Option value="except">Except</Select.Option>
-          </Select>
+            options={[
+              { label: "Single", value: "single" },
+              { label: "Union", value: "union" },
+              { label: "Intersect", value: "intersect" },
+              { label: "Except", value: "except" },
+            ]}
+          />
         );
       },
     },
     {
       title: "Settings",
       render: (_, record) => {
-        const entityRelations = relationList
-          .filter((authRelation) => authRelation.parentEntity === entity)
-          .map((authRelation) => ({
-            value: JSON.stringify({
-              relation: authRelation.relationName,
-            }),
-            label: <span>{authRelation.relationName}</span>,
-          }));
-
-        const entityPermissions = permissionList
-          .filter(
-            (authPermission) =>
-              authPermission.parentEntity === entity &&
-              authPermission.permissionName !== record.permission
-          )
-          .map((authPermission) => ({
-            value: JSON.stringify({
-              relation: authPermission.permissionName,
-            }),
-            label: <span>{authPermission.permissionName}</span>,
-          }));
-
-        const inheritedEntity = relationList
-          .filter((relationRow) => relationRow.parentEntity === entity)
-          .flatMap((relationRow) =>
-            relationRow.relatedEntity.map((authRelation) => ({
-              facet: authRelation.facet,
-              relationName: relationRow.relationName,
-              ...(authRelation.relation !== undefined && {
-                relation: authRelation.relation,
-              }),
-            }))
-          );
-
-        const resultArray = inheritedEntity.flatMap((authRelation) => {
-          const inheritedRelation = relationList
-            .filter((relation) => relation.parentEntity === authRelation.facet)
-            .map((relation) => relation.relationName);
-
-          const inheritedPermission = permissionList
-            .filter(
-              (permission) => permission.parentEntity === authRelation.facet
-            )
-            .map((permission) => permission.permissionName);
-
-          const combinedValues = [...inheritedRelation, ...inheritedPermission];
-
-          const valueLabelObjects = combinedValues.map((combinedValue) => ({
-            value: JSON.stringify({
-              relation: authRelation.relationName,
-              permission: combinedValue,
-            }),
-            label: authRelation.relationName + "-" + combinedValue,
-          }));
-
-          return valueLabelObjects;
-        });
-
-        if (isAuthorizationOperations(record.type)) {
-          return (
-            <Select
-              mode={"tags"}
-              value={record.type.operations.map((authOp) =>
-                JSON.stringify(authOp)
-              )}
-              onChange={(selectedRelations) => {
-                handleAuthOperationsChange(
-                  record.permission,
-                  selectedRelations
-                );
-              }}
-              placeholder="Select relations"
-              options={[
-                ...entityRelations,
-                ...entityPermissions,
-                ...resultArray,
-              ]}
-            />
-          );
-        }
-        if (isAuthorizationRule(record.type)) {
-          return (
-            <Select
-              value={JSON.stringify(record.type)}
-              onChange={(selectedRelation) => {
-                handleAuthRuleChange(record.permission, selectedRelation);
-              }}
-              placeholder="Select relation"
-              options={[
-                ...entityRelations,
-                ...entityPermissions,
-                ...resultArray,
-              ]}
-            />
-          );
-        }
+        return renderSettings(record);
       },
     },
     {

@@ -2,9 +2,9 @@ import { Modal, TableColumnsType, Select, Button, Table } from "antd";
 import {
   methodOptions,
   getPermissionValue,
-  relationOptions,
   entityTypeOptions,
   getAvailableMethod,
+  LabelManager,
 } from "../util";
 
 interface PermissionTableDataType {
@@ -148,6 +148,7 @@ export const HostPermissionTable = ({
       title: "Method",
       dataIndex: "method",
       render: (method, record) => {
+        const usedPermission = Object.keys(pathProperties.permission || {});
         return (
           <Select
             value={method}
@@ -155,10 +156,8 @@ export const HostPermissionTable = ({
               handleMethodChange(record.method, newMethod);
             }}
             className="w-[104px]"
-          >
-            {pathProperties.permission &&
-              methodOptions(Object.keys(pathProperties.permission))}
-          </Select>
+            options={methodOptions(usedPermission)}
+          />
         );
       },
     },
@@ -166,6 +165,15 @@ export const HostPermissionTable = ({
       title: "Permission",
       dataIndex: "permission",
       render: (permission, record) => {
+        const options = [
+          { label: "Only Authentication", value: "authentication_only" },
+          { label: "Public Access", value: "public_access" },
+          {
+            label: "Both Authentication and Authorization",
+            value: "authentication_and_authorization",
+            disabled: connectedEntities.length === 0,
+          },
+        ];
         return (
           <Select
             defaultValue={getPermissionValue(permission)}
@@ -173,18 +181,8 @@ export const HostPermissionTable = ({
               handlePermissionChange(record.method, selectedPermissionType);
             }}
             className="w-[300px]"
-          >
-            <Select.Option value="authentication_only">
-              Only Authentication
-            </Select.Option>
-            <Select.Option value="public_access">Public Access</Select.Option>
-            <Select.Option
-              disabled={connectedEntities.length === 0}
-              value="authentication_and_authorization"
-            >
-              Both Authentication and Authorization
-            </Select.Option>
-          </Select>
+            options={options}
+          />
         );
       },
     },
@@ -193,6 +191,7 @@ export const HostPermissionTable = ({
       dataIndex: "permission",
       render: (permission, record) => {
         if (permission && "entity" in permission && "type" in permission) {
+          const labelManager = new LabelManager();
           return (
             <div className="flex flex-col w-[128px] gap-2">
               <Select
@@ -205,9 +204,15 @@ export const HostPermissionTable = ({
                   handleEntitySettingsChange(record.method, selectedEntity)
                 }
                 placeholder="Entity"
-              >
-                {relationOptions(connectedEntities)}
-              </Select>
+                options={connectedEntities.map((entity) => {
+                  const uniqueLabel = labelManager.getUniqueLabel(entity);
+                  return {
+                    key: uniqueLabel,
+                    label: uniqueLabel,
+                    value: entity,
+                  };
+                })}
+              />
               <Select
                 value={
                   permission && "type" in permission
@@ -218,9 +223,8 @@ export const HostPermissionTable = ({
                   handleTypeSettingsChange(record.method, selectedType)
                 }
                 placeholder="Permission"
-              >
-                {entityTypeOptions(authData, permission.entity)}
-              </Select>
+                options={entityTypeOptions(authData, permission.entity)}
+              />
             </div>
           );
         }

@@ -210,7 +210,7 @@ export default function ApplicationTable({
     fetchApplications();
   }, [companyId, application]);
 
-  const expandedRowRender = (row: any) => {
+  const expandedRowRender = (row: ApplicationTableType) => {
     return (
       <Table<RulesetTableType>
         columns={expandColumns}

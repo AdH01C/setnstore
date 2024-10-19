@@ -8,7 +8,6 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { ReactNode } from "react";
 import { UserOutlined } from "@ant-design/icons";
-import { useRouter } from "next/navigation";
 import { AppProvider } from "../components/AppContext";
 
 export default function AppLayout({

@@ -1,14 +1,6 @@
-import { Select } from "antd";
+import { LabeledValue } from "antd/es/select";
 
-export function relationOptions(relations: string[]) {
-  return relations.map((relation: string, index: number) => (
-    <Select.Option key={relation + index} value={relation}>
-      {relation}
-    </Select.Option>
-  ));
-}
-
-export function authRelationOptions(relations: RelationRow[]) {
+export function authRelationOptions(relations: RelationRow[]): LabeledValue[] {
   return relations.map((relationObj: RelationRow) => {
     const selectValue = relationObj.relationName || relationObj.parentEntity;
 
@@ -17,55 +9,66 @@ export function authRelationOptions(relations: RelationRow[]) {
         facet: relationObj.parentEntity,
         relation: relationObj.relationName,
       }),
-      label: <span>{selectValue}</span>,
+      label: <span>{relationObj.parentEntity + "->" + selectValue}</span>,
     };
   });
 }
 
 const methods = ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"];
 
-export function methodOptions(permissions: string[]) {
+export function methodOptions(permissions: string[]): LabeledValue[] {
   return methods
     .filter((method) => !permissions.includes(method))
-    .map((method) => (
-      <Select.Option key={method} value={method}>
-        {method}
-      </Select.Option>
-    ));
+    .map((method) => ({
+      label: method,
+      value: method,
+    }));
+}
+
+export class LabelManager {
+  private labelCounts: { [key: string]: number } = {};
+
+  getUniqueLabel(type: string): string {
+    if (!this.labelCounts[type]) {
+      this.labelCounts[type] = 1;
+      return type; // First occurrence, no need to append
+    }
+
+    this.labelCounts[type] += 1;
+    return `${type} (${this.labelCounts[type]})`; // Append count to subsequent occurrences
+  }
 }
 
 export function entityTypeOptions(
   authData: AuthorizationValue,
   entity: string
-) {
-  return Object.entries(authData).map(([entityKey, authProperties]) => {
-    const result = [];
+): LabeledValue[] {
+  const options: LabeledValue[] = [];
 
+  Object.entries(authData).forEach(([entityKey, authProperties]) => {
     if (authProperties.permissions && entityKey === entity) {
-      result.push(
-        ...Object.keys(authProperties.permissions).map((type) => (
-          <Select.Option key={`${entity}_${type}`} value={type}>
-            {type}
-          </Select.Option>
-        ))
+      options.push(
+        ...Object.keys(authProperties.permissions).map((type) => ({
+          label: type,
+          value: type,
+        }))
       );
     }
 
     if (authProperties.relations && entityKey === entity) {
-      result.push(
-        ...Object.keys(authProperties.relations).map((type) => (
-          <Select.Option key={`${entity}_${type}`} value={type}>
-            {type}
-          </Select.Option>
-        ))
+      options.push(
+        ...Object.keys(authProperties.relations).map((type) => ({
+          label: type,
+          value: type,
+        }))
       );
     }
-
-    return result;
   });
+
+  return options;
 }
 
-export function getPermissionValue(requirement: Requirement) {
+export function getPermissionValue(requirement: Requirement): string {
   if (requirement === null) {
     return "Public";
   }
