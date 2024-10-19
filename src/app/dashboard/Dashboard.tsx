@@ -7,7 +7,7 @@ import ProjectCard from "./ProjectCard";
 import CreateProjectCard from "./CreateProjectCard";
 import { useAppContext } from "../components/AppContext";
 import { getSession } from "next-auth/react";
-import userDataService from "../services/NewUserDataService";
+import oldUserDataService from "../services/OldUserDataService";
 import oldCompanyDataService from "../services/OldCompanyDataService";
 import companyDataService from "../services/NewCompanyDataService";
 import { redirect } from "next/navigation";
@@ -30,26 +30,25 @@ export default function Dashboard() {
           // Try fetching the existing user
           let existingUser;
           try {
-            existingUser = await userDataService.getUserByUsername(email);
+            existingUser = await oldUserDataService.getUserByUsername(email);
           } catch (error: any) {
             // Check if the error is a 404 (user not found)
             if (error.response && error.response.status === 404) {
               // No existing user, proceed to create one
-              const newUser: User = {
+              const newUser = {
                 username: email,
                 email: email,
-                fullName: session.user.name!,
-                googleId: googleId!,
+                full_name: session.user.name,
+                google_id: googleId,
                 password: "password",
               };
-              const userResponse = await userDataService.createUser(newUser);
-
+              const userResponse = await oldUserDataService.createUser(newUser);
               // Create a company for the new user
               const companyData = {
                 company_name: session.user.name + "'s company",
               };
               const companyResponse = await oldCompanyDataService.createCompany(
-                userResponse.id,
+                userResponse.data.id,
                 companyData
               );
               // Store company details in state
@@ -65,13 +64,13 @@ export default function Dashboard() {
           }
 
           // If user exists, get company information
-          if (existingUser) {
-            if (googleId !== existingUser.googleId) {
+          if (existingUser?.data) {
+            if (googleId !== existingUser.data.google_id) {
               console.error("Google Id does not match session google Id");
               redirect("/");
             }
             const companyResponse = await companyDataService.getCompanyByUserId(
-              existingUser.id
+              existingUser.data.id
             );
             setCompanyId(companyResponse.id);
             setCompanyName(companyResponse.companyName);
