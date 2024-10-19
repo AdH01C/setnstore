@@ -6,6 +6,7 @@ import {
   isAuthorizationRule,
   PermissionRow,
   RelationRow,
+  sortedStringify,
 } from "../util";
 
 interface AuthPermissionTableDataType {
@@ -117,7 +118,7 @@ export const AuthPermissionTable = ({
       const entityRelations = relationList
         .filter((authRelation) => authRelation.parentEntity === entity)
         .map((authRelation) => ({
-          value: JSON.stringify({
+          value: sortedStringify({
             relation: authRelation.relationName,
           }),
           label: <span>{authRelation.relationName}</span>,
@@ -130,7 +131,7 @@ export const AuthPermissionTable = ({
             authPermission.permissionName !== record.permission
         )
         .map((authPermission) => ({
-          value: JSON.stringify({
+          value: sortedStringify({
             relation: authPermission.permissionName,
           }),
           label: <span>{authPermission.permissionName}</span>,
@@ -162,7 +163,7 @@ export const AuthPermissionTable = ({
         const combinedValues = [...inheritedRelation, ...inheritedPermission];
 
         const valueLabelObjects = combinedValues.map((combinedValue) => ({
-          value: JSON.stringify({
+          value: sortedStringify({
             relation: authRelation.relationName,
             permission: combinedValue,
           }),
@@ -177,7 +178,7 @@ export const AuthPermissionTable = ({
           <Select
             mode={"tags"}
             value={record.type.operations.map((authOp) =>
-              JSON.stringify(authOp)
+              sortedStringify(authOp)
             )}
             onChange={(selectedRelations) => {
               handleAuthOperationsChange(record.permission, selectedRelations);
@@ -192,8 +193,8 @@ export const AuthPermissionTable = ({
           <Select
             value={
               record.type &&
-              JSON.stringify(record.type) !== JSON.stringify({ relation: "" })
-                ? JSON.stringify(record.type)
+              sortedStringify(record.type) !== sortedStringify({ relation: "" })
+                ? sortedStringify(record.type)
                 : undefined
             }
             onChange={(selectedRelation) => {

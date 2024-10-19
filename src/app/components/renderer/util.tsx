@@ -5,7 +5,7 @@ export function authRelationOptions(relations: RelationRow[]): LabeledValue[] {
     const selectValue = relationObj.relationName || relationObj.parentEntity;
 
     return {
-      value: JSON.stringify({
+      value: sortedStringify({
         facet: relationObj.parentEntity,
         relation: relationObj.relationName,
       }),
@@ -165,4 +165,23 @@ export interface RelationRow {
 export interface PermissionRow {
   parentEntity: string;
   permissionName: string;
+}
+
+export function sortedStringify(obj: any): string {
+  return JSON.stringify(sortObjectKeys(obj));
+}
+
+function sortObjectKeys(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(sortObjectKeys);
+  } else if (obj !== null && typeof obj === "object") {
+    return Object.keys(obj)
+      .sort()
+      .reduce((result: any, key: string) => {
+        result[key] = sortObjectKeys(obj[key]);
+        return result;
+      }, {});
+  } else {
+    return obj; // Primitive value
+  }
 }

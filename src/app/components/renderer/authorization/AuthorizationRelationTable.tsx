@@ -1,5 +1,5 @@
 import { Table, Select, Button, Input, TableColumnsType } from "antd";
-import { RelationRow, authRelationOptions } from "../util";
+import { RelationRow, authRelationOptions, sortedStringify } from "../util";
 
 interface AuthRelationTableDataType {
   key: React.Key;
@@ -115,7 +115,7 @@ export const AuthRelationTable = ({
           <Select
             mode="tags"
             value={facets.map((authRelation: AuthorizationRelation) =>
-              JSON.stringify(authRelation)
+              sortedStringify(authRelation)
             )}
             onChange={(selectedRelations) => {
               handleAuthFacetsChange(record.relation, selectedRelations);
@@ -123,7 +123,7 @@ export const AuthRelationTable = ({
             placeholder="Select entities"
             options={[
               ...entityList.map((entity) => ({
-                value: JSON.stringify({ facet: entity }),
+                value: sortedStringify({ facet: entity }),
                 label: <span>{entity}</span>,
               })),
               ...facetOptions,
