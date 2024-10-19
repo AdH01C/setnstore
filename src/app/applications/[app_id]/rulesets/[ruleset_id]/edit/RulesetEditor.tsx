@@ -2,23 +2,16 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import rulesetDataService from "@/app/services/RulesetDataService";
 import RulesetForm from "../../../../../components/RulesetForm";
-import RulesetDataService from "@/app/services/RulesetDataService";
+import RulesetDataService from "@/app/services/NewRulesetDataService";
 import { useAppContext } from "@/app/components/AppContext";
 import { Button } from "antd";
-
-interface Ruleset {
-  rulesetID: string;
-  host: string;
-  dateLastModified: Date;
-  ruleset: any;
-}
+import { RulesetWithRulesetJson } from "@inquisico/ruleset-editor-api";
 
 export default function RulesetEditor() {
   const router = useRouter();
   const { appID, companyId, rulesetID } = useAppContext();
-  const [ruleset, setRuleset] = useState<Ruleset>();
+  const [ruleset, setRuleset] = useState<RulesetWithRulesetJson>();
 
   const handleFormChange = (data: any) => {
     setRuleset(
@@ -26,7 +19,7 @@ export default function RulesetEditor() {
         ({
           ...prevRuleset,
           ruleset: data,
-        } as Ruleset)
+        } as RulesetWithRulesetJson)
     );
   };
 
@@ -36,38 +29,28 @@ export default function RulesetEditor() {
         return;
       }
 
-      const response = await rulesetDataService.getRulesetByRulesetId(
+      const response = await RulesetDataService.getRulesetByID(
         companyId,
         appID,
         rulesetID
       );
 
-      const ruleset: Ruleset = {
-        rulesetID: response.id,
-        host: response.app_id,
-        dateLastModified: response.last_modified_datetime,
-        ruleset: response.ruleset_json,
-      };
-
-      setRuleset(ruleset);
+      setRuleset(response);
     };
 
     fetchRuleset();
   }, [companyId, appID, rulesetID]);
 
   const handleSubmit = async () => {
-    if (ruleset?.ruleset) {
-      const payload = { ruleset_json: ruleset.ruleset };
-
+    if (ruleset?.rulesetJson) {
       try {
-        // Update the existing ruleset
         await RulesetDataService.updateRuleset(
-          payload,
           companyId,
           appID,
-          ruleset.rulesetID
+          ruleset.id,
+          ruleset
         );
-        router.push(`/applications/${appID}/rulesets/${ruleset.rulesetID}`);
+        router.push(`/applications/${appID}/rulesets/${ruleset.id}`);
       } catch (error) {
         console.error("Error submitting ruleset:", error);
       }
@@ -79,7 +62,7 @@ export default function RulesetEditor() {
       {ruleset && (
         <>
           <RulesetForm
-            formData={ruleset.ruleset}
+            formData={ruleset.rulesetJson}
             onFormChange={handleFormChange}
           />
           <Button

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import ApplicationDataService from "@/app/services/ApplicationDataService";
+import ApplicationDataService from "@/app/services/NewAppDataService";
 import { useAppContext } from "../components/AppContext";
 import { Button, Card, Input } from "antd";
+import { App, AppDetailsWithID } from "@inquisico/ruleset-editor-api";
 
 interface CreateProjectCardProps {
   onCreate: (newApp: any) => void; // The function to call when a new app is created
@@ -15,18 +16,14 @@ export default function CreateProjectCard({
 
   const handleCreateApplication = async () => {
     try {
-      const payload = { app_name: appName };
+      const payload: App = { appName: appName };
       const response = await ApplicationDataService.createApplication(
-        payload,
-        companyId
+        companyId,
+        payload
       );
       console.log("Application created successfully", response);
-      const newApp = {
-        id: response.data.id,
-        company_name: companyName,
-        app_name: appName,
-      };
-      onCreate(newApp);
+
+      onCreate(response);
       setAppName("");
     } catch (error) {
       console.error("Error creating application:", error);

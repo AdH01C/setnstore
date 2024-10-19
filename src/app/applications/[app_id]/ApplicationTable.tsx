@@ -1,33 +1,23 @@
 import { TableColumnsType, Space, Table } from "antd";
 import { useState, useEffect } from "react";
-import rulesetDataService from "../../services/RulesetDataService";
-import ApplicationDataService from "../../services/ApplicationDataService";
+import RulesetDataService from "../../services/NewRulesetDataService";
+import ApplicationDataService from "../../services/NewAppDataService";
+import HostDataService from "../../services/HostDataService";
 import { useRouter } from "next/navigation";
+import {
+  AppDetailsWithID,
+  RulesetWithRulesetJson,
+} from "@inquisico/ruleset-editor-api";
 
-interface RulesetTableType extends Ruleset {
+interface RulesetTableType extends RulesetWithRulesetJson {
   key: string;
-}
-
-interface ApplicationTableType extends Application {
-  key: string;
-}
-
-interface Application {
-  appID: string;
-  applicationName: string;
-  dateCreated: Date;
-  companyId: string;
-}
-
-interface ApplicationWithRulesets extends Application {
-  rulesetCount: number;
-  rulesets: Ruleset[];
-}
-
-interface Ruleset {
-  rulesetID: string;
   host: string;
-  dateLastModified: Date;
+}
+
+interface ApplicationTableType extends AppDetailsWithID {
+  key: string;
+  rulesetCount: number;
+  rulesets: RulesetTableType[];
 }
 
 export default function ApplicationTable({
@@ -35,9 +25,9 @@ export default function ApplicationTable({
   application,
 }: {
   companyId: string;
-  application: Application;
+  application: AppDetailsWithID;
 }) {
-  const [tableData, setTableData] = useState<ApplicationWithRulesets[]>([]);
+  const [tableData, setTableData] = useState<ApplicationTableType[]>([]);
   const router = useRouter();
 
   const handleApplicationDelete = async (e: React.MouseEvent) => {
@@ -45,13 +35,8 @@ export default function ApplicationTable({
     e.stopPropagation();
 
     try {
-      await ApplicationDataService.deleteApplication(
-        companyId,
-        application.appID
-      );
-      console.log(
-        `Application with ID ${application.appID} deleted successfully`
-      );
+      await ApplicationDataService.deleteApplication(companyId, application.id);
+      console.log(`Application with ID ${application.id} deleted successfully`);
       router.push(`/dashboard`);
     } catch (error) {
       console.error("Error deleting application:", error);
@@ -66,23 +51,23 @@ export default function ApplicationTable({
     e.stopPropagation();
 
     try {
-      await rulesetDataService.deleteRulesetByRulesetId(
+      await RulesetDataService.deleteRulesetByID(
         companyId,
-        application.appID,
+        application.id,
         rulesetID
       );
       console.log(
-        `Ruleset with ID ${rulesetID} in application ${application.appID} deleted successfully`
+        `Ruleset with ID ${rulesetID} in application ${application.id} deleted successfully`
       );
 
       // Update the tableData to remove the deleted ruleset
       setTableData((prevTableData) => {
         return prevTableData.map((app) => {
-          if (app.appID === application.appID) {
+          if (app.id === application.id) {
             return {
               ...app,
               rulesets: app.rulesets.filter(
-                (ruleset) => ruleset.rulesetID !== rulesetID
+                (ruleset) => ruleset.id !== rulesetID
               ),
               rulesetCount: app.rulesetCount - 1, // Decrease the ruleset count
             };
@@ -96,12 +81,13 @@ export default function ApplicationTable({
   };
 
   const expandColumns: TableColumnsType<RulesetTableType> = [
-    { title: "Ruleset ID", dataIndex: "rulesetID", key: "rulesetID" },
+    { title: "Ruleset ID", dataIndex: "id", key: "id" },
     { title: "Host", dataIndex: "host", key: "host" },
     {
       title: "Date Last Modified",
-      dataIndex: "dateLastModified",
-      key: "dateLastModified",
+      dataIndex: "lastModifiedDatetime",
+      key: "lastModifiedDatetime",
+      render: (date: Date) => date.toString(),
     },
     {
       title: "Action",
@@ -112,7 +98,7 @@ export default function ApplicationTable({
             <a
               onClick={() => {
                 router.push(
-                  `/applications/${application.appID}/rulesets/${row.rulesetID}`
+                  `/applications/${application.id}/rulesets/${row.id}`
                 );
               }}
             >
@@ -121,7 +107,7 @@ export default function ApplicationTable({
             <a
               onClick={() => {
                 router.push(
-                  `/applications/${application.appID}/rulesets/${row.rulesetID}/edit`
+                  `/applications/${application.id}/rulesets/${row.id}/edit`
                 );
               }}
             >
@@ -129,7 +115,7 @@ export default function ApplicationTable({
             </a>
             <a
               onClick={(e) => {
-                handleRulesetDelete(e, row.rulesetID);
+                handleRulesetDelete(e, row.id);
               }}
             >
               Delete
@@ -141,13 +127,18 @@ export default function ApplicationTable({
   ];
 
   const columns: TableColumnsType<ApplicationTableType> = [
-    { title: "Application ID", dataIndex: "appID", key: "appID" },
+    { title: "Application ID", dataIndex: "id", key: "id" },
     {
       title: "Application Name",
-      dataIndex: "applicationName",
-      key: "applicationName",
+      dataIndex: "appName",
+      key: "appName",
     },
-    { title: "Date Created", dataIndex: "dateCreated", key: "dateCreated" },
+    {
+      title: "Date Created",
+      dataIndex: "createdDatetime",
+      key: "createdDatetime",
+      render: (date: Date) => date.toString(),
+    },
     {
       title: "Number of Rulesets",
       dataIndex: "rulesetCount",
@@ -160,7 +151,7 @@ export default function ApplicationTable({
         <Space size="middle">
           <a
             onClick={() => {
-              router.push(`/applications/${application.appID}/rulesets/new`);
+              router.push(`/applications/${application.id}/rulesets/new`);
             }}
           >
             Add Ruleset
@@ -174,39 +165,43 @@ export default function ApplicationTable({
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        const rulesetsID = await rulesetDataService.getRulesetsByAppId(
+        const rulesetsID = await RulesetDataService.getRulesets(
           companyId,
-          application.appID
+          application.id
         );
         const rulesetsData = await Promise.all(
-          rulesetsID.data.map(async (rulesetID: string) => {
-            const rulesetResponse =
-              await rulesetDataService.getRulesetByRulesetId(
-                companyId,
-                application.appID,
-                rulesetID
-              );
-            const hostResponse = await rulesetDataService.getHostByRulesetId(
+          rulesetsID.map(async (rulesetID: string) => {
+            const rulesetResponse = await RulesetDataService.getRulesetByID(
               companyId,
-              application.appID,
+              application.id,
               rulesetID
             );
-            return { ...rulesetResponse, host: hostResponse.data.host };
+            const hostResponse = await HostDataService.getHostByRulesetID(
+              companyId,
+              application.id,
+              rulesetID
+            );
+            return { ...rulesetResponse, host: hostResponse };
           })
         );
 
         const tableData = {
           ...application,
+          key: application.id,
           rulesetCount: rulesetsData.length,
           rulesets: rulesetsData.map((ruleset) => {
             return {
-              rulesetID: ruleset.id,
+              key: ruleset.id,
+              id: ruleset.id,
               host: ruleset.host,
-              dateLastModified: ruleset.last_modified_datetime,
+              lastModifiedDatetime: ruleset.lastModifiedDatetime,
+              appId: ruleset.appId,
+              rulesetJson: ruleset.rulesetJson,
             };
           }),
         };
         setTableData([tableData]);
+        console.log(tableData);
       } catch (error) {
         console.error("Failed to fetch menu items:", error);
       }
@@ -219,9 +214,8 @@ export default function ApplicationTable({
     return (
       <Table<RulesetTableType>
         columns={expandColumns}
-        dataSource={row.rulesets.map((app: any) => ({
+        dataSource={row.rulesets.map((app: RulesetTableType) => ({
           ...app,
-          key: app.rulesetID,
         }))}
         pagination={false}
       />
@@ -233,7 +227,6 @@ export default function ApplicationTable({
       expandable={{ expandedRowRender }}
       dataSource={tableData.map((app) => ({
         ...app,
-        key: app.appID,
       }))}
       pagination={false}
     />

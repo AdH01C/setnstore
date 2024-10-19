@@ -2,31 +2,20 @@
 
 import React, { useEffect, useState } from "react";
 import ApplicationTable from "@/app/applications/[app_id]/ApplicationTable";
-import applicationDataService from "@/app/services/ApplicationDataService";
+import applicationDataService from "@/app/services/NewAppDataService";
 import { useAppContext } from "@/app/components/AppContext";
-interface Application {
-  appID: string;
-  applicationName: string;
-  dateCreated: Date;
-  companyId: string;
-}
+import { AppDetailsWithID } from "@inquisico/ruleset-editor-api";
 export default function AppDisplay() {
   const { appID, companyId } = useAppContext();
-  const [application, setApplication] = useState<Application>();
-  
+  const [application, setApplication] = useState<AppDetailsWithID>();
+
   useEffect(() => {
     const fetchApplications = async () => {
-      const response = await applicationDataService.getApplicationByAppId(
+      const response = await applicationDataService.getApplicationByID(
         companyId,
         appID
       );
-      const application: Application = {
-        appID: appID,
-        applicationName: response.data.app_name,
-        companyId: response.data.company_id,
-        dateCreated: response.data.created_datetime,
-      };
-      setApplication(application);
+      setApplication(response);
     };
     fetchApplications();
   }, [companyId, appID]);

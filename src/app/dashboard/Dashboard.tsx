@@ -2,24 +2,20 @@
 
 import { useEffect, useState } from "react";
 import Loading from "../components/Loading";
-import ApplicationDataService from "../services/ApplicationDataService";
+import ApplicationDataService from "../services/NewAppDataService";
 import ProjectCard from "./ProjectCard";
 import CreateProjectCard from "./CreateProjectCard";
 import { useAppContext } from "../components/AppContext";
 import { getSession } from "next-auth/react";
-import userDataService from "../services/UserDataService";
-import companyDataService from "../services/CompanyDataService";
+import oldUserDataService from "../services/OldUserDataService";
+import oldCompanyDataService from "../services/OldCompanyDataService";
+import companyDataService from "../services/NewCompanyDataService";
 import { redirect } from "next/navigation";
-
-interface Application {
-  app_name: string;
-  company_name: string;
-  id: string;
-}
+import { AppDetailsWithID, User } from "@inquisico/ruleset-editor-api";
 
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
-  const [applications, setApplications] = useState<Application[]>([]);
+  const [applications, setApplications] = useState<AppDetailsWithID[]>([]);
   const { companyName, setCompanyName, companyId, setCompanyId } =
     useAppContext();
 
@@ -34,7 +30,7 @@ export default function Dashboard() {
           // Try fetching the existing user
           let existingUser;
           try {
-            existingUser = await userDataService.getUserByUsername(email);
+            existingUser = await oldUserDataService.getUserByUsername(email);
           } catch (error: any) {
             // Check if the error is a 404 (user not found)
             if (error.response && error.response.status === 404) {
@@ -46,13 +42,12 @@ export default function Dashboard() {
                 google_id: googleId,
                 password: "password",
               };
-              const userResponse = await userDataService.createUser(newUser);
-
+              const userResponse = await oldUserDataService.createUser(newUser);
               // Create a company for the new user
               const companyData = {
                 company_name: session.user.name + "'s company",
               };
-              const companyResponse = await companyDataService.createCompany(
+              const companyResponse = await oldCompanyDataService.createCompany(
                 userResponse.data.id,
                 companyData
               );
@@ -74,11 +69,11 @@ export default function Dashboard() {
               console.error("Google Id does not match session google Id");
               redirect("/");
             }
-            const companyResponse = await userDataService.getCompanyByUserId(
+            const companyResponse = await companyDataService.getCompanyByUserId(
               existingUser.data.id
             );
-            setCompanyId(companyResponse.data.id);
-            setCompanyName(companyResponse.data.company_name);
+            setCompanyId(companyResponse.id);
+            setCompanyName(companyResponse.companyName);
           }
         } else {
           console.error("No session or email found. Redirect to login.");
@@ -96,9 +91,10 @@ export default function Dashboard() {
     // Fetch all applications by company name
     const fetchApplications = async () => {
       try {
-        const response =
-          await ApplicationDataService.getAllApplicationsByCompanyId(companyId);
-        setApplications(response.data);
+        const response = await ApplicationDataService.getApplications(
+          companyId
+        );
+        setApplications(response);
       } catch (error) {
         console.error("Error fetching applications:", error);
       } finally {
@@ -115,7 +111,7 @@ export default function Dashboard() {
   };
 
   // Function to add a new application to the list
-  const handleCreate = (newApp: Application) => {
+  const handleCreate = (newApp: AppDetailsWithID) => {
     setApplications((prevApps = []) => [...prevApps, newApp]); // Append the new application
   };
 
@@ -130,7 +126,7 @@ export default function Dashboard() {
               <ProjectCard
                 key={application.id} // Ensure each card has a unique key
                 appId={application.id}
-                appName={application.app_name}
+                appName={application.appName}
                 companyName={companyName}
                 companyId={companyId}
                 onDelete={handleDelete}

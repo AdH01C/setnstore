@@ -94,9 +94,7 @@ export default function AppLayout({
 
 function itemRender(
   route: any,
-  params: any,
   routes: any,
-  paths: any
 ): ReactNode {
   const isLast = route?.title === routes[routes.title - 1]?.path;
   return isLast || route.href === undefined ? (
@@ -144,13 +142,7 @@ const generateBreadCrumb = (pathname: string) => {
               : undefined,
         });
       }
-    } else if (segments[2] === "rulesets" && segments[3]) {
-      const rulesetID = segments[3];
-      items.push({
-        title: "Ruleset",
-        href: `/applications/${appID}/rulesets/${rulesetID}`,
-      });
-    }
+    } 
 
     if (segments[4] === "edit") {
       items.push({ title: "Edit" });
