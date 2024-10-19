@@ -15,9 +15,6 @@ export default function RulesetDisplay() {
   const handleRulesetDelete = async (rulesetID: string) => {
     try {
       await RulesetDataService.deleteRulesetByID(companyId, appID, rulesetID);
-      console.log(
-        `Ruleset with ID ${rulesetID} in application ${appID} deleted successfully`
-      );
       router.push(`/applications/${appID}`);
     } catch (error) {
       console.error("Error deleting application:", error);

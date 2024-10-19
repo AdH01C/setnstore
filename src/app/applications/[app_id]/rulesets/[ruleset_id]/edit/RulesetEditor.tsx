@@ -8,13 +8,6 @@ import { useAppContext } from "@/app/components/AppContext";
 import { Button } from "antd";
 import { RulesetWithRulesetJson } from "@inquisico/ruleset-editor-api";
 
-interface Ruleset {
-  rulesetID: string;
-  host: string;
-  dateLastModified: Date;
-  ruleset: any;
-}
-
 export default function RulesetEditor() {
   const router = useRouter();
   const { appID, companyId, rulesetID } = useAppContext();

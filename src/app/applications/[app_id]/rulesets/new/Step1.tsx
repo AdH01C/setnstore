@@ -39,7 +39,7 @@ export default function Step1({
     const newFormData = { ...ruleset };
 
     // Check if the old key exists in the host object
-    if (newFormData.host.hasOwn(oldHost)) {
+    if (oldHost in newFormData.host) {
       // Get the value associated with the old dynamic key
       oldValue = newFormData.host[oldHost];
 

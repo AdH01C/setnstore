@@ -4,25 +4,20 @@ import RulesetDataService from "../../services/NewRulesetDataService";
 import ApplicationDataService from "../../services/NewAppDataService";
 import HostDataService from "../../services/HostDataService";
 import { useRouter } from "next/navigation";
-import { AppDetailsWithID } from "@inquisico/ruleset-editor-api";
+import {
+  AppDetailsWithID,
+  RulesetWithRulesetJson,
+} from "@inquisico/ruleset-editor-api";
 
-interface RulesetTableType extends Ruleset {
+interface RulesetTableType extends RulesetWithRulesetJson {
   key: string;
+  host: string;
 }
 
 interface ApplicationTableType extends AppDetailsWithID {
   key: string;
-}
-
-interface ApplicationWithRulesets extends AppDetailsWithID {
   rulesetCount: number;
-  rulesets: Ruleset[];
-}
-
-interface Ruleset {
-  rulesetID: string;
-  host: string;
-  dateLastModified: Date;
+  rulesets: RulesetTableType[];
 }
 
 export default function ApplicationTable({
@@ -32,7 +27,7 @@ export default function ApplicationTable({
   companyId: string;
   application: AppDetailsWithID;
 }) {
-  const [tableData, setTableData] = useState<ApplicationWithRulesets[]>([]);
+  const [tableData, setTableData] = useState<ApplicationTableType[]>([]);
   const router = useRouter();
 
   const handleApplicationDelete = async (e: React.MouseEvent) => {
@@ -72,7 +67,7 @@ export default function ApplicationTable({
             return {
               ...app,
               rulesets: app.rulesets.filter(
-                (ruleset) => ruleset.rulesetID !== rulesetID
+                (ruleset) => ruleset.id !== rulesetID
               ),
               rulesetCount: app.rulesetCount - 1, // Decrease the ruleset count
             };
@@ -86,12 +81,13 @@ export default function ApplicationTable({
   };
 
   const expandColumns: TableColumnsType<RulesetTableType> = [
-    { title: "Ruleset ID", dataIndex: "rulesetID", key: "rulesetID" },
+    { title: "Ruleset ID", dataIndex: "id", key: "id" },
     { title: "Host", dataIndex: "host", key: "host" },
     {
       title: "Date Last Modified",
-      dataIndex: "dateLastModified",
-      key: "dateLastModified",
+      dataIndex: "lastModifiedDatetime",
+      key: "lastModifiedDatetime",
+      render: (date: Date) => date.toString(),
     },
     {
       title: "Action",
@@ -102,7 +98,7 @@ export default function ApplicationTable({
             <a
               onClick={() => {
                 router.push(
-                  `/applications/${application.id}/rulesets/${row.rulesetID}`
+                  `/applications/${application.id}/rulesets/${row.id}`
                 );
               }}
             >
@@ -111,7 +107,7 @@ export default function ApplicationTable({
             <a
               onClick={() => {
                 router.push(
-                  `/applications/${application.id}/rulesets/${row.rulesetID}/edit`
+                  `/applications/${application.id}/rulesets/${row.id}/edit`
                 );
               }}
             >
@@ -119,7 +115,7 @@ export default function ApplicationTable({
             </a>
             <a
               onClick={(e) => {
-                handleRulesetDelete(e, row.rulesetID);
+                handleRulesetDelete(e, row.id);
               }}
             >
               Delete
@@ -191,16 +187,21 @@ export default function ApplicationTable({
 
         const tableData = {
           ...application,
+          key: application.id,
           rulesetCount: rulesetsData.length,
           rulesets: rulesetsData.map((ruleset) => {
             return {
-              rulesetID: ruleset.id,
+              key: ruleset.id,
+              id: ruleset.id,
               host: ruleset.host,
-              dateLastModified: ruleset.lastModifiedDatetime,
+              lastModifiedDatetime: ruleset.lastModifiedDatetime,
+              appId: ruleset.appId,
+              rulesetJson: ruleset.rulesetJson,
             };
           }),
         };
         setTableData([tableData]);
+        console.log(tableData);
       } catch (error) {
         console.error("Failed to fetch menu items:", error);
       }
@@ -213,9 +214,8 @@ export default function ApplicationTable({
     return (
       <Table<RulesetTableType>
         columns={expandColumns}
-        dataSource={row.rulesets.map((app: any) => ({
+        dataSource={row.rulesets.map((app: RulesetTableType) => ({
           ...app,
-          key: app.rulesetID,
         }))}
         pagination={false}
       />
@@ -227,7 +227,6 @@ export default function ApplicationTable({
       expandable={{ expandedRowRender }}
       dataSource={tableData.map((app) => ({
         ...app,
-        key: app.id,
       }))}
       pagination={false}
     />

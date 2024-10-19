@@ -19,7 +19,7 @@ export default function Step3({
       const newRuleset = await RulesetDataService.createRuleset(
         companyId,
         appID,
-        ruleset
+        { rulesetJson: ruleset }
       );
 
       router.push(`/applications/${appID}/rulesets/${newRuleset.id}`);
