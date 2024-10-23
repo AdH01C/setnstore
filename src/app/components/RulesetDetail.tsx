@@ -1,5 +1,11 @@
-import { Button } from "antd";
+import { Button, Card, Space, Typography } from "antd";
+import CodeMirror, { EditorView, keymap } from "@uiw/react-codemirror";
+import { javascript } from "@codemirror/lang-javascript";
 import React from "react";
+import { barf } from "thememirror";
+import { defaultKeymap } from "@codemirror/commands";
+
+const { Title } = Typography;
 
 export default function RulesetDetail({
   ruleset,
@@ -17,19 +23,36 @@ export default function RulesetDetail({
   return (
     <>
       {ruleset && (
-        <div className="flex items-start space-x-4">
-          <pre className="flex-grow">{JSON.stringify(ruleset, null, 2)}</pre>
-          {isEditable && (
-            <Button type="primary" onClick={onEdit}>
-              Edit ruleset
-            </Button>
-          )}
-          {isDeletable && (
-            <Button type="primary" danger onClick={onDelete}>
-              Delete ruleset
-            </Button>
-          )}
-        </div>
+        <Card
+          title={<Title level={4}>Final Ruleset Details</Title>}
+          bordered={true}
+          style={{ width: "100%", marginTop: "20px" }}
+        >
+          <CodeMirror
+            value={JSON.stringify(ruleset, null, 2)}
+            extensions={[
+              javascript(),
+              keymap.of(defaultKeymap),
+              EditorView.lineWrapping,
+            ]}
+            theme={barf}
+            height="100%" // Ensure CodeMirror takes up the full height
+            editable={false}
+          />
+
+          <Space style={{ marginTop: "20px" }}>
+            {isEditable && (
+              <Button type="primary" onClick={onEdit}>
+                Edit Ruleset
+              </Button>
+            )}
+            {isDeletable && (
+              <Button type="primary" danger onClick={onDelete}>
+                Delete Ruleset
+              </Button>
+            )}
+          </Space>
+        </Card>
       )}
     </>
   );
