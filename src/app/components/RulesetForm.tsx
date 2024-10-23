@@ -14,7 +14,7 @@ import allowedOriginsControl from "@/app/components/renderer/allowedOrigins/Allo
 import { useEffect, useState } from "react";
 import { javascript } from "@codemirror/lang-javascript";
 import { barf } from "thememirror";
-import { defaultKeymap } from "@codemirror/commands"; // Default key bindings
+import { defaultKeymap } from "@codemirror/commands";
 import React from "react";
 import { Flex, Splitter } from "antd";
 import { EditorView } from "@codemirror/view";
@@ -28,7 +28,6 @@ export default function RulesetForm({
 }) {
   const renderers = [
     ...vanillaRenderers,
-    //register custom renderers
     { tester: authorizationControlTester, renderer: authorizationControl },
     { tester: hostControlTester, renderer: hostControl },
     { tester: allowedOriginsTester, renderer: allowedOriginsControl },
@@ -54,12 +53,16 @@ export default function RulesetForm({
 
   return (
     <>
-      <Flex gap="middle" vertical>
+      <Flex gap="middle" vertical style={{ height: '100vh' }}>
         <Splitter>
+          {/* Left panel containing the JsonForms with independent scrolling */}
           <Splitter.Panel
-            style={{ padding: "0 20px 0  0" }}
-            defaultSize="70%"
-            max="90%"
+            style={{
+              paddingRight: "20px",
+              height: "100%",
+              overflowY: "auto",
+              padding: "0 20px 0 0",
+            }}
           >
             <JsonForms
               schema={schema}
@@ -72,7 +75,16 @@ export default function RulesetForm({
               }
             />
           </Splitter.Panel>
-          <Splitter.Panel collapsible>
+
+          {/* Right panel containing CodeMirror with independent scrolling */}
+          <Splitter.Panel
+            defaultSize="30%"
+            max="35%"
+            style={{
+              height: "100%",
+              overflowY: "auto", // Independent scrolling for the CodeMirror editor
+            }}
+          >
             <CodeMirror
               value={textAreaValue}
               extensions={[
@@ -82,6 +94,7 @@ export default function RulesetForm({
               ]}
               onChange={handleCodeMirrorChange}
               theme={barf}
+              height="100%" // Ensure CodeMirror takes up the full height
             />
           </Splitter.Panel>
         </Splitter>

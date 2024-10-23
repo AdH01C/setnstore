@@ -38,8 +38,14 @@ export default function RulesetCreator() {
   const items = steps.map((item) => ({ key: item.title, title: item.title }));
 
   return (
-    <>
-      <Steps current={current} items={items} />
+    <div>
+      <Steps current={current} items={items} style={
+        { 
+          marginBottom: "2rem",
+          paddingRight: "2rem",
+        }
+
+      } />
       <div>
         {current == 0 ? (
           <Step1 ruleset={formData} updateRuleset={setFormData} next={next} />
@@ -54,6 +60,6 @@ export default function RulesetCreator() {
           <Step3 ruleset={formData} prev={prev} />
         ) : null}
       </div>
-    </>
+    </div>
   );
 }

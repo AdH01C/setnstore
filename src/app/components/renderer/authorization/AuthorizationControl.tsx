@@ -61,7 +61,7 @@ function Authorization({ id, value, updateValue }: AuthorizationProps) {
     <Collapse className="text-sm">
       <Panel header="Authorization" key="1">
         <Collapse
-          className="w-full border-none flex flex-col"
+          className="w-full flex flex-col"
           expandIconPosition="right"
         >
           {Object.entries(value).map(([entity, entityAuthData]) => {
@@ -116,7 +116,7 @@ function Authorization({ id, value, updateValue }: AuthorizationProps) {
             );
           })}
           <button
-            className="border border-dotted border-gray-300 rounded-md p-2 mt-4 hover:bg-gray-100"
+            className="border border-dotted border-gray-300 rounded-md p-2 hover:bg-gray-100"
             onClick={() => {
               const newEntity = `new-entity-${Object.keys(value).length + 1}`;
               updateValue({

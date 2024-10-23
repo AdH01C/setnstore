@@ -113,6 +113,7 @@ export const AuthRelationTable = ({
 
         return (
           <Select
+            className="w-[156px]"
             mode="tags"
             value={facets.map((authRelation: AuthorizationRelation) =>
               sortedStringify(authRelation)

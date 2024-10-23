@@ -47,7 +47,7 @@ export const Path: React.FC<PathProps> = ({
   }
 
   return (
-    <Collapse className="text-sm w-[768px]">
+    <Collapse className="text-sm w-fit">
       <Collapse.Panel
         header={
           <>

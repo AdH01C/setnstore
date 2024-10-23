@@ -180,7 +180,7 @@ export const HostPermissionTable = ({
             onChange={(selectedPermissionType) => {
               handlePermissionChange(record.method, selectedPermissionType);
             }}
-            className="w-[300px]"
+            className="w-[156px]"
             options={options}
           />
         );
@@ -193,7 +193,7 @@ export const HostPermissionTable = ({
         if (permission && "entity" in permission && "type" in permission) {
           const labelManager = new LabelManager();
           return (
-            <div className="flex flex-col w-[128px] gap-2">
+            <div className="flex flex-col w-[256px] gap-2">
               <Select
                 defaultValue={
                   permission && "entity" in permission

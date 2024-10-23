@@ -18,8 +18,8 @@ export default function Step2({
 
   return (
     <>
-      <RulesetForm formData={ruleset} onFormChange={handleFormChange} />
-      <div style={{ marginTop: 24 }}>
+      
+      <div className="mb-4 flex justify-between pr-4">
         <Button
           type="primary"
           onClick={() => {
@@ -37,6 +37,7 @@ export default function Step2({
           Next
         </Button>
       </div>
+      <RulesetForm formData={ruleset} onFormChange={handleFormChange} />
     </>
   );
 }

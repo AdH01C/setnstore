@@ -20,7 +20,7 @@ function Host({ id, value, updateValue }: HostProps) {
   const authData = ctx.core?.data?.authorization
 
   return (
-    <Collapse className="text-sm">
+    <Collapse className="text-sm w-full">
       {Object.entries(value).map(([host, hostProperties]) => {
         const handleHostValueChange = (newPath: PathValue) => {
           const newValue: HostValue = { ...value };
@@ -28,7 +28,7 @@ function Host({ id, value, updateValue }: HostProps) {
           updateValue(newValue);
         };
         return (
-          <Collapse.Panel className="text-sm" header={host} key={host}>
+          <Collapse.Panel className="text-sm w-full" header={host} key={host}>
             <HostPanel
               key={host}
               value={{ [host]: hostProperties }}

@@ -176,6 +176,7 @@ export const AuthPermissionTable = ({
       if (isAuthorizationOperations(record.type)) {
         return (
           <Select
+            className="w-fit min-w-[216px]"
             mode={"tags"}
             value={record.type.operations.map((authOp) =>
               sortedStringify(authOp)
@@ -191,6 +192,7 @@ export const AuthPermissionTable = ({
       if (isAuthorizationRule(record.type)) {
         return (
           <Select
+            className="w-[156px]"
             value={
               record.type &&
               sortedStringify(record.type) !== sortedStringify({ relation: "" })

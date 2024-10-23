@@ -29,8 +29,8 @@ export default function Step3({
   };
   return (
     <>
-      <RulesetDetail ruleset={ruleset} />
-      <div style={{ marginTop: 24 }}>
+      
+      <div className="flex justify-between mb-4 pr-4">
         <Button
           type="primary"
           onClick={() => {
@@ -48,6 +48,7 @@ export default function Step3({
           Submit
         </Button>
       </div>
+      <RulesetDetail ruleset={ruleset} />
     </>
   );
 }
