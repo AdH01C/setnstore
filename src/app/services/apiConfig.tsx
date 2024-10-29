@@ -3,7 +3,7 @@ import {
   server3 as customServer,
 } from "@inquisico/ruleset-editor-api";
 import NgrokMiddleware from "./middlewares/ngrok";
-import PeflightHeadersMiddleware from "./middlewares/preflightHeaders";
+import PreflightHeadersMiddleware from "./middlewares/preflightHeaders";
 
 const url = process.env.NEXT_PUBLIC_BACKEND!;
 const [scheme, address] = url.split("://");
@@ -18,7 +18,7 @@ customServer.setVariables({
 
 const configuration = createConfiguration({
   baseServer: customServer,
-  promiseMiddleware: [new NgrokMiddleware(), new PeflightHeadersMiddleware()],
+  promiseMiddleware: [new NgrokMiddleware(), new PreflightHeadersMiddleware()],
 });
 
 export default configuration;

@@ -106,8 +106,7 @@ export const AuthRelationTable = ({
         const facetOptions = authRelationOptions([
           ...relationList.filter(
             (authRelation) =>
-              authRelation.parentEntity !== entity &&
-              authRelation.relationName !== record.relation
+              authRelation.parentEntity !== entity
           ),
         ]);
 

@@ -4,7 +4,7 @@ import {
   Middleware,
 } from "@inquisico/ruleset-editor-api";
 
-export default class PeflightHeadersMiddleware implements Middleware {
+export default class PreflightHeadersMiddleware implements Middleware {
   pre(context: RequestContext): Promise<RequestContext> {
     context.setHeaderParam("Content-Type", "application/json");
     return Promise.resolve(context);
