@@ -10,7 +10,7 @@ class CompanyDataService {
   private companyAPI: CompanyApi;
 
   constructor() {
-    this.companyAPI = new CompanyApi(configuration);
+    this.companyAPI = new CompanyApi(configuration(true));
   }
 
   async createCompany(userId: string, company: Company): Promise<ID> {

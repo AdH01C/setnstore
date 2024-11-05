@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { ReactNode } from "react";
 import { UserOutlined } from "@ant-design/icons";
+import Image from "next/image";
 import { AppProvider } from "../components/AppContext";
 
 export default function AppLayout({
@@ -52,8 +53,12 @@ export default function AppLayout({
     <AppProvider>
       <Layout style={{ minHeight: "100vh" }}>
         <Header className="flex items-center justify-between">
-          <Link href="/dashboard" className="text-white text-2xl font-bold">
+          {/* <Link href="/dashboard" className="text-white text-2xl font-bold">
             Inquisico
+          </Link> */}
+          {/* Logo */}
+          <Link href="/dashboard" className="relative aspect-[168/44] h-[2.75rem]">
+            <Image alt="logo" src="/logo.svg" layout="fill" />
           </Link>
 
           <Dropdown menu={{ items }}>

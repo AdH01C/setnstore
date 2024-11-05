@@ -5,7 +5,7 @@ class HostDataService {
   private hostAPI: HostApi;
 
   constructor() {
-    this.hostAPI = new HostApi(configuration);
+    this.hostAPI = new HostApi(configuration(true));
   }
 
   async getHostByRulesetID(

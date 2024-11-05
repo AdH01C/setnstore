@@ -5,7 +5,7 @@ class UserDataService {
   private userAPI: UserApi;
 
   constructor() {
-    this.userAPI = new UserApi(configuration);
+    this.userAPI = new UserApi(configuration(true));
   }
 
   async createUser(user: User): Promise<ID> {
