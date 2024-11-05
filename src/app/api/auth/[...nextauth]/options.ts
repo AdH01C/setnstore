@@ -1,42 +1,42 @@
 import type { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
-
 
 export const options: NextAuthOptions = {
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_SECRET_ID as string,
-    }),
-    CredentialsProvider({
-      name: "Credentials",
-      credentials: {
-        username: {
-          label: "Username:",
-          type: "text",
-        },
-        password: {
-          label: "Password:",
-          type: "text",
+    {
+      id: "authlink",
+      name: "AuthLink",
+      type: "oauth",
+      version: "2.0",
+      issuer: "http://host.docker.internal:32766/realms/dev", // Add this line
+      wellKnown: "http://host.docker.internal:32766/realms/dev/.well-known/openid-configuration",
+      authorization: {
+        url: "http://host.docker.internal:32766/realms/dev/protocol/openid-connect/auth",
+        params: {
+          client_id: process.env.APP_OIDC_CLIENT_ID,
+          scope: "openid profile email",
+          response_type: "code",
+          redirect_uri: "http://localhost:3000/api/auth/callback/authlink", // Make sure this is correct
         },
       },
-      async authorize(credentials, req) {
-        const user = { username: "test", password: "test" };
-
-        if (
-          credentials?.username === user.username &&
-          credentials?.password === user.password
-        ) {
-          return {
-            id: "1", // Dummy id
-            name: credentials?.username,
-          };
-        } else {
-          return null;
-        }
+      token: {
+        url: "http://host.docker.internal:32766/realms/dev/protocol/openid-connect/token",
       },
-    }),
+      userinfo: {
+        url: "http://host.docker.internal:32766/realms/dev/protocol/openid-connect/userinfo",
+      },
+      clientId: process.env.APP_OIDC_CLIENT_ID,
+      clientSecret: process.env.APP_OIDC_CLIENT_SECRET,
+      idToken: true,
+      checks: ["pkce", "state"],
+      profile(profile) {
+        return {
+          id: profile.sub,
+          name: profile.name || profile.preferred_username || profile.email,
+          email: profile.email,
+          image: profile.picture,
+        };
+      },
+    },
   ],
   session: {
     strategy: "jwt",
@@ -49,13 +49,12 @@ export const options: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      // Check if session.user exists
       if (session.user) {
         session.accessToken = token.accessToken;
         session.user.sub = token.sub;
       }
       return session;
-    }    
+    },
   },
 };
 

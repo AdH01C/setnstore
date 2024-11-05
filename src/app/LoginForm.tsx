@@ -2,30 +2,20 @@
 
 import { LockOutlined, UserOutlined, GoogleOutlined } from "@ant-design/icons";
 import { Form, Flex, Checkbox, Button, Input } from "antd";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Loading from "@/app/components/Loading";
 
 export default function LoginForm() {
   const router = useRouter();
-
-  const onLogin = async (values: any) => {
-    const result = await signIn("credentials", {
-      redirect: false, // Prevent automatic redirection
-      username: values.username,
-      password: values.password,
-    });
-
+  const onLogin = async () => {
+    const result = await signIn("authlink", { callbackUrl: "/dashboard" });
     if (result?.error) {
-      console.error("Login error:", result.error);
+      console.error("Error signing in:", result.error);
     } else {
-      router.push("/dashboard");
+      redirect("/dashboard");
     }
-  };
-
-  const onGoogleLogin = async () => {
-    signIn("google", { callbackUrl: "/dashboard" });
   };
 
   const [isLoading, setIsLoading] = useState(true);
@@ -53,39 +43,7 @@ export default function LoginForm() {
             className="w-[360px]"
             onFinish={onLogin}
           >
-            <Form.Item
-              name="username"
-              rules={[
-                { required: true, message: "Please input your Username!" },
-              ]}
-            >
-              <Input prefix={<UserOutlined />} placeholder="Username" />
-            </Form.Item>
-            <Form.Item
-              name="password"
-              rules={[
-                { required: true, message: "Please input your Password!" },
-              ]}
-            >
-              <Input
-                prefix={<LockOutlined />}
-                type="password"
-                placeholder="Password"
-              />
-            </Form.Item>
-            <Form.Item>
-              <Flex justify="space-between" align="center">
-                <Form.Item name="remember" valuePropName="checked" noStyle>
-                  <Checkbox>
-                    <a className="text-secondary">Remember me</a>
-                  </Checkbox>
-                </Form.Item>
-                <a href="" className="text-secondary">
-                  Forgot password
-                </a>
-              </Flex>
-            </Form.Item>
-
+            
             <Form.Item>
               <Button
                 block
@@ -93,25 +51,10 @@ export default function LoginForm() {
                 htmlType="submit"
                 className="bg-secondary"
               >
-                Log in
+                Get Started
               </Button>
             </Form.Item>
 
-            <Form.Item>
-              <Button
-                block
-                icon={<GoogleOutlined />}
-                type="primary"
-                style={{
-                  backgroundColor: "#fa3452",
-                  borderColor: "#fa3452",
-                  color: "white",
-                }}
-                onClick={onGoogleLogin}
-              >
-                Log in with Google
-              </Button>
-            </Form.Item>
           </Form>
         </>
       )}
