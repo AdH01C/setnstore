@@ -5,12 +5,13 @@ import { redirect } from "next/navigation";
 import { Layout } from "antd";
 import { Footer } from "antd/es/layout/layout";
 import { Content } from "antd/es/layout/layout";
+import userDataService from "./services/NewUserDataService";
 
 export default async function Page() {
   const session = await getServerSession(options);
 
   if (session) {
-    redirect("/dashboard");
+    return redirect("/dashboard");
   }
 
   return (

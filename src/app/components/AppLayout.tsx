@@ -43,7 +43,8 @@ export default function AppLayout({
       danger: true,
       label: "Log out",
       onClick: () => {
-        signOut({ callbackUrl: "/" });
+        // signOut({ callbackUrl: "/" });
+        signOut();
       },
     },
   ];

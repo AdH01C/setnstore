@@ -1,4 +1,10 @@
-import type { NextAuthOptions } from "next-auth";
+import type { NextAuthOptions, Session } from "next-auth";
+
+declare module "next-auth" {
+  interface Session {
+    idToken?: string;
+  }
+}
 
 export const options: NextAuthOptions = {
   providers: [
@@ -19,7 +25,7 @@ export const options: NextAuthOptions = {
         },
       },
       token: {
-        url: "http://host.docker.internal:32766/realms/dev/protocol/openid-connect/token",
+        url: "https://api.127.0.0.1.nip.io:8443",
       },
       userinfo: {
         url: "http://host.docker.internal:32766/realms/dev/protocol/openid-connect/userinfo",
@@ -45,16 +51,19 @@ export const options: NextAuthOptions = {
     async jwt({ token, account }) {
       if (account) {
         token.accessToken = account.access_token;
+        // Type assertion to ensure idToken is treated as a string
+        token.idToken = account.id_token as string | undefined;
       }
       return token;
     },
     async session({ session, token }) {
-      if (session.user) {
-        session.accessToken = token.accessToken;
-        session.user.sub = token.sub;
-      }
+      // Type assertion here as well
+      session.accessToken = token.accessToken as string | undefined;
+      session.idToken = token.idToken as string | undefined;
       return session;
     },
   },
+  
+  
 };
 

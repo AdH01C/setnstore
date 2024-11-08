@@ -12,12 +12,33 @@ import oldCompanyDataService from "../services/OldCompanyDataService";
 import companyDataService from "../services/NewCompanyDataService";
 import { redirect } from "next/navigation";
 import { AppDetailsWithID } from "@inquisico/ruleset-editor-api";
+import IdentityDataService from "../services/IdentityDataService";
 
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [applications, setApplications] = useState<AppDetailsWithID[]>([]);
-  const { companyName, setCompanyName, companyId, setCompanyId } =
-    useAppContext();
+  const { companyName, setCompanyName, companyId, setCompanyId } = useAppContext();
+
+  const [user, setUser] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const obtainUser = (): Promise<any> => {
+        const identityDataService = new IdentityDataService();
+        return identityDataService.getIdentity();
+      };
+
+      setUser(await obtainUser());
+    };
+
+    try {
+      fetchUser();
+    } catch (error) {
+      setError(String(error));
+    }
+    
+  }, []);
 
   useEffect(() => {
     const checkAndSetUser = async () => {
@@ -25,7 +46,6 @@ export default function Dashboard() {
       try {
         if (session?.user?.email) {
           const email = session.user.email;
-          const googleId = session.user.sub;
 
           // Try fetching the existing user
           let existingUser;
@@ -39,8 +59,7 @@ export default function Dashboard() {
                 username: email,
                 email: email,
                 full_name: session.user.name,
-                google_id: googleId,
-                password: "password",
+                password: "password", // Placeholder password
               };
               const userResponse = await oldUserDataService.createUser(newUser);
               // Create a company for the new user
@@ -55,20 +74,14 @@ export default function Dashboard() {
               setCompanyId(companyResponse.data.id);
               setCompanyName(companyResponse.data.company_name);
             } else if (error.response && error.response.status === 500) {
-              // If the error is not 404, rethrow it to be caught by the outer catch
               console.error("Prevent User Creation 500 Error");
             } else {
-              // If the error is not 404 or 500, rethrow it to be caught by the outer catch
               throw error;
             }
           }
 
           // If user exists, get company information
           if (existingUser?.data) {
-            if (googleId !== existingUser.data.google_id) {
-              console.error("Google Id does not match session google Id");
-              redirect("/");
-            }
             const companyResponse = await companyDataService.getCompanyByUserId(
               existingUser.data.id
             );
@@ -121,10 +134,22 @@ export default function Dashboard() {
         <Loading />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-3/4">
+          <>
+            {user ? (
+              <div className="flex flex-col gap-2 text-black">
+                <h1>Welcome, {user}</h1>
+                <h2>Company: {companyName}</h2>
+              </div>
+            ): (
+              <div className="flex flex-col gap-2 text-black">
+                <h1> {error} </h1>
+              </div>
+              )}
+          </>
           {applications &&
             applications.map((application) => (
               <ProjectCard
-                key={application.id} // Ensure each card has a unique key
+                key={application.id}
                 appId={application.id}
                 appName={application.appName}
                 companyName={companyName}
