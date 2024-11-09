@@ -1186,6 +1186,11 @@ cookie@^0.7.0:
   resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.7.2.tgz#556369c472a2ba910f2979891b526b3436237ed7"
   integrity sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w==
 
+cookie@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/cookie/-/cookie-1.0.1.tgz#e1a00d20420e0266aff817815640289eef142751"
+  integrity sha512-Xd8lFX4LM9QEEwxQpF9J9NTUh8pmdJO0cyRJhFiDoLTk2eH8FXlRv2IFGYVadZpqI3j8fhNrSdKCeYPxiAhLXw==
+
 cookies-next@^4.2.1:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/cookies-next/-/cookies-next-4.3.0.tgz#66c489d1c7be126b844097c94b00cd66690a3791"
@@ -3510,7 +3515,7 @@ set-function-name@^2.0.1, set-function-name@^2.0.2:
     react "^18"
     react-dom "^18"
     react-hook-form "^7.53.0"
-    setnstore "file:../../../../../Library/Caches/Yarn/v6/npm-setnstore-0.1.0-8f881285-acd9-4354-97f7-142839919a8c-1731051989531/node_modules/setnstore"
+    setnstore "file:../../../../../Library/Caches/Yarn/v6/npm-setnstore-0.1.0-eb5fcd37-0e1b-415c-ac37-f41f524c3a7f-1731160015972/node_modules/setnstore"
     thememirror "^2.0.1"
 
 shallowequal@^1.1.0:
@@ -3566,6 +3571,7 @@ string-convert@^0.2.0:
   integrity sha512-u/1tdPl4yQnPBjnVrmdLo9gtuLvELKsAoRapekWggdiQNvvvum+jYF329d84NAa660KQw7pB2n36KrIKVoXa3A==
 
 "string-width-cjs@npm:string-width@^4.2.0", string-width@^4.1.0:
+  name string-width-cjs
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
   integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==

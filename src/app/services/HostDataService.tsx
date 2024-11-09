@@ -1,4 +1,4 @@
-import { HostApi, RulesetJson } from "@inquisico/ruleset-editor-api";
+import { Host, HostApi, RulesetJson } from "@inquisico/ruleset-editor-api";
 import configuration from "./apiConfig";
 
 class HostDataService {
@@ -12,7 +12,7 @@ class HostDataService {
     companyID: string,
     appID: string,
     rulesetID: string
-  ): Promise<string> {
+  ): Promise<Host> {
     try {
       const response = await this.hostAPI.getHostByRulesetId(
         companyID,

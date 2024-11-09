@@ -11,11 +11,19 @@ import userDataService from "./services/NewUserDataService";
 export default function LoginForm() {
   const router = useRouter();
   const onLogin = async () => {
-    const result = await signIn("authlink", { callbackUrl: "/dashboard" });
+    const result = await signIn("authlink", {
+      callbackUrl: "/dashboard",
+      redirect: false, // Prevent automatic redirect
+    });
+
     if (result?.error) {
       console.error("Error signing in:", result.error);
     } else {
-      redirect("/dashboard");
+      // Call the API route to set the cookie
+      await fetch("/api/set-token");
+
+      // Redirect to the dashboard after setting the cookie
+      router.push("/dashboard");
     }
   };
 
