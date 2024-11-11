@@ -18,6 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <meta name="referrer" content="no-referrer-when-downgrade" />
       <body>
         <Providers>
           <AntdRegistry>{children}</AntdRegistry>
