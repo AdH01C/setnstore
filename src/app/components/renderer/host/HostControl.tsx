@@ -3,7 +3,7 @@
 import { useJsonForms, withJsonFormsControlProps } from "@jsonforms/react";
 import { Collapse, CollapseProps } from "antd";
 import { HostPanel } from "./HostPanel";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 const HostControl = ({ data, handleChange, path }: HostControlProps) => (
   <Host
@@ -20,7 +20,7 @@ function Host({ id, value, updateValue }: HostProps) {
   // const relations: string[] = Object.keys(ctx.core?.data?.authorization || {});
   const authData = ctx.core?.data?.authorization;
 
-  const defaultValue = {
+  const defaultValue = useMemo(() => ({
     "": {
       "": {
         permission: {
@@ -28,13 +28,13 @@ function Host({ id, value, updateValue }: HostProps) {
         },
       },
     },
-  };
+  }), []);
 
   useEffect(() => {
     if (!value) {
       updateValue(defaultValue);
     }
-  }, [value, updateValue]);
+  }, [value, defaultValue, updateValue]);
 
   const currentValue = value || defaultValue;
 

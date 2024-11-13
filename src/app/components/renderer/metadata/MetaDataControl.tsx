@@ -7,7 +7,7 @@ import {
   Select,
   Typography,
 } from "antd";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 interface MetaDataControlProps {
   data: MetaDataValue;
@@ -64,19 +64,23 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
     { label: "Lowercase", value: "lowercase" },
     { label: "Uppercase", value: "uppercase" },
   ];
-  const defaultValue: MetaDataValue = {
-    trailingSlashMode: "strict",
-    redirectSlashes: "strip",
-    caseSensitive: false,
-    entityValueCase: "none",
-    optionsPassthrough: false,
-  };
+
+  const defaultValue: MetaDataValue = useMemo(
+    () => ({
+      trailingSlashMode: "strict",
+      redirectSlashes: "strip",
+      caseSensitive: false,
+      entityValueCase: "none",
+      optionsPassthrough: false,
+    }),
+    []
+  );
 
   useEffect(() => {
     if (!value) {
       updateValue(defaultValue);
     }
-  }, [value, updateValue]);
+  }, [value, defaultValue, updateValue]);
 
   const currentValue = value || defaultValue;
 
