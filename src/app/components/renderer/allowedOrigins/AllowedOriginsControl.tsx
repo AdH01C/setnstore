@@ -1,5 +1,6 @@
 import { Button, Collapse, CollapseProps, Input, Table } from "antd";
 import { withJsonFormsControlProps } from "@jsonforms/react";
+import { useEffect } from "react";
 
 interface AllowedOriginsControlProps {
   data: string[];
@@ -27,10 +28,17 @@ const AllowedOriginsControl = ({
 export default withJsonFormsControlProps(AllowedOriginsControl);
 
 function AllowedOrigins({ id, value, updateValue }: AllowedOriginsProps) {
+  useEffect(() => {
+    if (!value) {
+      updateValue([]);
+    }
+  }, [value, updateValue]);
+
+  const currentValue = value || [];
   const dataSource =
-    value === undefined
+    currentValue === undefined
       ? []
-      : value.map((origin, index) => ({ key: index, origin }));
+      : currentValue.map((origin, index) => ({ key: index, origin }));
 
   const items: CollapseProps["items"] = [
     {

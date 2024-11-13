@@ -1,5 +1,13 @@
 import { withJsonFormsControlProps } from "@jsonforms/react";
-import { Collapse, CollapseProps, Divider, Input, Select, Typography } from "antd";
+import {
+  Collapse,
+  CollapseProps,
+  Divider,
+  Input,
+  Select,
+  Typography,
+} from "antd";
+import { useCallback, useEffect } from "react";
 
 interface MetaDataControlProps {
   data: MetaDataValue;
@@ -56,8 +64,23 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
     { label: "Lowercase", value: "lowercase" },
     { label: "Uppercase", value: "uppercase" },
   ];
+  const defaultValue: MetaDataValue = {
+    trailingSlashMode: "strict",
+    redirectSlashes: "strip",
+    caseSensitive: false,
+    entityValueCase: "none",
+    optionsPassthrough: false,
+  };
 
-  const items: CollapseProps['items'] = [
+  useEffect(() => {
+    if (!value) {
+      updateValue(defaultValue);
+    }
+  }, [value, updateValue]);
+
+  const currentValue = value || defaultValue;
+
+  const items: CollapseProps["items"] = [
     {
       key: "Metadata",
       label: "Metadata",
@@ -67,10 +90,10 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
           <div className="flex items-center justify-between">
             <Typography.Text>Trailing Slash Mode</Typography.Text>
             <Select
-              value={value.trailingSlashMode}
+              value={currentValue.trailingSlashMode}
               onChange={(val) =>
                 updateValue({
-                  ...value,
+                  ...currentValue,
                   trailingSlashMode: val as TrailingSlashMode,
                 })
               }
@@ -83,10 +106,10 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
           <div className="flex items-center justify-between">
             <Typography.Text>Redirect Slashes</Typography.Text>
             <Select
-              value={value.redirectSlashes}
+              value={currentValue.redirectSlashes}
               onChange={(val) =>
                 updateValue({
-                  ...value,
+                  ...currentValue,
                   redirectSlashes: val as RedirectSlashes,
                 })
               }
@@ -101,9 +124,12 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
             <div className="w-16">
               <Input
                 type="checkbox"
-                checked={value.caseSensitive}
+                checked={currentValue.caseSensitive}
                 onChange={(e) =>
-                  updateValue({ ...value, caseSensitive: e.target.checked })
+                  updateValue({
+                    ...currentValue,
+                    caseSensitive: e.target.checked,
+                  })
                 }
               />
             </div>
@@ -113,9 +139,12 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
           <div className="flex items-center justify-between">
             <Typography.Text>Entity Value Case</Typography.Text>
             <Select
-              value={value.entityValueCase}
+              value={currentValue.entityValueCase}
               onChange={(val) =>
-                updateValue({ ...value, entityValueCase: val as EntityCase })
+                updateValue({
+                  ...currentValue,
+                  entityValueCase: val as EntityCase,
+                })
               }
               className="w-1/6"
               options={entityValueCaseOptions}
@@ -128,10 +157,10 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
             <div className="w-16">
               <Input
                 type="checkbox"
-                checked={value.optionsPassthrough}
+                checked={currentValue.optionsPassthrough}
                 onChange={(e) =>
                   updateValue({
-                    ...value,
+                    ...currentValue,
                     optionsPassthrough: e.target.checked,
                   })
                 }

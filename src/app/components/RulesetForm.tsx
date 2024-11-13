@@ -11,6 +11,8 @@ import hostControlTester from "@/app/components/renderer/host/HostControlTester"
 import hostControl from "@/app/components/renderer/host/HostControl";
 import allowedOriginsTester from "@/app/components/renderer/allowedOrigins/AllowedOriginsTester";
 import allowedOriginsControl from "@/app/components/renderer/allowedOrigins/AllowedOriginsControl";
+import tabsCategorizationLayout from "@/app/components/renderer/tabs/TabsCategorizationLayout";
+import tabsCategorizationLayoutTester from "@/app/components/renderer/tabs/TabsCategorizationLayoutTester";
 import { useEffect, useState } from "react";
 import { javascript } from "@codemirror/lang-javascript";
 import { barf } from "thememirror";
@@ -28,6 +30,10 @@ export default function RulesetForm({
 }) {
   const renderers = [
     ...vanillaRenderers,
+    {
+      tester: tabsCategorizationLayoutTester,
+      renderer: tabsCategorizationLayout,
+    },
     { tester: authorizationControlTester, renderer: authorizationControl },
     { tester: hostControlTester, renderer: hostControl },
     { tester: allowedOriginsTester, renderer: allowedOriginsControl },
@@ -53,7 +59,7 @@ export default function RulesetForm({
 
   return (
     <>
-      <Flex gap="middle" vertical style={{ height: '100vh' }}>
+      <Flex gap="middle" vertical style={{ height: "100vh" }}>
         <Splitter>
           {/* Left panel containing the JsonForms with independent scrolling */}
           <Splitter.Panel
