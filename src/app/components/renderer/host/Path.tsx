@@ -1,4 +1,12 @@
-import { Button, Collapse, CollapseProps, Form, Input, Typography } from "antd";
+import {
+  Button,
+  Collapse,
+  CollapseProps,
+  Form,
+  Input,
+  Modal,
+  Typography,
+} from "antd";
 import React from "react";
 import { HostPermissionTable } from "./HostPermissionTable";
 import { EntitySettingsForm } from "./EntitySettingForm";
@@ -43,7 +51,17 @@ export const Path: React.FC<PathProps> = ({
   }
 
   function handleDeletePath() {
-    updatePathRoute();
+    Modal.confirm({
+      title: "Delete Path",
+      content:
+        "Are you sure you want to delete this path? All paths and its child routes will be deleted.",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      onOk() {
+        updatePathRoute();
+      },
+    });
   }
 
   const items: CollapseProps["items"] = [
