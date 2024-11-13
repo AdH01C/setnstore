@@ -1,7 +1,6 @@
 "use client";
 
 import { useJsonForms, withJsonFormsControlProps } from "@jsonforms/react";
-import { Collapse, CollapseProps } from "antd";
 import { HostPanel } from "./HostPanel";
 import { useEffect, useMemo } from "react";
 
@@ -20,15 +19,18 @@ function Host({ id, value, updateValue }: HostProps) {
   // const relations: string[] = Object.keys(ctx.core?.data?.authorization || {});
   const authData = ctx.core?.data?.authorization;
 
-  const defaultValue = useMemo(() => ({
-    "": {
+  const defaultValue = useMemo(
+    () => ({
       "": {
-        permission: {
-          GET: null,
+        "": {
+          permission: {
+            GET: null,
+          },
         },
       },
-    },
-  }), []);
+    }),
+    []
+  );
 
   useEffect(() => {
     if (!value) {
@@ -37,25 +39,6 @@ function Host({ id, value, updateValue }: HostProps) {
   }, [value, defaultValue, updateValue]);
 
   const currentValue = value || defaultValue;
-
-  const items: CollapseProps["items"] = Object.entries(currentValue).map(
-    ([host, hostProperties]) => ({
-      key: host,
-      label: host,
-      children: (
-        <HostPanel
-          key={host}
-          value={{ [host]: hostProperties }}
-          updateValue={(newPath) => {
-            const newValue = { ...currentValue };
-            newValue[host] = newPath;
-            updateValue(newValue);
-          }}
-          authData={authData}
-        />
-      ),
-    })
-  );
 
   return Object.keys(currentValue).length === 0 ? (
     <button
@@ -67,6 +50,17 @@ function Host({ id, value, updateValue }: HostProps) {
       Add Host
     </button>
   ) : (
-    <Collapse className="text-sm" items={items} />
+    Object.entries(currentValue).map(([host, hostProperties]) => (
+      <HostPanel
+        key={host}
+        value={{ [host]: hostProperties }}
+        updateValue={(newPath) => {
+          const newValue = { ...currentValue };
+          newValue[host] = newPath;
+          updateValue(newValue);
+        }}
+        authData={authData}
+      />
+    ))
   );
 }

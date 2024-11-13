@@ -1,4 +1,4 @@
-import { Button, Collapse, CollapseProps, Input, Table } from "antd";
+import { Button, Input, Table } from "antd";
 import { withJsonFormsControlProps } from "@jsonforms/react";
 import { useEffect } from "react";
 
@@ -40,53 +40,45 @@ function AllowedOrigins({ id, value, updateValue }: AllowedOriginsProps) {
       ? []
       : currentValue.map((origin, index) => ({ key: index, origin }));
 
-  const items: CollapseProps["items"] = [
-    {
-      key: "Allowed Origins",
-      label: "Allowed Origins",
-      children: (
-        <div className="flex flex-col p-4">
-          <Table dataSource={dataSource} pagination={false} rowKey="key">
-            <Table.Column
-              title="Allowed Origin"
-              dataIndex="origin"
-              key="origin"
-              render={(text, record, index) => (
-                <Input
-                  value={text}
-                  onChange={(e) => {
-                    const newValue = [...value];
-                    newValue[index] = e.target.value;
-                    updateValue(newValue);
-                  }}
-                />
-              )}
+  return (
+    <div className="flex flex-col p-4">
+      <Table dataSource={dataSource} pagination={false} rowKey="key">
+        <Table.Column
+          title="Allowed Origin"
+          dataIndex="origin"
+          key="origin"
+          render={(text, record, index) => (
+            <Input
+              value={text}
+              onChange={(e) => {
+                const newValue = [...value];
+                newValue[index] = e.target.value;
+                updateValue(newValue);
+              }}
             />
-            <Table.Column
-              title="Actions"
-              key="actions"
-              render={(text, record, index) => (
-                <Button
-                  type="text"
-                  danger
-                  onClick={() => {
-                    const newValue = [...value];
-                    newValue.splice(index, 1);
-                    updateValue(newValue);
-                  }}
-                >
-                  Delete
-                </Button>
-              )}
-            />
-          </Table>
-          <Button type="dashed" onClick={() => updateValue([...value, ""])}>
-            Add Allowed Origin
-          </Button>
-        </div>
-      ),
-    },
-  ];
-
-  return <Collapse className="text-sm" items={items} />;
+          )}
+        />
+        <Table.Column
+          title="Actions"
+          key="actions"
+          render={(text, record, index) => (
+            <Button
+              type="text"
+              danger
+              onClick={() => {
+                const newValue = [...value];
+                newValue.splice(index, 1);
+                updateValue(newValue);
+              }}
+            >
+              Delete
+            </Button>
+          )}
+        />
+      </Table>
+      <Button type="dashed" onClick={() => updateValue([...value, ""])}>
+        Add Allowed Origin
+      </Button>
+    </div>
+  );
 }

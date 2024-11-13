@@ -104,34 +104,26 @@ function Authorization({ id, value, updateValue }: AuthorizationProps) {
     })
   );
 
-  const items: CollapseProps["items"] = [
-    {
-      key: "Authorization",
-      label: "Authorization",
-      children: (
-        <>
-          <Collapse accordion className="text-sm" items={authItem} />
-          <button
-            className="border border-dotted border-gray-300 rounded-md p-2 hover:bg-gray-100"
-            onClick={() => {
-              const newEntity = `new-entity-${
-                Object.keys(currentValue).length + 1
-              }`;
-              updateValue({
-                ...currentValue,
-                [newEntity]: {
-                  relations: {},
-                  permissions: {},
-                },
-              });
-            }}
-          >
-            Add Entity
-          </button>
-        </>
-      ),
-    },
-  ];
-
-  return <Collapse accordion className="text-sm" items={items} />;
+  return (
+    <>
+      <Collapse accordion className="text-sm" items={authItem} />
+      <button
+        className="border border-dotted border-gray-300 rounded-md p-2 hover:bg-gray-100"
+        onClick={() => {
+          const newEntity = `new-entity-${
+            Object.keys(currentValue).length + 1
+          }`;
+          updateValue({
+            ...currentValue,
+            [newEntity]: {
+              relations: {},
+              permissions: {},
+            },
+          });
+        }}
+      >
+        Add Entity
+      </button>
+    </>
+  );
 }
