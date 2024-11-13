@@ -1,4 +1,4 @@
-import { ID, User, UserApi, UserDetails } from "@inquisico/ruleset-editor-api";
+import { ID, User, UserApi } from "@inquisico/ruleset-editor-api";
 import configuration from "./apiConfig";
 
 class UserDataService {
@@ -18,25 +18,25 @@ class UserDataService {
     }
   }
 
-  async getUserById(userId: string): Promise<UserDetails> {
-    try {
-      const response = await this.userAPI.getUserById(userId);
-      return response;
-    } catch (error) {
-      console.error("Error fetching user by ID:", error);
-      throw error;
-    }
-  }
+  // async getUserById(userId: string): Promise<UserDetails> {
+  //   try {
+  //     const response = await this.userAPI.getUserById(userId);
+  //     return response;
+  //   } catch (error) {
+  //     console.error("Error fetching user by ID:", error);
+  //     throw error;
+  //   }
+  // }
 
-  async getUserByUsername(username: string): Promise<UserDetails> {
-    try {
-      const response = await this.userAPI.getUserByUsername(username);
-      return response;
-    } catch (error) {
-      console.error("Error fetching user by username:", error);
-      throw error;
-    }
-  }
+  // async getUserByUsername(username: string): Promise<UserDetails> {
+  //   try {
+  //     const response = await this.userAPI.getUserByUsername(username);
+  //     return response;
+  //   } catch (error) {
+  //     console.error("Error fetching user by username:", error);
+  //     throw error;
+  //   }
+  // }
 
   async updateUser(userId: string, user: User): Promise<void> {
     try {
