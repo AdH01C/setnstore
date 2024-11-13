@@ -32,7 +32,7 @@ export default function ApplicationsTable({
     const fetchApplications = async () => {
       try {
         const tableData = await Promise.all(
-          applications.map(async (application) => {
+          (applications || []).map(async (application) => {
             const rulesets = await RulesetDataService.getRulesets(
               companyId,
               application.id

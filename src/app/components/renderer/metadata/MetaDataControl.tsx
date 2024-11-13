@@ -1,5 +1,5 @@
 import { withJsonFormsControlProps } from "@jsonforms/react";
-import { Collapse, Divider, Input, Select, Typography } from "antd";
+import { Collapse, CollapseProps, Divider, Input, Select, Typography } from "antd";
 
 interface MetaDataControlProps {
   data: MetaDataValue;
@@ -56,9 +56,12 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
     { label: "Lowercase", value: "lowercase" },
     { label: "Uppercase", value: "uppercase" },
   ];
-  return (
-    <Collapse defaultActiveKey={["1"]} className="text-sm">
-      <Collapse.Panel header="Metadata" key="1">
+
+  const items: CollapseProps['items'] = [
+    {
+      key: "Metadata",
+      label: "Metadata",
+      children: (
         <div className="flex flex-col p-4">
           {/* Trailing Slash */}
           <div className="flex items-center justify-between">
@@ -136,7 +139,9 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
             </div>
           </div>
         </div>
-      </Collapse.Panel>
-    </Collapse>
-  );
+      ),
+    },
+  ];
+
+  return <Collapse className="text-sm" items={items} />;
 }

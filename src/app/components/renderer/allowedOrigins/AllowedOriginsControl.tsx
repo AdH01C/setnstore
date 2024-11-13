@@ -1,6 +1,5 @@
-import { Button, Collapse, Input, Table } from "antd";
+import { Button, Collapse, CollapseProps, Input, Table } from "antd";
 import { withJsonFormsControlProps } from "@jsonforms/react";
-const { Panel } = Collapse;
 
 interface AllowedOriginsControlProps {
   data: string[];
@@ -28,12 +27,16 @@ const AllowedOriginsControl = ({
 export default withJsonFormsControlProps(AllowedOriginsControl);
 
 function AllowedOrigins({ id, value, updateValue }: AllowedOriginsProps) {
- 
-  const dataSource = value === undefined ? [] : value.map((origin, index) => ({ key: index, origin }));
+  const dataSource =
+    value === undefined
+      ? []
+      : value.map((origin, index) => ({ key: index, origin }));
 
-  return (
-    <Collapse defaultActiveKey={["1"]} className="text-sm">
-      <Panel header="Allowed Origins" key="1">
+  const items: CollapseProps["items"] = [
+    {
+      key: "Allowed Origins",
+      label: "Allowed Origins",
+      children: (
         <div className="flex flex-col p-4">
           <Table dataSource={dataSource} pagination={false} rowKey="key">
             <Table.Column
@@ -73,7 +76,9 @@ function AllowedOrigins({ id, value, updateValue }: AllowedOriginsProps) {
             Add Allowed Origin
           </Button>
         </div>
-      </Panel>
-    </Collapse>
-  );
+      ),
+    },
+  ];
+
+  return <Collapse className="text-sm" items={items} />;
 }

@@ -1,8 +1,7 @@
-import { Collapse } from "antd";
+import { Collapse, CollapseProps } from "antd";
 import { withJsonFormsControlProps } from "@jsonforms/react";
 import { AuthPanel } from "./AuthorizationPanel";
 import { PermissionRow, RelationRow } from "../util";
-const { Panel } = Collapse;
 
 interface AuthorizationControlProps {
   data: AuthorizationValue;
@@ -57,64 +56,53 @@ function Authorization({ id, value, updateValue }: AuthorizationProps) {
     }
   }
 
-  return (
-    <Collapse className="text-sm">
-      <Panel header="Authorization" key="1">
-        <Collapse
-          className="w-full flex flex-col"
-          expandIconPosition="right"
-        >
-          {Object.entries(value).map(([entity, entityAuthData]) => {
-            function handleAuthorizationValueChange(
-              newAuth: AuthorizationDefinition
-            ) {
-              const newValue: AuthorizationValue = { ...value };
-              newValue[entity] = newAuth;
-              updateValue(newValue);
-            }
+  const authItem: CollapseProps["items"] = Object.entries(value).map(
+    ([entity, entityAuthData]) => ({
+      key: entity,
+      label: `Entity: ${entity}`,
+      children: (
+        <AuthPanel
+          value={entityAuthData}
+          entity={entity}
+          entityList={entityList}
+          relationList={relationList}
+          permissionList={permissionList}
+          updateValue={(newAuth: AuthorizationDefinition) => {
+            const newValue: AuthorizationValue = { ...value };
+            newValue[entity] = newAuth;
+            updateValue(newValue);
+          }}
+          updateEntityName={(newEntity: string) => {
+            if (newEntity === entity) return;
 
-            function handleEntityNameChange(newEntity: string) {
-              if (newEntity === entity) {
-                return;
+            const newValue = Object.keys(value).reduce((acc, key) => {
+              if (key === entity) {
+                acc[newEntity] = value[key];
+              } else {
+                acc[key] = value[key];
               }
+              return acc;
+            }, {} as AuthorizationValue);
 
-              const newValue = Object.keys(value).reduce((acc, key) => {
-                if (key === entity) {
-                  acc[newEntity] = value[key];
-                } else {
-                  acc[key] = value[key];
-                }
-                return acc;
-              }, {} as AuthorizationValue);
+            updateValue(newValue);
+          }}
+          deleteEntity={() => {
+            const newValue = { ...value };
+            delete newValue[entity];
+            updateValue(newValue);
+          }}
+        />
+      ),
+    })
+  );
 
-              updateValue(newValue);
-            }
-
-            function handleDeleteEntity() {
-              const newValue = { ...value };
-              delete newValue[entity];
-              updateValue(newValue);
-            }
-
-            return (
-              <Collapse.Panel
-                className="text-sm"
-                header={"Entity: " + entity}
-                key={entity}
-              >
-                <AuthPanel
-                  value={entityAuthData}
-                  entity={entity}
-                  entityList={entityList}
-                  relationList={relationList}
-                  permissionList={permissionList}
-                  updateValue={handleAuthorizationValueChange}
-                  updateEntityName={handleEntityNameChange}
-                  deleteEntity={handleDeleteEntity}
-                />
-              </Collapse.Panel>
-            );
-          })}
+  const items: CollapseProps['items'] = [
+    {
+      key: "Authorization",
+      label: "Authorization",
+      children: (
+        <>
+          <Collapse accordion className="text-sm" items={authItem} />
           <button
             className="border border-dotted border-gray-300 rounded-md p-2 hover:bg-gray-100"
             onClick={() => {
@@ -130,8 +118,10 @@ function Authorization({ id, value, updateValue }: AuthorizationProps) {
           >
             Add Entity
           </button>
-        </Collapse>
-      </Panel>
-    </Collapse>
-  );
+        </>
+      ),
+    },
+  ];
+
+  return <Collapse accordion className="text-sm" items={items} />;
 }

@@ -1,4 +1,4 @@
-import { Button, Collapse, Form, Input, Typography } from "antd";
+import { Button, Collapse, CollapseProps, Form, Input, Typography } from "antd";
 import React from "react";
 import { HostPermissionTable } from "./HostPermissionTable";
 import { EntitySettingsForm } from "./EntitySettingForm";
@@ -46,23 +46,21 @@ export const Path: React.FC<PathProps> = ({
     updatePathRoute();
   }
 
-  return (
-    <Collapse className="text-sm w-fit">
-      <Collapse.Panel
-        header={
-          <>
-            {absolutePath}
-            {absolutePath !== "/" && (
-              <>
-                <Button onClick={handleAddChildPath}>Add Child Path</Button>{" "}
-                <Button onClick={handleDeletePath}>Delete Path</Button>
-              </>
-            )}
-          </>
-        }
-        key={absolutePath}
-        className="w-full"
-      >
+  const items: CollapseProps["items"] = [
+    {
+      key: absolutePath,
+      label: (
+        <>
+          {absolutePath}
+          {absolutePath !== "/" && (
+            <>
+              <Button onClick={handleAddChildPath}>Add Child Path</Button>{" "}
+              <Button onClick={handleDeletePath}>Delete Path</Button>
+            </>
+          )}
+        </>
+      ),
+      children: (
         <div className="flex flex-col">
           <Typography>{absolutePath}</Typography>
           <Form.Item label="Route: ">
@@ -90,7 +88,9 @@ export const Path: React.FC<PathProps> = ({
             ancestorEntities={ancestorEntities}
           />
         </div>
-      </Collapse.Panel>
-    </Collapse>
-  );
+      ),
+    },
+  ];
+
+  return <Collapse accordion className="text-sm w-fit" items={items} />;
 };

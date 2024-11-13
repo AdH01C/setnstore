@@ -114,7 +114,6 @@ export default function ApplicationTable({
               application.id,
               rulesetID
             );
-            console.log({ ...rulesetResponse, host: hostResponse });
             return { ...rulesetResponse, host: hostResponse };
           })
         );

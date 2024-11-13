@@ -26,7 +26,7 @@ export const HostPanel = ({
     <>
       {pathData.length ? (
         <Tree
-          defaultExpandAll
+          // defaultExpandAll
           checkStrictly
           virtual={false}
           motion={false}
