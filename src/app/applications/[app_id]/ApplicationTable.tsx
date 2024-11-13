@@ -1,7 +1,6 @@
 import { TableColumnsType, Space, Table } from "antd";
 import { useState, useEffect } from "react";
 import RulesetDataService from "../../services/NewRulesetDataService";
-import ApplicationDataService from "../../services/NewAppDataService";
 import HostDataService from "../../services/HostDataService";
 import { useRouter } from "next/navigation";
 import {
@@ -14,12 +13,6 @@ interface RulesetTableType extends RulesetWithRulesetJson {
   host: string;
 }
 
-interface ApplicationTableType extends AppDetailsWithID {
-  key: string;
-  rulesetCount: number;
-  rulesets: RulesetTableType[];
-}
-
 export default function ApplicationTable({
   companyId,
   application,
@@ -27,21 +20,8 @@ export default function ApplicationTable({
   companyId: string;
   application: AppDetailsWithID;
 }) {
-  const [tableData, setTableData] = useState<ApplicationTableType[]>([]);
+  const [tableData, setTableData] = useState<RulesetTableType[]>([]);
   const router = useRouter();
-
-  const handleApplicationDelete = async (e: React.MouseEvent) => {
-    // Prevent the card click event from firing when delete is clicked
-    e.stopPropagation();
-
-    try {
-      await ApplicationDataService.deleteApplication(companyId, application.id);
-      console.log(`Application with ID ${application.id} deleted successfully`);
-      router.push(`/dashboard`);
-    } catch (error) {
-      console.error("Error deleting application:", error);
-    }
-  };
 
   const handleRulesetDelete = async (
     e: React.MouseEvent,
@@ -59,28 +39,17 @@ export default function ApplicationTable({
       console.log(
         `Ruleset with ID ${rulesetID} in application ${application.id} deleted successfully`
       );
-
-      // Update the tableData to remove the deleted ruleset
-      setTableData((prevTableData) => {
-        return prevTableData.map((app) => {
-          if (app.id === application.id) {
-            return {
-              ...app,
-              rulesets: app.rulesets.filter(
-                (ruleset) => ruleset.id !== rulesetID
-              ),
-              rulesetCount: app.rulesetCount - 1, // Decrease the ruleset count
-            };
-          }
-          return app;
-        });
-      });
+      setTableData((prevTableData) =>
+        prevTableData
+          ? prevTableData.filter((ruleset) => ruleset.id !== rulesetID)
+          : []
+      );
     } catch (error) {
       console.error("Error deleting application:", error);
     }
   };
 
-  const expandColumns: TableColumnsType<RulesetTableType> = [
+  const columns: TableColumnsType<RulesetTableType> = [
     { title: "Ruleset ID", dataIndex: "id", key: "id" },
     { title: "Host", dataIndex: "host", key: "host" },
     {
@@ -126,42 +95,6 @@ export default function ApplicationTable({
     },
   ];
 
-  const columns: TableColumnsType<ApplicationTableType> = [
-    { title: "Application ID", dataIndex: "id", key: "id" },
-    {
-      title: "Application Name",
-      dataIndex: "appName",
-      key: "appName",
-    },
-    {
-      title: "Date Created",
-      dataIndex: "createdDatetime",
-      key: "createdDatetime",
-      render: (date: Date) => date.toString(),
-    },
-    {
-      title: "Number of Rulesets",
-      dataIndex: "rulesetCount",
-      key: "rulesetCount",
-    },
-    {
-      title: "Action",
-      key: "operation",
-      render: () => (
-        <Space size="middle">
-          <a
-            onClick={() => {
-              router.push(`/applications/${application.id}/rulesets/new`);
-            }}
-          >
-            Add Ruleset
-          </a>
-          <a onClick={handleApplicationDelete}>Delete</a>
-        </Space>
-      ),
-    },
-  ];
-
   useEffect(() => {
     const fetchApplications = async () => {
       try {
@@ -181,26 +114,22 @@ export default function ApplicationTable({
               application.id,
               rulesetID
             );
+            console.log({ ...rulesetResponse, host: hostResponse });
             return { ...rulesetResponse, host: hostResponse };
           })
         );
 
-        const tableData = {
-          ...application,
-          key: application.id,
-          rulesetCount: rulesetsData.length,
-          rulesets: rulesetsData.map((ruleset) => {
-            return {
-              key: ruleset.id,
-              id: ruleset.id,
-              host: ruleset.host,
-              lastModifiedDatetime: ruleset.lastModifiedDatetime,
-              appId: ruleset.appId,
-              rulesetJson: ruleset.rulesetJson,
-            };
-          }),
-        };
-        setTableData([tableData]);
+        const tableData = rulesetsData.map((ruleset) => {
+          return {
+            key: ruleset.id,
+            id: ruleset.id,
+            host: ruleset.host,
+            lastModifiedDatetime: ruleset.lastModifiedDatetime,
+            appId: ruleset.appId,
+            rulesetJson: ruleset.rulesetJson,
+          };
+        });
+        setTableData(tableData);
         console.log(tableData);
       } catch (error) {
         console.error("Failed to fetch menu items:", error);
@@ -210,23 +139,11 @@ export default function ApplicationTable({
     fetchApplications();
   }, [companyId, application]);
 
-  const expandedRowRender = (row: ApplicationTableType) => {
-    return (
-      <Table<RulesetTableType>
-        columns={expandColumns}
-        dataSource={row.rulesets.map((app: RulesetTableType) => ({
-          ...app,
-        }))}
-        pagination={false}
-      />
-    );
-  };
   return (
-    <Table<ApplicationTableType>
+    <Table<RulesetTableType>
       columns={columns}
-      expandable={{ expandedRowRender }}
-      dataSource={tableData.map((app) => ({
-        ...app,
+      dataSource={tableData.map((ruleset) => ({
+        ...ruleset,
       }))}
       pagination={false}
     />

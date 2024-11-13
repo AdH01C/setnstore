@@ -1,7 +1,7 @@
 "use client";
 
 import { signOut } from "next-auth/react";
-import { Breadcrumb, Dropdown, Layout, MenuProps } from "antd";
+import { Breadcrumb, Dropdown, Layout, MenuProps, Typography } from "antd";
 import { Header, Footer, Content } from "antd/es/layout/layout";
 import ApplicationSiderMenu from "./ApplicationSiderMenu";
 import { usePathname } from "next/navigation";
@@ -13,33 +13,37 @@ import { AppProvider } from "../components/AppContext";
 export default function AppLayout({
   children,
   contentPadding = "0 24px 24px",
+  title,
+  subtitle,
   hasSider = false,
   hasBreadcrumb = false,
 }: {
   children: React.ReactNode;
   contentPadding?: string;
+  title?: string;
+  subtitle?: string;
   hasSider?: boolean;
   hasBreadcrumb?: boolean;
 }) {
   const pathname = usePathname();
 
   const items: MenuProps["items"] = [
+  //   {
+  //     key: "1",
+  //     label: <a>Profile</a>,
+  //   },
+  //   {
+  //     key: "2",
+  //     label: <a>Permissions</a>,
+  //     disabled: true,
+  //   },
+  //   {
+  //     key: "3",
+  //     label: <a>Settings</a>,
+  //     disabled: true,
+  //   },
     {
       key: "1",
-      label: <a>Profile</a>,
-    },
-    {
-      key: "2",
-      label: <a>Permissions</a>,
-      disabled: true,
-    },
-    {
-      key: "3",
-      label: <a>Settings</a>,
-      disabled: true,
-    },
-    {
-      key: "4",
       danger: true,
       label: "Log out",
       onClick: () => {
@@ -72,6 +76,8 @@ export default function AppLayout({
                 minHeight: 280,
               }}
             >
+              {title && <Typography.Title level={2}>{title}</Typography.Title>}
+              {subtitle && <Typography.Text>{subtitle}</Typography.Text>}
               {hasBreadcrumb && (
                 <Breadcrumb
                   itemRender={itemRender}
@@ -91,10 +97,7 @@ export default function AppLayout({
   );
 }
 
-function itemRender(
-  route: any,
-  routes: any,
-): ReactNode {
+function itemRender(route: any, routes: any): ReactNode {
   const isLast = route?.title === routes[routes.title - 1]?.path;
   return isLast || route.href === undefined ? (
     <span>{route.title}</span>
@@ -141,7 +144,7 @@ const generateBreadCrumb = (pathname: string) => {
               : undefined,
         });
       }
-    } 
+    }
 
     if (segments[4] === "edit") {
       items.push({ title: "Edit" });

@@ -12,7 +12,11 @@ export default async function Page() {
   }
 
   return (
-    <AppLayout>
+    <AppLayout
+      title="Dashboard"
+      subtitle="View all information regarding your services and application."
+      contentPadding="50px 150px 0 150px"
+    >
       <Dashboard />
     </AppLayout>
   );
