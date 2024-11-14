@@ -6,31 +6,27 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Loading from "@/app/components/Loading";
+import { useAuth } from "./hooks/useAuth";
 
 export default function LoginForm() {
   const router = useRouter();
-
-  const onLogin = async (values: any) => {
-    const result = await signIn("credentials", {
-      redirect: false, // Prevent automatic redirection
-      username: values.username,
-      password: values.password,
-    });
-
-    if (result?.error) {
-      console.error("Login error:", result.error);
-    } else {
+  const { isFetching, identity } = useAuth({ forceRefetch: false });
+  const onAuthlinkLogin = () => {
+    if (identity) {
       router.push("/dashboard");
+    } else {
+      router.push(process.env.NEXT_PUBLIC_AUTH_ENDPOINT + "/login");
     }
-  };
-
-  const onGoogleLogin = async () => {
-    signIn("google", { callbackUrl: "/dashboard" });
   };
 
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (!isFetching && identity) {
+      router.push("/dashboard");
+      return;
+    }
+
     // Allow time for render
     const timer = setTimeout(() => {
       setIsLoading(false);
@@ -38,7 +34,7 @@ export default function LoginForm() {
 
     // Cleanup the timer on component unmount
     return () => clearTimeout(timer);
-  }, []);
+  }, [isFetching, identity]);
 
   return (
     <>
@@ -51,7 +47,6 @@ export default function LoginForm() {
             name="login"
             initialValues={{ remember: true }}
             className="w-[360px]"
-            onFinish={onLogin}
           >
             <Form.Item
               name="username"
@@ -98,19 +93,18 @@ export default function LoginForm() {
             </Form.Item>
 
             <Form.Item>
-              <Button
+                <Button
                 block
-                icon={<GoogleOutlined />}
                 type="primary"
                 style={{
-                  backgroundColor: "#fa3452",
-                  borderColor: "#fa3452",
+                  backgroundColor: "black",
+                  borderColor: "black",
                   color: "white",
                 }}
-                onClick={onGoogleLogin}
-              >
-                Log in with Google
-              </Button>
+                onClick={onAuthlinkLogin}
+                >
+                Log in with Authlink
+                </Button>
             </Form.Item>
           </Form>
         </>

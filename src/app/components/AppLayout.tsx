@@ -4,11 +4,12 @@ import { signOut } from "next-auth/react";
 import { Breadcrumb, Dropdown, Layout, MenuProps } from "antd";
 import { Header, Footer, Content } from "antd/es/layout/layout";
 import ApplicationSiderMenu from "./ApplicationSiderMenu";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ReactNode } from "react";
 import { UserOutlined } from "@ant-design/icons";
 import { AppProvider } from "../components/AppContext";
+
 
 export default function AppLayout({
   children,
@@ -22,7 +23,8 @@ export default function AppLayout({
   hasBreadcrumb?: boolean;
 }) {
   const pathname = usePathname();
-
+  const router = useRouter();
+  const addTrailingSlash = (url: string) => url.replace(/\/?$/, "/");
   const items: MenuProps["items"] = [
     {
       key: "1",
@@ -43,7 +45,8 @@ export default function AppLayout({
       danger: true,
       label: "Log out",
       onClick: () => {
-        signOut({ callbackUrl: "/" });
+        router.push(addTrailingSlash(process.env.NEXT_PUBLIC_AUTH_ENDPOINT ?? "") + "logout_unified")
+        
       },
     },
   ];
@@ -150,3 +153,5 @@ const generateBreadCrumb = (pathname: string) => {
 
   return items;
 };
+
+

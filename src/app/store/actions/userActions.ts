@@ -9,7 +9,13 @@ export const fetchUserInit = createAsyncThunk<Identity, { isRedirect: boolean } 
     try {
       const identityApi = new IdentityApi(configuration(isRedirect));
       const identityRes = await identityApi.getIdentity();
-      return identityRes;
+
+      const serializableIdentity = {
+        ...identityRes,
+        // Remove or convert non-serializable fields
+      };
+      return serializableIdentity;
+
     } catch (e) {
       //check if 404 -> create user
       if (e instanceof ApiException && e.code === 404) {
