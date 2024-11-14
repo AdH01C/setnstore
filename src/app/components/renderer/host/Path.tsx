@@ -2,14 +2,17 @@ import {
   Button,
   Collapse,
   CollapseProps,
+  Flex,
   Form,
   Input,
   Modal,
+  Tooltip,
   Typography,
 } from "antd";
 import React from "react";
 import { HostPermissionTable } from "./HostPermissionTable";
 import { EntitySettingsForm } from "./EntitySettingForm";
+import { QuestionCircleOutlined } from "@ant-design/icons";
 
 interface PathProps {
   pathData: PathValue;
@@ -79,16 +82,33 @@ export const Path: React.FC<PathProps> = ({
         </>
       ),
       children: (
-        <div className="flex flex-col">
-          <Typography>{absolutePath}</Typography>
-          <Form.Item label="Route: ">
+        <Form style={{ minWidth: 750 }} layout="vertical">
+          {/* <Typography>{absolutePath}</Typography> */}
+          <Form.Item
+            label={
+              <Flex gap="small">
+                <Typography.Text>Route</Typography.Text>
+                <Tooltip
+                  overlayStyle={{ whiteSpace: "pre-line" }}
+                  title={`Name of URL route
+
+                    Use '#' to define a wildcard
+
+                    A wildcard captures and assigns all values in the route  to a selected entity value`}
+                >
+                  <QuestionCircleOutlined />
+                </Tooltip>
+              </Flex>
+            }
+          >
             <Input
               addonBefore="/"
               defaultValue={path}
               onBlur={(e) => {
                 updatePathRoute(e.target.value);
               }}
-              disabled={path === "#"}
+              style={{ width: 250 }}
+              // disabled={path === "#"}
             />
           </Form.Item>
           {isEntityPath && (
@@ -105,10 +125,17 @@ export const Path: React.FC<PathProps> = ({
             authData={authData}
             ancestorEntities={ancestorEntities}
           />
-        </div>
+        </Form>
       ),
     },
   ];
 
-  return <Collapse accordion className="text-sm w-fit" items={items} />;
+  return (
+    <Collapse
+      style={{ minWidth: 500 }}
+      accordion
+      className="text-sm w-fit"
+      items={items}
+    />
+  );
 };

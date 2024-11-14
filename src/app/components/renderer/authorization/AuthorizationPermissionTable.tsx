@@ -1,4 +1,14 @@
-import { TableColumnsType, Select, Button, Table, Input } from "antd";
+import {
+  TableColumnsType,
+  Select,
+  Button,
+  Table,
+  Input,
+  Flex,
+  Tooltip,
+  Typography,
+  Modal,
+} from "antd";
 import {
   getAuthorizationTypeValue,
   getAuthorizationTypeObject,
@@ -8,6 +18,7 @@ import {
   RelationRow,
   sortedStringify,
 } from "../util";
+import { QuestionCircleOutlined } from "@ant-design/icons";
 
 interface AuthPermissionTableDataType {
   key: React.Key;
@@ -43,11 +54,20 @@ export const AuthPermissionTable = ({
   }
 
   function handleDeletePermission(permission: string) {
-    const newPermissions = {
-      ...permissionData,
-    };
-    delete newPermissions[permission];
-    updateValue(newPermissions);
+    Modal.confirm({
+      title: "Delete Permission",
+      content: "Are you sure you want to delete this permission?",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      onOk() {
+        const newPermissions = {
+          ...permissionData,
+        };
+        delete newPermissions[permission];
+        updateValue(newPermissions);
+      },
+    });
   }
 
   function handleAuthRuleChange(permission: string, selectedRelation: string) {
@@ -176,7 +196,6 @@ export const AuthPermissionTable = ({
       if (isAuthorizationOperations(record.type)) {
         return (
           <Select
-            className="w-fit min-w-[216px]"
             mode={"tags"}
             value={record.type.operations.map((authOp) =>
               sortedStringify(authOp)
@@ -192,7 +211,6 @@ export const AuthPermissionTable = ({
       if (isAuthorizationRule(record.type)) {
         return (
           <Select
-            className="w-[156px]"
             value={
               record.type &&
               sortedStringify(record.type) !== sortedStringify({ relation: "" })
@@ -220,7 +238,14 @@ export const AuthPermissionTable = ({
 
   const columns: TableColumnsType<AuthPermissionTableDataType> = [
     {
-      title: "Permission",
+      title: (
+        <Flex gap="small">
+          <Typography.Text>Permission</Typography.Text>
+          <Tooltip title="Name of permission">
+            <QuestionCircleOutlined />
+          </Tooltip>
+        </Flex>
+      ),
       dataIndex: "permission",
       render: (permission, record) => {
         return (
@@ -232,7 +257,20 @@ export const AuthPermissionTable = ({
       },
     },
     {
-      title: "Type",
+      title: (
+        <Flex gap="small">
+          <Typography.Text>Type</Typography.Text>
+          <Tooltip
+            overlayStyle={{ whiteSpace: "pre-line" }}
+            title={`Single - Select one permission
+                    Union - Merge multiple permissions
+                    Intersect - Retrieve common permissions
+                    Except - Exclude selected permissions`}
+          >
+            <QuestionCircleOutlined />
+          </Tooltip>
+        </Flex>
+      ),
       dataIndex: "type",
       render: (type: AuthorizationType, record) => {
         return (
@@ -252,7 +290,19 @@ export const AuthPermissionTable = ({
       },
     },
     {
-      title: "Settings",
+      title: (
+        <Flex gap="small">
+          <Typography.Text>Settings</Typography.Text>
+          <Tooltip
+            overlayStyle={{ whiteSpace: "pre-line" }}
+            title={`Select another entity
+                     or
+                    a relation or permission of a related entity`}
+          >
+            <QuestionCircleOutlined />
+          </Tooltip>
+        </Flex>
+      ),
       render: (_, record) => {
         return renderSettings(record);
       },
@@ -280,7 +330,9 @@ export const AuthPermissionTable = ({
         dataSource={dataSource}
         columns={columns}
       />
-      <Button onClick={handleAddPermission}>Add Permission</Button>
+      <Button style={{ width: "100%" }} onClick={handleAddPermission}>
+        Add Permission
+      </Button>
     </>
   );
 };

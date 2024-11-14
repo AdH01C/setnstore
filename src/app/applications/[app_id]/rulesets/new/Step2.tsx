@@ -18,6 +18,7 @@ export default function Step2({
 
   const navOperations = [
     <Button
+      key="next"
       type="primary"
       onClick={() => {
         prev();
@@ -26,6 +27,7 @@ export default function Step2({
       Previous
     </Button>,
     <Button
+      key="prev"
       type="primary"
       onClick={() => {
         next();

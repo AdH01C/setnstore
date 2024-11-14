@@ -59,13 +59,14 @@ export default function RulesetEditor() {
 
   const saveOperation = [
     <Button
+      key="save"
       type="primary"
       onClick={() => {
         handleSubmit();
       }}
     >
       Save Changes
-    </Button>
+    </Button>,
   ];
 
   return (

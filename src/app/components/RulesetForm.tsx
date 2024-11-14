@@ -83,7 +83,7 @@ export default function RulesetForm({
           onFormChange(JSON.parse(e.target.result));
         }
       };
-      message.success("File upload failed.");
+      message.success("File upload successfully.");
     } else if (file.status === "error") {
       message.error("File upload failed.");
     }
@@ -101,14 +101,14 @@ export default function RulesetForm({
           <Paragraph>
             The <strong>Ruleset Editor</strong> allows you to define and manage
             authorization rules for your application in a JSON format called
-            <em>Rulesets</em>. This structure lets you specify how different
+            <em> Rulesets</em>. This structure lets you specify how different
             entities interact with various paths of your application.
           </Paragraph>
           <Paragraph>
             The <strong>Authorization</strong> form lets you define the entities
             (like users, roles, or permissions) that control access to your app.
             These entities are tied to the paths configured in the
-            <strong>Hosts</strong> form, determining who can access which
+            <strong> Hosts</strong> form, determining who can access which
             resources based on their relationships.
           </Paragraph>
           <Paragraph>

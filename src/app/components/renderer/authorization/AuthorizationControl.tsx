@@ -1,4 +1,4 @@
-import { Collapse, CollapseProps } from "antd";
+import { Button, Collapse, CollapseProps, Modal } from "antd";
 import { withJsonFormsControlProps } from "@jsonforms/react";
 import { AuthPanel } from "./AuthorizationPanel";
 import { PermissionRow, RelationRow } from "../util";
@@ -95,9 +95,18 @@ function Authorization({ id, value, updateValue }: AuthorizationProps) {
             updateValue(newValue);
           }}
           deleteEntity={() => {
-            const newValue = { ...currentValue };
-            delete newValue[entity];
-            updateValue(newValue);
+            Modal.confirm({
+              title: "Delete Entity",
+              content: "Are you sure you want to delete this entity?",
+              okText: "Yes",
+              okType: "danger",
+              cancelText: "No",
+              onOk() {
+                const newValue = { ...currentValue };
+                delete newValue[entity];
+                updateValue(newValue);
+              },
+            });
           }}
         />
       ),
@@ -107,8 +116,9 @@ function Authorization({ id, value, updateValue }: AuthorizationProps) {
   return (
     <>
       <Collapse accordion className="text-sm" items={authItem} />
-      <button
-        className="border border-dotted border-gray-300 rounded-md p-2 hover:bg-gray-100"
+      <Button
+        type="primary"
+        // className="border border-dotted border-gray-300 rounded-md p-2 hover:bg-gray-100"
         onClick={() => {
           const newEntity = `new-entity-${
             Object.keys(currentValue).length + 1
@@ -123,7 +133,7 @@ function Authorization({ id, value, updateValue }: AuthorizationProps) {
         }}
       >
         Add Entity
-      </button>
+      </Button>
     </>
   );
 }

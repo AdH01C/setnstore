@@ -1,5 +1,16 @@
-import { Table, Select, Button, Input, TableColumnsType } from "antd";
+import {
+  Table,
+  Select,
+  Button,
+  Input,
+  TableColumnsType,
+  Tooltip,
+  Typography,
+  Flex,
+  Modal,
+} from "antd";
 import { RelationRow, authRelationOptions, sortedStringify } from "../util";
+import { QuestionCircleOutlined } from "@ant-design/icons";
 
 interface AuthRelationTableDataType {
   key: React.Key;
@@ -24,11 +35,20 @@ export const AuthRelationTable = ({
   const relationsData = authData.relations;
 
   function handleDeleteRelation(relation: string) {
-    const newRelations = {
-      ...relationsData,
-    };
-    delete newRelations[relation];
-    updateValue(newRelations);
+    Modal.confirm({
+      title: "Delete Permission",
+      content: "Are you sure you want to delete this permission?",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      onOk() {
+        const newRelations = {
+          ...relationsData,
+        };
+        delete newRelations[relation];
+        updateValue(newRelations);
+      },
+    });
   }
 
   function handleAddRelation() {
@@ -86,7 +106,14 @@ export const AuthRelationTable = ({
 
   const columns: TableColumnsType<AuthRelationTableDataType> = [
     {
-      title: "Relation",
+      title: (
+        <Flex gap="small">
+          <Typography.Text>Relation</Typography.Text>
+          <Tooltip title="Name of relation">
+            <QuestionCircleOutlined />
+          </Tooltip>
+        </Flex>
+      ),
       dataIndex: "relation",
       render: (relation, record) => {
         return (
@@ -100,19 +127,24 @@ export const AuthRelationTable = ({
       },
     },
     {
-      title: "Facet",
+      title: (
+        <Flex gap="small">
+          <Typography.Text>Facet</Typography.Text>
+          <Tooltip title="Select an entity or a relation associated with another entity">
+            <QuestionCircleOutlined />
+          </Tooltip>
+        </Flex>
+      ),
       dataIndex: "facets",
       render: (facets, record) => {
         const facetOptions = authRelationOptions([
           ...relationList.filter(
-            (authRelation) =>
-              authRelation.parentEntity !== entity
+            (authRelation) => authRelation.parentEntity !== entity
           ),
         ]);
 
         return (
           <Select
-            className="w-[156px]"
             mode="tags"
             value={facets.map((authRelation: AuthorizationRelation) =>
               sortedStringify(authRelation)
@@ -155,7 +187,9 @@ export const AuthRelationTable = ({
         dataSource={dataSource}
         columns={columns}
       />
-      <Button onClick={handleAddRelation}>Add Relation</Button>
+      <Button style={{ width: "100%" }} onClick={handleAddRelation}>
+        Add Relation
+      </Button>
     </>
   );
 };

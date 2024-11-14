@@ -1,5 +1,6 @@
+import { QuestionCircleOutlined } from "@ant-design/icons";
 import { withJsonFormsControlProps } from "@jsonforms/react";
-import { Divider, Input, Select, Typography } from "antd";
+import { Divider, Flex, Input, Select, Tooltip, Typography } from "antd";
 import { useEffect, useMemo } from "react";
 
 interface MetaDataControlProps {
@@ -81,7 +82,17 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
     <div className="flex flex-col p-4">
       {/* Trailing Slash */}
       <div className="flex items-center justify-between">
-        <Typography.Text>Trailing Slash Mode</Typography.Text>
+        <Flex gap="small">
+          <Typography.Text>Trailing Slash Mode</Typography.Text>
+          <Tooltip
+            overlayStyle={{ whiteSpace: "pre-line" }}
+            title={`Fallback - The server treats URLs with and without trailing slashes (/) as equivalent.
+
+                  Strict - The server strictly distinguishes between URLs with and without trailing slashes.`}
+          >
+            <QuestionCircleOutlined />
+          </Tooltip>
+        </Flex>
         <Select
           value={currentValue.trailingSlashMode}
           onChange={(val) =>
@@ -97,7 +108,17 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
       <Divider />
       {/* Redirect Slashes */}
       <div className="flex items-center justify-between">
-        <Typography.Text>Redirect Slashes</Typography.Text>
+        <Flex gap="small">
+          <Typography.Text>Redirect Slashes</Typography.Text>
+          <Tooltip
+            overlayStyle={{ whiteSpace: "pre-line" }}
+            title={`Strip - Server will redirect URLs ending with a trailing slash (/) to a version without the trailing slash.
+
+                   Append - Server will redirect URLs without a trailing slash to a version with the trailing slash appended.`}
+          >
+            <QuestionCircleOutlined />
+          </Tooltip>
+        </Flex>
         <Select
           value={currentValue.redirectSlashes}
           onChange={(val) =>
@@ -113,7 +134,12 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
       <Divider />
       {/* Case Sensitive */}
       <div className="flex items-center justify-between">
-        <Typography.Text>Case Sensitive</Typography.Text>
+        <Flex gap="small">
+          <Typography.Text>Case Sensitive</Typography.Text>
+          <Tooltip title={`Specifies whether the Ruleset is case-sensitive.`}>
+            <QuestionCircleOutlined />
+          </Tooltip>
+        </Flex>
         <div className="w-16">
           <Input
             type="checkbox"
@@ -130,7 +156,14 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
       <Divider />
       {/* Entity Value Case */}
       <div className="flex items-center justify-between">
-        <Typography.Text>Entity Value Case</Typography.Text>
+        <Flex gap="small">
+          <Typography.Text>Entity Value Case</Typography.Text>
+          <Tooltip
+            title={`Specifies how to handle the case of entity values in the URL path.`}
+          >
+            <QuestionCircleOutlined />
+          </Tooltip>
+        </Flex>
         <Select
           value={currentValue.entityValueCase}
           onChange={(val) =>
@@ -146,7 +179,14 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
       <Divider />
       {/* Options Passthrough */}
       <div className="flex items-center justify-between">
-        <Typography.Text>Options Passthrough</Typography.Text>
+        <Flex gap="small">
+          <Typography.Text>Options Passthrough</Typography.Text>
+          <Tooltip
+            title={`Specifies whether OPTIONS requests are allowed without authentication checks.`}
+          >
+            <QuestionCircleOutlined />
+          </Tooltip>
+        </Flex>
         <div className="w-16">
           <Input
             type="checkbox"

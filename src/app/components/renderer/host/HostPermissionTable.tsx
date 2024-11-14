@@ -1,4 +1,14 @@
-import { Modal, TableColumnsType, Select, Button, Table } from "antd";
+import {
+  Modal,
+  TableColumnsType,
+  Select,
+  Button,
+  Table,
+  Flex,
+  Form,
+  Typography,
+  Tooltip,
+} from "antd";
 import {
   methodOptions,
   getPermissionValue,
@@ -6,6 +16,7 @@ import {
   getAvailableMethod,
   LabelManager,
 } from "../util";
+import { QuestionCircleOutlined } from "@ant-design/icons";
 
 interface PermissionTableDataType {
   key: React.Key;
@@ -145,7 +156,14 @@ export const HostPermissionTable = ({
 
   const columns: TableColumnsType<PermissionTableDataType> = [
     {
-      title: "Method",
+      title: (
+        <Flex gap="small">
+          <Typography.Text>Method</Typography.Text>
+          <Tooltip title="Choose HTTP method">
+            <QuestionCircleOutlined />
+          </Tooltip>
+        </Flex>
+      ),
       dataIndex: "method",
       render: (method, record) => {
         const usedPermission = Object.keys(pathProperties.permission || {});
@@ -155,14 +173,28 @@ export const HostPermissionTable = ({
             onChange={(newMethod) => {
               handleMethodChange(record.method, newMethod);
             }}
-            className="w-[104px]"
             options={methodOptions(usedPermission)}
+            style={{ minWidth: 100 }}
           />
         );
       },
     },
     {
-      title: "Permission",
+      title: (
+        <Flex gap="small">
+          <Typography.Text>Permission</Typography.Text>
+          <Tooltip
+            overlayStyle={{ whiteSpace: "pre-line" }}
+            title={`Public - Accessible to anyone without restrictions.
+            
+            Authentication - Accessible only to authenticated (logged-in) users.
+            
+            Authorization - Accessible only to authenticated users with the required permissions to access the selected entity in the current path or any entity up the chain. (Requires valid entity ('#') up in the chain`}
+          >
+            <QuestionCircleOutlined />
+          </Tooltip>
+        </Flex>
+      ),
       dataIndex: "permission",
       render: (permission, record) => {
         const options = [
@@ -180,20 +212,32 @@ export const HostPermissionTable = ({
             onChange={(selectedPermissionType) => {
               handlePermissionChange(record.method, selectedPermissionType);
             }}
-            className="w-[156px]"
             options={options}
+            style={{ minWidth: 250 }}
           />
         );
       },
     },
     {
-      title: "Settings",
+      title: (
+        <Flex gap="small">
+          <Typography.Text>Authorization Settings</Typography.Text>
+          <Tooltip
+            overlayStyle={{ whiteSpace: "pre-line" }}
+            title={`Select an entity up in the chain.
+
+                     Select the required permissions for the authenticated user to access the selected entity.`}
+          >
+            <QuestionCircleOutlined />
+          </Tooltip>
+        </Flex>
+      ),
       dataIndex: "permission",
       render: (permission, record) => {
         if (permission && "entity" in permission && "type" in permission) {
           const labelManager = new LabelManager();
           return (
-            <div className="flex flex-col w-[256px] gap-2">
+            <Flex style={{ minWidth: 150 }} vertical>
               <Select
                 defaultValue={
                   permission && "entity" in permission
@@ -225,7 +269,7 @@ export const HostPermissionTable = ({
                 placeholder="Permission"
                 options={entityTypeOptions(authData, permission.entity)}
               />
-            </div>
+            </Flex>
           );
         }
       },
@@ -249,12 +293,29 @@ export const HostPermissionTable = ({
 
   return (
     <>
-      <Table<PermissionTableDataType>
-        pagination={false}
-        dataSource={dataSource}
-        columns={columns}
-      />
-      <Button onClick={handleAddPermission}>Add Permission</Button>
+      <Form.Item
+        label={
+          <Flex gap="small">
+            <Typography.Text>Access Control Settings</Typography.Text>
+            <Tooltip
+              title={
+                "Define authentication and authorization rules of the HTTP methods for the route"
+              }
+            >
+              <QuestionCircleOutlined />
+            </Tooltip>
+          </Flex>
+        }
+      >
+        <Table<PermissionTableDataType>
+          pagination={false}
+          dataSource={dataSource}
+          columns={columns}
+        />
+        <Button style={{ width: "100%" }} onClick={handleAddPermission}>
+          Add Permission
+        </Button>
+      </Form.Item>
     </>
   );
 };

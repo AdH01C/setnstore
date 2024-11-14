@@ -1,6 +1,7 @@
-import { Button, Input, Table } from "antd";
+import { Button, Flex, Input, Modal, Table, Tooltip, Typography } from "antd";
 import { withJsonFormsControlProps } from "@jsonforms/react";
 import { useEffect } from "react";
+import { QuestionCircleOutlined } from "@ant-design/icons";
 
 interface AllowedOriginsControlProps {
   data: string[];
@@ -40,11 +41,40 @@ function AllowedOrigins({ id, value, updateValue }: AllowedOriginsProps) {
       ? []
       : currentValue.map((origin, index) => ({ key: index, origin }));
 
+  function handleDeleteOrigin(index: number) {
+    Modal.confirm({
+      title: "Delete Origin",
+      content: "Are you sure you want to delete this origin?",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      onOk() {
+        const newValue = [...value];
+        newValue.splice(index, 1);
+        updateValue(newValue);
+      },
+    });
+  }
+
   return (
-    <div className="flex flex-col p-4">
+    <div>
       <Table dataSource={dataSource} pagination={false} rowKey="key">
         <Table.Column
-          title="Allowed Origin"
+          title={
+            <Flex gap="small">
+              <Typography.Text>Allowed Origins</Typography.Text>
+              <Tooltip
+                overlayStyle={{ whiteSpace: "pre-line" }}
+                title={`Enter the URLs of domains allowed to access your application. 
+
+                Each URL should be a fully qualified domain (e.g., https://example.com). 
+
+                Use "*" to allow all domains`}
+              >
+                <QuestionCircleOutlined />
+              </Tooltip>
+            </Flex>
+          }
           dataIndex="origin"
           key="origin"
           render={(text, record, index) => (
@@ -66,9 +96,7 @@ function AllowedOrigins({ id, value, updateValue }: AllowedOriginsProps) {
               type="text"
               danger
               onClick={() => {
-                const newValue = [...value];
-                newValue.splice(index, 1);
-                updateValue(newValue);
+                handleDeleteOrigin(index);
               }}
             >
               Delete
