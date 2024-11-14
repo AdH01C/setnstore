@@ -1,4 +1,4 @@
-import React, { ComponentType, useMemo } from "react";
+import React, { ComponentType, useMemo, useState } from "react";
 import {
   Categorization,
   Category,
@@ -15,17 +15,15 @@ import {
   withJsonFormsLayoutProps,
   withTranslateProps,
 } from "@jsonforms/react";
-import { Button, Flex, Tabs, TabsProps } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
+import { Button, Flex, message, Tabs, TabsProps, Upload } from "antd";
 import { renderChildren } from "./util";
 
-interface MaterialCategorizationLayoutRendererProps
+interface TabsCategorizationLayoutRendererProps
   extends StatePropsOfLayout,
-    AjvProps,
     TranslateProps {
-  selected?: number;
-  ownState?: boolean;
+  ajv: Ajv;
   data?: any;
-  onChange?(selected: number, prevSelected: number): void;
 }
 
 interface AjvProps {
@@ -41,7 +39,7 @@ const withAjvProps = <P extends {}>(Component: ComponentType<AjvProps & P>) =>
   };
 
 export const TabsCategorizationLayout = (
-  props: MaterialCategorizationLayoutRendererProps
+  props: TabsCategorizationLayoutRendererProps
 ) => {
   const { data, path, schema, uischema, visible, enabled, ajv, t } = props;
 
@@ -80,14 +78,8 @@ export const TabsCategorizationLayout = (
       children: renderContent(),
     };
   });
-  const operations = (
-    <Flex gap="middle">
-      <Button>View Guide</Button>
-      <Button>Import JSON</Button>
-    </Flex>
-  );
 
-  return visible ? <Tabs tabBarExtraContent={operations} items={items} /> : null;
+  return visible ? <Tabs items={items} /> : null;
 };
 
 export default withAjvProps(

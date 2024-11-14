@@ -18,8 +18,9 @@ import { javascript } from "@codemirror/lang-javascript";
 import { barf } from "thememirror";
 import { defaultKeymap } from "@codemirror/commands";
 import React from "react";
-import { Flex, Splitter } from "antd";
+import { Button, Flex, Splitter, Upload, message } from "antd";
 import { EditorView } from "@codemirror/view";
+import { UploadOutlined } from "@ant-design/icons";
 
 export default function RulesetForm({
   formData,
@@ -56,6 +57,22 @@ export default function RulesetForm({
       console.error("Invalid JSON:", error);
     }
   };
+  const handleFileChange = (info: { file: any }) => {
+    const file = info.file;
+
+    if (file.status === "done") {
+      const reader = new FileReader();
+      reader.readAsText(file.originFileObj);
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        if (e.target && typeof e.target.result === "string") {
+          onFormChange(JSON.parse(e.target.result));
+        }
+      };
+      message.success("File upload failed.");
+    } else if (file.status === "error") {
+      message.error("File upload failed.");
+    }
+  };
 
   return (
     <>
@@ -68,18 +85,36 @@ export default function RulesetForm({
               height: "100%",
               overflowY: "auto",
               padding: "0 20px 0 0",
+              position: "relative",
+              display: "inline-block",
             }}
           >
-            <JsonForms
-              schema={schema}
-              uischema={uischema}
-              data={formData}
-              renderers={renderers}
-              cells={vanillaCells}
-              onChange={(formData: { data: any }) =>
-                onFormChange(formData.data)
-              }
-            />
+            <Flex
+              style={{ position: "absolute", top: 20, right: 20, zIndex: 10 }}
+              gap="middle"
+            >
+              <Button>View Guide</Button>
+              <Upload
+                name="file"
+                accept=".json"
+                showUploadList={false}
+                onChange={handleFileChange}
+              >
+                <Button icon={<UploadOutlined />}>Click to Upload JSON</Button>
+              </Upload>
+            </Flex>
+            <div style={{ position: "relative" }}>
+              <JsonForms
+                schema={schema}
+                uischema={uischema}
+                data={formData}
+                renderers={renderers}
+                cells={vanillaCells}
+                onChange={(formData: { data: any }) =>
+                  onFormChange(formData.data)
+                }
+              />
+            </div>
           </Splitter.Panel>
 
           {/* Right panel containing CodeMirror with independent scrolling */}
