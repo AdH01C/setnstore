@@ -62,10 +62,29 @@ export default function RulesetDetail({
       />
     ),
   };
+
+  const operations = (
+    <Flex
+      style={{ position: "absolute", top: 20, right: 20, zIndex: 10 }}
+      gap="middle"
+    >
+      {isEditable && (
+        <Button type="primary" onClick={onEdit}>
+          Edit Ruleset
+        </Button>
+      )}
+      {isDeletable && (
+        <Button type="primary" danger onClick={onDelete}>
+          Delete Ruleset
+        </Button>
+      )}
+    </Flex>
+  );
+
   return (
     <>
       {ruleset && (
-        <RefsContext.Provider value={{ tabs }}>
+        <RefsContext.Provider value={{ tabs, operations }}>
           <JsonForms
             schema={schema}
             uischema={uischema}

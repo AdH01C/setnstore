@@ -6,6 +6,7 @@ import RulesetDataService from "@/app/services/NewRulesetDataService";
 import { useAppContext } from "@/app/components/AppContext";
 import RulesetDetail from "@/app/components/RulesetDetail";
 import { RulesetWithRulesetJson } from "@inquisico/ruleset-editor-api";
+import { Modal } from "antd";
 
 export default function RulesetDisplay() {
   const router = useRouter();
@@ -13,12 +14,25 @@ export default function RulesetDisplay() {
   const [ruleset, setRuleset] = useState<RulesetWithRulesetJson>();
 
   const handleRulesetDelete = async (rulesetID: string) => {
-    try {
-      await RulesetDataService.deleteRulesetByID(companyId, appID, rulesetID);
-      router.push(`/applications/${appID}`);
-    } catch (error) {
-      console.error("Error deleting application:", error);
-    }
+    Modal.confirm({
+      title: "Delete Ruleset",
+      content: "Are you sure you want to delete this ruleset?",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      async onOk() {
+        try {
+          await RulesetDataService.deleteRulesetByID(
+            companyId,
+            appID,
+            rulesetID
+          );
+          router.push(`/applications/${appID}`);
+        } catch (error) {
+          console.error("Error deleting application:", error);
+        }
+      },
+    });
   };
 
   useEffect(() => {
