@@ -57,6 +57,17 @@ export default function RulesetEditor() {
     }
   };
 
+  const saveOperation = [
+    <Button
+      type="primary"
+      onClick={() => {
+        handleSubmit();
+      }}
+    >
+      Save Changes
+    </Button>
+  ];
+
   return (
     <>
       {ruleset && (
@@ -64,15 +75,8 @@ export default function RulesetEditor() {
           <RulesetForm
             formData={ruleset.rulesetJson}
             onFormChange={handleFormChange}
+            operations={saveOperation}
           />
-          <Button
-            type="primary"
-            onClick={() => {
-              handleSubmit();
-            }}
-          >
-            Save Changes
-          </Button>
         </>
       )}
     </>

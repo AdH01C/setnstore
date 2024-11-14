@@ -1,4 +1,4 @@
-import React, { ComponentType, useMemo, useState } from "react";
+import React, { ComponentType, useContext, useMemo } from "react";
 import {
   Categorization,
   Category,
@@ -15,9 +15,9 @@ import {
   withJsonFormsLayoutProps,
   withTranslateProps,
 } from "@jsonforms/react";
-import { UploadOutlined } from "@ant-design/icons";
-import { Button, Flex, message, Tabs, TabsProps, Upload } from "antd";
+import { Tabs, TabsProps } from "antd";
 import { renderChildren } from "./util";
+import { RefsContext } from "../../FormContext";
 
 interface TabsCategorizationLayoutRendererProps
   extends StatePropsOfLayout,
@@ -42,7 +42,7 @@ export const TabsCategorizationLayout = (
   props: TabsCategorizationLayoutRendererProps
 ) => {
   const { data, path, schema, uischema, visible, enabled, ajv, t } = props;
-
+  const { formRef, operations } = useContext(RefsContext);
   const categorization = uischema as Categorization;
 
   const categories = useMemo(
@@ -79,7 +79,11 @@ export const TabsCategorizationLayout = (
     };
   });
 
-  return visible ? <Tabs items={items} /> : null;
+  return visible ? (
+    <div ref={formRef}>
+      <Tabs tabBarExtraContent={operations} items={items} />
+    </div>
+  ) : null;
 };
 
 export default withAjvProps(
