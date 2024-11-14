@@ -8,11 +8,13 @@ export const EntitySettingsForm = ({
   updateValue,
   relations,
   ancestorEntities,
+  readonly
 }: {
   pathData: PathValue;
   updateValue: (newValue: PathValue) => void;
   relations: string[];
   ancestorEntities: string[];
+  readonly: boolean;
 }) => {
   const [[path, untypedProperties]] = Object.entries(pathData);
   const pathProperties = untypedProperties as EntityPathSettings;
@@ -106,6 +108,7 @@ export const EntitySettingsForm = ({
                 value: relation,
               }))}
               style={{ width: 250 }}
+              disabled={readonly}
             />
           </Form.Item>
           <Form.Item
@@ -133,6 +136,7 @@ export const EntitySettingsForm = ({
               placeholder="Relation Type"
               options={relationTypeOptions}
               style={{ width: 250 }}
+              disabled={readonly}
             />
             {toggleCustomRelation && (
               <Select

@@ -24,12 +24,14 @@ export const AuthRelationTable = ({
   entityList,
   relationList,
   updateValue,
+  readonly,
 }: {
   entity: string;
   authData: AuthorizationDefinition;
   entityList: string[];
   relationList: RelationRow[];
   updateValue: (newValue: AuthorizationRelations) => void;
+  readonly: boolean;
 }) => {
   //   const permissionData = authData.permissions;
   const relationsData = authData.relations;
@@ -122,6 +124,7 @@ export const AuthRelationTable = ({
             onBlur={(e) => {
               handleRelationNameChange(e, record.relation);
             }}
+            disabled={readonly}
           />
         );
       },
@@ -145,7 +148,7 @@ export const AuthRelationTable = ({
 
         return (
           <Select
-            mode="tags"
+            mode="multiple"
             value={facets.map((authRelation: AuthorizationRelation) =>
               sortedStringify(authRelation)
             )}
@@ -160,6 +163,7 @@ export const AuthRelationTable = ({
               })),
               ...facetOptions,
             ]}
+            disabled={readonly}
           />
         );
       },
@@ -185,11 +189,17 @@ export const AuthRelationTable = ({
       <Table<AuthRelationTableDataType>
         pagination={false}
         dataSource={dataSource}
-        columns={columns}
+        columns={
+          !readonly
+            ? [...columns]
+            : columns.filter((column) => column.title !== "Actions")
+        }
       />
-      <Button style={{ width: "100%" }} onClick={handleAddRelation}>
-        Add Relation
-      </Button>
+      {!readonly && (
+        <Button style={{ width: "100%" }} onClick={handleAddRelation}>
+          Add Relation
+        </Button>
+      )}
     </>
   );
 };

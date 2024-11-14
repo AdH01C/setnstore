@@ -7,28 +7,37 @@ interface AllowedOriginsControlProps {
   data: string[];
   handleChange(path: string, value: string[]): void;
   path: string;
+  enabled: boolean;
 }
 
 interface AllowedOriginsProps {
   id?: string;
   value: string[];
   updateValue: (newValue: string[]) => void;
+  readonly: boolean;
 }
 
 const AllowedOriginsControl = ({
   data,
   handleChange,
   path,
+  enabled,
 }: AllowedOriginsControlProps) => (
   <AllowedOrigins
     value={data}
     updateValue={(newValue: string[]) => handleChange(path, newValue)}
+    readonly={!enabled}
   />
 );
 
 export default withJsonFormsControlProps(AllowedOriginsControl);
 
-function AllowedOrigins({ id, value, updateValue }: AllowedOriginsProps) {
+function AllowedOrigins({
+  id,
+  value,
+  updateValue,
+  readonly,
+}: AllowedOriginsProps) {
   useEffect(() => {
     if (!value) {
       updateValue([]);
@@ -85,28 +94,34 @@ function AllowedOrigins({ id, value, updateValue }: AllowedOriginsProps) {
                 newValue[index] = e.target.value;
                 updateValue(newValue);
               }}
+              style={{ width: 650 }}
+              disabled={readonly}
             />
           )}
         />
-        <Table.Column
-          title="Actions"
-          key="actions"
-          render={(text, record, index) => (
-            <Button
-              type="text"
-              danger
-              onClick={() => {
-                handleDeleteOrigin(index);
-              }}
-            >
-              Delete
-            </Button>
-          )}
-        />
+        {!readonly && (
+          <Table.Column
+            title="Actions"
+            key="actions"
+            render={(text, record, index) => (
+              <Button
+                type="text"
+                danger
+                onClick={() => {
+                  handleDeleteOrigin(index);
+                }}
+              >
+                Delete
+              </Button>
+            )}
+          />
+        )}
       </Table>
-      <Button type="dashed" onClick={() => updateValue([...value, ""])}>
-        Add Allowed Origin
-      </Button>
+      {!readonly && (
+        <Button type="dashed" onClick={() => updateValue([...value, ""])}>
+          Add Allowed Origin
+        </Button>
+      )}
     </div>
   );
 }

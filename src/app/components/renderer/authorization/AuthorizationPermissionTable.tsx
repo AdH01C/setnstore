@@ -32,12 +32,14 @@ export const AuthPermissionTable = ({
   relationList,
   permissionList,
   updateValue,
+  readonly,
 }: {
   entity: string;
   authData: AuthorizationDefinition;
   relationList: RelationRow[];
   permissionList: PermissionRow[];
   updateValue: (newValue: AuthorizationPermissions) => void;
+  readonly: boolean;
 }) => {
   const permissionData = authData.permissions;
 
@@ -196,7 +198,7 @@ export const AuthPermissionTable = ({
       if (isAuthorizationOperations(record.type)) {
         return (
           <Select
-            mode={"tags"}
+            mode={"multiple"}
             value={record.type.operations.map((authOp) =>
               sortedStringify(authOp)
             )}
@@ -205,6 +207,7 @@ export const AuthPermissionTable = ({
             }}
             placeholder="Select relations"
             options={[...entityRelations, ...entityPermissions, ...resultArray]}
+            disabled={readonly}
           />
         );
       }
@@ -222,6 +225,7 @@ export const AuthPermissionTable = ({
             }}
             placeholder="Select relation"
             options={[...entityRelations, ...entityPermissions, ...resultArray]}
+            disabled={readonly}
           />
         );
       }
@@ -252,6 +256,7 @@ export const AuthPermissionTable = ({
           <Input
             defaultValue={permission}
             onBlur={(e) => handlePermissionNameChange(e, record.permission)}
+            disabled={readonly}
           />
         );
       },
@@ -285,6 +290,7 @@ export const AuthPermissionTable = ({
               { label: "Intersect", value: "intersect" },
               { label: "Except", value: "except" },
             ]}
+            disabled={readonly}
           />
         );
       },
@@ -328,11 +334,17 @@ export const AuthPermissionTable = ({
       <Table<AuthPermissionTableDataType>
         pagination={false}
         dataSource={dataSource}
-        columns={columns}
+        columns={
+          !readonly
+            ? [...columns]
+            : columns.filter((column) => column.title !== "Actions")
+        }
       />
-      <Button style={{ width: "100%" }} onClick={handleAddPermission}>
-        Add Permission
-      </Button>
+      {!readonly && (
+        <Button style={{ width: "100%" }} onClick={handleAddPermission}>
+          Add Permission
+        </Button>
+      )}
     </>
   );
 };

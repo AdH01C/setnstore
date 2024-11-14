@@ -42,7 +42,7 @@ export const TabsCategorizationLayout = (
   props: TabsCategorizationLayoutRendererProps
 ) => {
   const { data, path, schema, uischema, visible, enabled, ajv, t } = props;
-  const { formRef, operations } = useContext(RefsContext);
+  const { formRef, operations, tabs } = useContext(RefsContext) || {};
   const categorization = uischema as Categorization;
 
   const categories = useMemo(
@@ -78,6 +78,10 @@ export const TabsCategorizationLayout = (
       children: renderContent(),
     };
   });
+
+  if (tabs) {
+    items.push(tabs)
+  }
 
   return visible ? (
     <div ref={formRef}>

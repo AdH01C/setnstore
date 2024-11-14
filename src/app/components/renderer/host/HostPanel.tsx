@@ -6,20 +6,27 @@ export const HostPanel = ({
   value,
   updateValue,
   authData,
+  readonly,
 }: {
   value: HostValue;
   updateValue: (newValue: PathValue) => void;
   authData: AuthorizationValue;
+  readonly: boolean;
 }) => {
   const [host] = Object.keys(value);
 
   const pathData = useMemo(() => {
-    const generatedData = generatePathData(value[host], updateValue, authData);
-    if (generatedData.length > 0) {
+    const generatedData = generatePathData(
+      value[host],
+      updateValue,
+      authData,
+      readonly
+    );
+    if (generatedData.length > 0 && !readonly) {
       return [...generatedData, addPathButton(value[host], updateValue, host)];
     }
     return generatedData;
-  }, [value, authData, host, updateValue]);
+  }, [value, authData, host, updateValue, readonly]);
   //   const pathData = generatePathData(value[host], updateValue, relations, host);
 
   return (
@@ -33,7 +40,7 @@ export const HostPanel = ({
           showLine
           treeData={pathData}
         />
-      ) : (
+      ) : readonly ? null : (
         <Button
           onClick={() => {
             updateValue({
@@ -56,6 +63,7 @@ const generatePathData = (
   value: PathValue,
   updateValue: (newValue: PathValue) => void,
   authData: AuthorizationValue,
+  readonly: boolean,
   absolutePath: string = "",
   ancestorEntities: string[] = []
 ): TreeDataNode[] => {
@@ -102,6 +110,7 @@ const generatePathData = (
           pathProperties.children!,
           handleChildPathPropertyChange,
           authData,
+          readonly,
           `${absolutePath}/${path}`,
           isEntityPath
             ? [
@@ -121,6 +130,7 @@ const generatePathData = (
           updatePathRoute={handlePathRouteChange}
           authData={authData}
           ancestorEntities={ancestorEntities}
+          readonly={readonly}
         />
       ),
       key: `$${absolutePath}/${path}`,
@@ -129,7 +139,7 @@ const generatePathData = (
       isLeaf: !hasChildren,
       children: [
         ...childrenNodes,
-        ...(childrenNodes.length > 0
+        ...(childrenNodes.length > 0 && !readonly
           ? [
               addPathButton(
                 { ...value[path].children },

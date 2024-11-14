@@ -21,6 +21,7 @@ interface PathProps {
   updatePathRoute: (newValue?: string) => void;
   authData: AuthorizationValue;
   ancestorEntities: string[];
+  readonly: boolean;
 }
 
 export const Path: React.FC<PathProps> = ({
@@ -30,6 +31,7 @@ export const Path: React.FC<PathProps> = ({
   updatePathRoute,
   authData,
   ancestorEntities,
+  readonly,
 }) => {
   const [path] = Object.keys(pathData);
   const isEntityPath = path === "#";
@@ -73,7 +75,7 @@ export const Path: React.FC<PathProps> = ({
       label: (
         <>
           {absolutePath}
-          {absolutePath !== "/" && (
+          {absolutePath !== "/" && !readonly && (
             <>
               <Button onClick={handleAddChildPath}>Add Child Path</Button>{" "}
               <Button onClick={handleDeletePath}>Delete Path</Button>
@@ -83,7 +85,6 @@ export const Path: React.FC<PathProps> = ({
       ),
       children: (
         <Form style={{ minWidth: 750 }} layout="vertical">
-          {/* <Typography>{absolutePath}</Typography> */}
           <Form.Item
             label={
               <Flex gap="small">
@@ -108,6 +109,7 @@ export const Path: React.FC<PathProps> = ({
                 updatePathRoute(e.target.value);
               }}
               style={{ width: 250 }}
+              disabled={readonly}
               // disabled={path === "#"}
             />
           </Form.Item>
@@ -117,6 +119,7 @@ export const Path: React.FC<PathProps> = ({
               updateValue={updateValue}
               relations={Object.keys(authData || {})}
               ancestorEntities={ancestorEntities}
+              readonly={readonly}
             />
           )}
           <HostPermissionTable
@@ -124,6 +127,7 @@ export const Path: React.FC<PathProps> = ({
             updateValue={updateValue}
             authData={authData}
             ancestorEntities={ancestorEntities}
+            readonly={readonly}
           />
         </Form>
       ),

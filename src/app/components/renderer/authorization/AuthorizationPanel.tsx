@@ -11,6 +11,7 @@ export const AuthPanel = ({
   relationList,
   permissionList,
   updateValue,
+  readonly,
   updateEntityName,
   deleteEntity,
 }: {
@@ -20,6 +21,7 @@ export const AuthPanel = ({
   relationList: RelationRow[];
   permissionList: PermissionRow[];
   updateValue: (newValue: AuthorizationDefinition) => void;
+  readonly: boolean;
   updateEntityName: (newEntity: string) => void;
   deleteEntity: () => void;
 }) => {
@@ -56,6 +58,7 @@ export const AuthPanel = ({
             updateEntityName(e.target.value);
           }}
           style={{ width: 250 }}
+          disabled={readonly}
         />
       </Form.Item>
       <Form.Item label="Relations">
@@ -67,6 +70,7 @@ export const AuthPanel = ({
           updateValue={(newValue) => {
             handleRelationChange(entity, newValue);
           }}
+          readonly={readonly}
         />
       </Form.Item>
       <Form.Item label="Permissions">
@@ -78,12 +82,15 @@ export const AuthPanel = ({
           updateValue={(newValue) => {
             handlePermissionChange(newValue);
           }}
+          readonly={readonly}
         />
       </Form.Item>
 
-      <Button color="danger" variant="solid" onClick={() => deleteEntity()}>
-        Delete
-      </Button>
+      {!readonly && (
+        <Button color="danger" variant="solid" onClick={() => deleteEntity()}>
+          Delete
+        </Button>
+      )}
     </Form>
   );
 };

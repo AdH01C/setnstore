@@ -7,6 +7,7 @@ interface MetaDataControlProps {
   data: MetaDataValue;
   handleChange(path: string, value: MetaDataValue): void;
   path: string;
+  enabled: boolean;
 }
 
 interface MetaDataValue {
@@ -21,6 +22,7 @@ interface MetaDataProps {
   id?: string;
   value: MetaDataValue;
   updateValue: (newValue: MetaDataValue) => void;
+  readonly: boolean;
 }
 
 type EntityCase = "none" | "lowercase" | "uppercase";
@@ -32,18 +34,20 @@ const MetaDataControl = ({
   data,
   handleChange,
   path,
+  enabled,
 }: MetaDataControlProps) => {
   return (
     <MetaData
       value={data}
       updateValue={(newValue: MetaDataValue) => handleChange(path, newValue)}
+      readonly={!enabled}
     />
   );
 };
 
 export default withJsonFormsControlProps(MetaDataControl);
 
-function MetaData({ id, value, updateValue }: MetaDataProps) {
+function MetaData({ id, value, updateValue, readonly }: MetaDataProps) {
   const trailingSlashModeOptions = [
     { label: "Strict", value: "strict" },
     { label: "Fallback", value: "fallback" },
@@ -103,6 +107,7 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
           }
           className="w-1/6"
           options={trailingSlashModeOptions}
+          disabled={readonly}
         />
       </div>
       <Divider />
@@ -129,6 +134,7 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
           }
           className="w-1/6"
           options={redirectSlashesOptions}
+          disabled={readonly}
         />
       </div>
       <Divider />
@@ -150,6 +156,7 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
                 caseSensitive: e.target.checked,
               })
             }
+            disabled={readonly}
           />
         </div>
       </div>
@@ -174,6 +181,7 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
           }
           className="w-1/6"
           options={entityValueCaseOptions}
+          disabled={readonly}
         />
       </div>
       <Divider />
@@ -197,6 +205,7 @@ function MetaData({ id, value, updateValue }: MetaDataProps) {
                 optionsPassthrough: e.target.checked,
               })
             }
+            disabled={readonly}
           />
         </div>
       </div>

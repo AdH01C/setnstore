@@ -29,11 +29,13 @@ export const HostPermissionTable = ({
   updateValue,
   authData,
   ancestorEntities,
+  readonly,
 }: {
   pathData: PathValue;
   updateValue: (newValue: PathValue) => void;
   authData: AuthorizationValue;
   ancestorEntities: string[];
+  readonly: boolean;
 }) => {
   const [[path, pathProperties]] = Object.entries(pathData);
   const connectedEntities = [
@@ -175,6 +177,7 @@ export const HostPermissionTable = ({
             }}
             options={methodOptions(usedPermission)}
             style={{ minWidth: 100 }}
+            disabled={readonly}
           />
         );
       },
@@ -214,6 +217,7 @@ export const HostPermissionTable = ({
             }}
             options={options}
             style={{ minWidth: 250 }}
+            disabled={readonly}
           />
         );
       },
@@ -256,6 +260,7 @@ export const HostPermissionTable = ({
                     value: entity,
                   };
                 })}
+                disabled={readonly}
               />
               <Select
                 value={
@@ -268,6 +273,7 @@ export const HostPermissionTable = ({
                 }
                 placeholder="Permission"
                 options={entityTypeOptions(authData, permission.entity)}
+                disabled={readonly}
               />
             </Flex>
           );
@@ -310,11 +316,17 @@ export const HostPermissionTable = ({
         <Table<PermissionTableDataType>
           pagination={false}
           dataSource={dataSource}
-          columns={columns}
+          columns={
+            !readonly
+              ? [...columns]
+              : columns.filter((column) => column.title !== "Actions")
+          }
         />
-        <Button style={{ width: "100%" }} onClick={handleAddPermission}>
-          Add Permission
-        </Button>
+        {!readonly && (
+          <Button style={{ width: "100%" }} onClick={handleAddPermission}>
+            Add Permission
+          </Button>
+        )}
       </Form.Item>
     </>
   );

@@ -72,6 +72,7 @@ export default function RulesetForm({
       console.error("Invalid JSON:", error);
     }
   };
+
   const handleFileChange = (info: { file: any }) => {
     const file = info.file;
 

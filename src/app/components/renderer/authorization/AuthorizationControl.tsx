@@ -3,21 +3,25 @@ import { withJsonFormsControlProps } from "@jsonforms/react";
 import { AuthPanel } from "./AuthorizationPanel";
 import { PermissionRow, RelationRow } from "../util";
 import { useEffect } from "react";
+import { evalManifestWithRetries } from "next/dist/server/load-components";
 
 interface AuthorizationControlProps {
   data: AuthorizationValue;
   handleChange(path: string, value: AuthorizationValue): void;
   path: string;
+  enabled: boolean;
 }
 
 const AuthorizationControl = ({
   data,
   handleChange,
   path,
+  enabled,
 }: AuthorizationControlProps) => (
   <Authorization
     value={data}
     updateValue={(newValue: AuthorizationValue) => handleChange(path, newValue)}
+    readonly={!enabled}
   />
 );
 
@@ -27,9 +31,15 @@ interface AuthorizationProps {
   id?: string;
   value: AuthorizationValue;
   updateValue: (newValue: AuthorizationValue) => void;
+  readonly: boolean;
 }
 
-function Authorization({ id, value, updateValue }: AuthorizationProps) {
+function Authorization({
+  id,
+  value,
+  updateValue,
+  readonly,
+}: AuthorizationProps) {
   useEffect(() => {
     if (!value) {
       updateValue({});
@@ -80,6 +90,7 @@ function Authorization({ id, value, updateValue }: AuthorizationProps) {
             newValue[entity] = newAuth;
             updateValue(newValue);
           }}
+          readonly={readonly}
           updateEntityName={(newEntity: string) => {
             if (newEntity === entity) return;
 
@@ -116,24 +127,26 @@ function Authorization({ id, value, updateValue }: AuthorizationProps) {
   return (
     <>
       <Collapse accordion className="text-sm" items={authItem} />
-      <Button
-        type="primary"
-        // className="border border-dotted border-gray-300 rounded-md p-2 hover:bg-gray-100"
-        onClick={() => {
-          const newEntity = `new-entity-${
-            Object.keys(currentValue).length + 1
-          }`;
-          updateValue({
-            ...currentValue,
-            [newEntity]: {
-              relations: {},
-              permissions: {},
-            },
-          });
-        }}
-      >
-        Add Entity
-      </Button>
+      {!readonly && (
+        <Button
+          type="primary"
+          // className="border border-dotted border-gray-300 rounded-md p-2 hover:bg-gray-100"
+          onClick={() => {
+            const newEntity = `new-entity-${
+              Object.keys(currentValue).length + 1
+            }`;
+            updateValue({
+              ...currentValue,
+              [newEntity]: {
+                relations: {},
+                permissions: {},
+              },
+            });
+          }}
+        >
+          Add Entity
+        </Button>
+      )}
     </>
   );
 }

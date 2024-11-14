@@ -3,17 +3,24 @@
 import { useJsonForms, withJsonFormsControlProps } from "@jsonforms/react";
 import { HostPanel } from "./HostPanel";
 import { useEffect, useMemo } from "react";
+import { Button } from "antd";
 
-const HostControl = ({ data, handleChange, path }: HostControlProps) => (
+const HostControl = ({
+  data,
+  handleChange,
+  path,
+  enabled,
+}: HostControlProps) => (
   <Host
     value={data}
     updateValue={(newValue: HostValue) => handleChange(path, newValue)}
+    readonly={!enabled}
   />
 );
 
 export default withJsonFormsControlProps(HostControl);
 
-function Host({ id, value, updateValue }: HostProps) {
+function Host({ id, value, updateValue, readonly }: HostProps) {
   const ctx = useJsonForms();
 
   // const relations: string[] = Object.keys(ctx.core?.data?.authorization || {});
@@ -41,14 +48,15 @@ function Host({ id, value, updateValue }: HostProps) {
   const currentValue = value || defaultValue;
 
   return Object.keys(currentValue).length === 0 ? (
-    <button
-      className="border border-dotted border-gray-300 rounded-md p-2 hover:bg-gray-100"
-      onClick={() => {
-        updateValue(defaultValue);
-      }}
-    >
-      Add Host
-    </button>
+    readonly ? (
+      <Button
+        onClick={() => {
+          updateValue(defaultValue);
+        }}
+      >
+        Add Host
+      </Button>
+    ) : null
   ) : (
     Object.entries(currentValue).map(([host, hostProperties]) => (
       <HostPanel
@@ -60,6 +68,7 @@ function Host({ id, value, updateValue }: HostProps) {
           updateValue(newValue);
         }}
         authData={authData}
+        readonly={readonly}
       />
     ))
   );
