@@ -5,7 +5,7 @@ import { Button, Card, Modal, Typography } from "antd";
 interface ProjectCardProps {
   appId: string;
   appName: string;
-  companyName: string;
+  // companyName: string;
   companyId: string;
   onDelete: (appId: string) => void;
 }

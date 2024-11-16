@@ -9,6 +9,14 @@ import {
 import { useParams } from "next/navigation";
 
 interface AppContextType {
+  userId: string;
+  setUserId: Dispatch<SetStateAction<string>>;
+  firstName: string;
+  setFirstName: Dispatch<SetStateAction<string>>;
+  lastName: string;
+  setLastName: Dispatch<SetStateAction<string>>;
+  email: string;
+  setEmail: Dispatch<SetStateAction<string>>;
   appID: string;
   companyName: string;
   setCompanyName: Dispatch<SetStateAction<string>>;
@@ -64,12 +72,26 @@ export const AppProvider: React.FC<{
     }
   }, [companyName]);
 
+  const [userId, setUserId] = useState<string>("");
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  
+
   // Values provided by the context
   const value = {
     companyId,
     setCompanyId,
     companyName,
     setCompanyName,
+    userId,
+    setUserId,
+    firstName,
+    setFirstName,
+    lastName,
+    setLastName,
+    email,
+    setEmail,
     appID: app_id,
     rulesetID: ruleset_id,
   };

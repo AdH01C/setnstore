@@ -7,13 +7,34 @@ import { signIn } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Loading from "@/app/components/Loading";
 import { useAuth } from "./hooks/useAuth";
+import { AppProvider, useAppContext } from "./components/AppContext";
+import { userDetailsAtom } from "@/jotai/User";
+import { useAtom } from "jotai";
 
 export default function LoginForm() {
   const router = useRouter();
   const { isFetching, identity } = useAuth({ forceRefetch: false });
+  // const { userId, setUserId, firstName, setFirstName, lastName, setLastName } = useAppContext();
+  const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
+
   const onAuthlinkLogin = () => {
-    if (identity) {
-      router.push("/dashboard");
+    if (!isFetching && identity ) {
+      
+      if (!identity) {
+        console.error("User not found or error fetching user data");
+        return;
+      }
+
+      setUserDetails({
+        id: identity.id,
+        firstName: identity.firstName,
+        lastName: identity.lastName,
+        email: "",
+        companyId: "",
+        companyName: "",
+      });
+
+      // router.push("/dashboard");
     } else {
       router.push(process.env.NEXT_PUBLIC_AUTH_ENDPOINT + "/login");
     }
@@ -23,6 +44,21 @@ export default function LoginForm() {
 
   useEffect(() => {
     if (!isFetching && identity) {
+      
+      if (!identity) {
+        console.error("User not found or error fetching user data");
+        setIsLoading(false);
+        return;
+      }
+
+      setUserDetails({
+        id: identity.id,
+        firstName: identity.firstName,
+        lastName: identity.lastName,
+        email: "",
+        companyId: "",
+      });
+      console.log("User exists:", userDetails);
       router.push("/dashboard");
       return;
     }

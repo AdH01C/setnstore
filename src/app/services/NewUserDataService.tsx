@@ -8,7 +8,7 @@ class UserDataService {
     this.userAPI = new UserApi(configuration());
   }
 
-  createUser(user: User): Promise<ID> {
+  async createUser(user: User): Promise<ID> {
     return this.userAPI.createUser(user)
       .then((response) => {
         return response;
@@ -19,7 +19,7 @@ class UserDataService {
       });
   }
 
-  getUserById(userId: string): Promise<User> {
+  async getUserById(userId: string): Promise<User> {
     return this.userAPI.getUserById(userId)
       .then((response) => {
         return response;
@@ -30,7 +30,7 @@ class UserDataService {
       });
   }
 
-  updateUser(userId: string, user: User): Promise<void> {
+  async updateUser(userId: string, user: User): Promise<void> {
     return this.userAPI.updateUser(userId, user)
       .then(() => {
         // No response to return for void
@@ -40,6 +40,7 @@ class UserDataService {
         throw error;
       });
   }
+
 }
 
 const userDataService = new UserDataService();

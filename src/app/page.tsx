@@ -1,4 +1,3 @@
-"use client"
 // import { useRouter } from "next/navigation";
 import { useAuth } from "./hooks/useAuth";
 import { Layout } from "antd";
