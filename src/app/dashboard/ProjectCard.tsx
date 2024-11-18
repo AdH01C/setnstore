@@ -1,6 +1,10 @@
+"use client";
+
 import ApplicationDataService from "@/app/services/NewAppDataService";
 import { useRouter } from "next/navigation";
 import { Button, Card, Modal, Typography } from "antd";
+import { useAtom } from "jotai";
+import { userDetailsAtom } from "@/jotai/User";
 
 interface ProjectCardProps {
   appId: string;
@@ -17,10 +21,11 @@ export default function ProjectCard({
   companyId,
   onDelete,
 }: ProjectCardProps) {
-  // const [currentlySelected, setCurrentlySelected] = useAtom(
-  //   currentlySelectedAtom
-  // );
+  
+  const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
+
   const router = useRouter();
+
 
   const handleDelete = async (e: React.MouseEvent) => {
     // Prevent the card click event from firing when delete is clicked
@@ -33,7 +38,6 @@ export default function ProjectCard({
         try {
           await ApplicationDataService.deleteApplication(companyId, appId);
           console.log(`Application with ID ${appId} deleted successfully`);
-          onDelete(appId);
         } catch (error) {
           console.error("Error deleting application:", error);
         }
@@ -48,6 +52,10 @@ export default function ProjectCard({
         <Button
           type="primary"
           onClick={() => {
+            setUserDetails({
+              ...userDetails,
+              appId: appId,
+            });
             router.push(`/applications/${appId}`);
           }}
           style={{ marginTop: "1rem" }}

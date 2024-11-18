@@ -3,27 +3,29 @@
 import React, { useEffect, useState } from "react";
 import ApplicationTable from "@/app/applications/[app_id]/ApplicationTable";
 import applicationDataService from "@/app/services/NewAppDataService";
-import { useAppContext } from "@/app/components/AppContext";
 import { AppDetailsWithID } from "@inquisico/ruleset-editor-api";
+import { userDetailsAtom } from "@/jotai/User";
+import { useAtom } from "jotai";
+
 export default function AppDisplay() {
-  const { appID, companyId } = useAppContext();
+  const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
   const [application, setApplication] = useState<AppDetailsWithID>();
 
   useEffect(() => {
     const fetchApplications = async () => {
       const response = await applicationDataService.getApplicationByID(
-        companyId,
-        appID
+        userDetails.companyId,
+        userDetails.appId
       );
       setApplication(response);
     };
     fetchApplications();
-  }, [companyId, appID]);
+  }, []);
 
   return (
     <>
       {application && (
-        <ApplicationTable companyId={companyId} application={application} />
+        <ApplicationTable companyId={userDetails.companyId} application={application} />
       )}
     </>
   );

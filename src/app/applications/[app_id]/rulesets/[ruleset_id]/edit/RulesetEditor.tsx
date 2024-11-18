@@ -4,13 +4,21 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import RulesetForm from "../../../../../components/RulesetForm";
 import RulesetDataService from "@/app/services/NewRulesetDataService";
-import { useAppContext } from "@/app/components/AppContext";
 import { Button } from "antd";
 import { RulesetWithRulesetJson } from "@inquisico/ruleset-editor-api";
+import { useAtom } from "jotai";
+import { userDetailsAtom } from "@/jotai/User";
 
 export default function RulesetEditor() {
   const router = useRouter();
-  const { appID, companyId, rulesetID } = useAppContext();
+  
+
+  const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
+
+  const appID = userDetails.appId;
+  const rulesetID = userDetails.rulesetId;
+  const companyId = userDetails.companyId;
+
   const [ruleset, setRuleset] = useState<RulesetWithRulesetJson>();
 
   const handleFormChange = (data: any) => {

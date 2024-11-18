@@ -1,7 +1,10 @@
-import { useAppContext } from "@/app/components/AppContext";
+"use client"
+
 import RulesetDetail from "@/app/components/RulesetDetail";
 import RulesetDataService from "@/app/services/NewRulesetDataService";
+import { userDetailsAtom } from "@/jotai/User";
 import { Button } from "antd";
+import { useAtom } from "jotai";
 import { useRouter } from "next/navigation";
 
 export default function Step3({
@@ -12,7 +15,13 @@ export default function Step3({
   prev: () => void;
 }) {
   const router = useRouter();
-  const { appID, companyId } = useAppContext();
+  const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
+
+  const appID = userDetails.appId;
+  const companyId = userDetails.companyId;
+
+
+
   const handleSubmit = async () => {
     try {
       // Update the existing ruleset

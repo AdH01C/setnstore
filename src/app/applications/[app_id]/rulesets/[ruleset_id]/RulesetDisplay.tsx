@@ -3,13 +3,20 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import RulesetDataService from "@/app/services/NewRulesetDataService";
-import { useAppContext } from "@/app/components/AppContext";
 import RulesetDetail from "@/app/components/RulesetDetail";
 import { RulesetWithRulesetJson } from "@inquisico/ruleset-editor-api";
+import { userDetailsAtom } from "@/jotai/User";
+import { useAtom } from "jotai";
 
 export default function RulesetDisplay() {
   const router = useRouter();
-  const { appID, companyId, rulesetID } = useAppContext();
+  const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
+
+  const appID = userDetails.appId;
+  const rulesetID = userDetails.rulesetId;
+  const companyId = userDetails.companyId;
+
+
   const [ruleset, setRuleset] = useState<RulesetWithRulesetJson>();
 
   const handleRulesetDelete = async (rulesetID: string) => {

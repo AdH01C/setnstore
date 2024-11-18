@@ -7,13 +7,17 @@ import RulesetDataService from "../services/NewRulesetDataService";
 import { useRouter } from "next/navigation";
 import { PieChartOutlined } from "@ant-design/icons";
 import Link from "next/link";
-import { useAppContext } from "./AppContext";
 import { AppDetailsWithID } from "@inquisico/ruleset-editor-api";
 import hostDataService from "../services/HostDataService";
+import { useAtom } from "jotai";
+import { userDetailsAtom } from "@/jotai/User";
 
 export default function ApplicationSiderMenu() {
   const router = useRouter();
-  const { appID, companyId, rulesetID } = useAppContext();
+  const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
+  const appID = userDetails.appId;
+  const companyId = userDetails.companyId;
+  const rulesetID = userDetails.rulesetId;
   const [items, setItems] = useState<MenuItem[]>([]);
 
   useEffect(() => {

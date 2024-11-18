@@ -7,6 +7,8 @@ export type UserDetails = {
     email: string;
     companyId: string;
     companyName: string;
+    appId: string;
+    rulesetId: string;
 };
 
 export const userDetailsAtom = atom<UserDetails>({
@@ -16,4 +18,6 @@ export const userDetailsAtom = atom<UserDetails>({
     email: "",
     companyId: "",
     companyName: "",
+    appId: "",
+    rulesetId: "",
 });

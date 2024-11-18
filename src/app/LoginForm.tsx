@@ -7,14 +7,12 @@ import { signIn } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Loading from "@/app/components/Loading";
 import { useAuth } from "./hooks/useAuth";
-import { AppProvider, useAppContext } from "./components/AppContext";
 import { userDetailsAtom } from "@/jotai/User";
 import { useAtom } from "jotai";
 
 export default function LoginForm() {
   const router = useRouter();
   const { isFetching, identity } = useAuth({ forceRefetch: false });
-  // const { userId, setUserId, firstName, setFirstName, lastName, setLastName } = useAppContext();
   const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
 
   const onAuthlinkLogin = () => {
@@ -32,6 +30,7 @@ export default function LoginForm() {
         email: "",
         companyId: "",
         companyName: "",
+        appId: "",
       });
 
       // router.push("/dashboard");
