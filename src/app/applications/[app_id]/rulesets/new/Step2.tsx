@@ -16,28 +16,35 @@ export default function Step2({
     updateRuleset(data);
   };
 
+  const navOperations = [
+    <Button
+      key="next"
+      type="primary"
+      onClick={() => {
+        prev();
+      }}
+    >
+      Previous
+    </Button>,
+    <Button
+      key="prev"
+      type="primary"
+      onClick={() => {
+        next();
+      }}
+    >
+      Next
+    </Button>,
+  ];
+
   return (
     <>
-      
-      <div className="mb-4 flex justify-between pr-4">
-        <Button
-          type="primary"
-          onClick={() => {
-            prev();
-          }}
-        >
-          Previous
-        </Button>
-        <Button
-          type="primary"
-          onClick={() => {
-            next();
-          }}
-        >
-          Next
-        </Button>
-      </div>
-      <RulesetForm formData={ruleset} onFormChange={handleFormChange} />
+      <div className="mb-4 flex justify-between pr-4"></div>
+      <RulesetForm
+        formData={ruleset}
+        onFormChange={handleFormChange}
+        operations={navOperations}
+      />
     </>
   );
 }

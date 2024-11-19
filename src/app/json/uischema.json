@@ -1,21 +1,65 @@
 {
-  "type": "VerticalLayout",
+  "type": "Categorization",
   "elements": [
     {
-      "type": "Control",
-      "scope": "#/properties/authorization"
+      "type": "Category",
+      "label": "Authorization",
+      "elements": [
+        {
+          "type": "VerticalLayout",
+          "elements": [
+            {
+              "type": "Control",
+              "scope": "#/properties/authorization"
+            }
+          ]
+        }
+      ]
     },
     {
-      "type": "Control",
-      "scope": "#/properties/host"
+      "type": "Category",
+      "label": "Host",
+      "elements": [
+        {
+          "type": "VerticalLayout",
+          "elements": [
+            {
+              "type": "Control",
+              "scope": "#/properties/host"
+            }
+          ]
+        }
+      ]
     },
     {
-      "type": "Control",
-      "scope": "#/properties/allowedOrigins"
+      "type": "Category",
+      "label": "Allowed Origins",
+      "elements": [
+        {
+          "type": "VerticalLayout",
+          "elements": [
+            {
+              "type": "Control",
+              "scope": "#/properties/allowedOrigins"
+            }
+          ]
+        }
+      ]
     },
     {
-      "type": "Control",
-      "scope": "#/properties/metadata"
+      "type": "Category",
+      "label": "Metadata",
+      "elements": [
+        {
+          "type": "VerticalLayout",
+          "elements": [
+            {
+              "type": "Control",
+              "scope": "#/properties/metadata"
+            }
+          ]
+        }
+      ]
     }
   ]
 }

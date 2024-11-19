@@ -1,17 +1,20 @@
-import { Form, Select } from "antd";
+import { Flex, Form, Select, Tooltip, Typography } from "antd";
 import { useState } from "react";
 import { LabelManager } from "../util";
+import { QuestionCircleOutlined } from "@ant-design/icons";
 
 export const EntitySettingsForm = ({
   pathData,
   updateValue,
   relations,
   ancestorEntities,
+  readonly
 }: {
   pathData: PathValue;
   updateValue: (newValue: PathValue) => void;
   relations: string[];
   ancestorEntities: string[];
+  readonly: boolean;
 }) => {
   const [[path, untypedProperties]] = Object.entries(pathData);
   const pathProperties = untypedProperties as EntityPathSettings;
@@ -86,7 +89,16 @@ export const EntitySettingsForm = ({
     <>
       {pathProperties && (
         <>
-          <Form.Item label="Entity: ">
+          <Form.Item
+            label={
+              <Flex gap="small">
+                <Typography.Text>Entity</Typography.Text>
+                <Tooltip title="Select an entity to assign captured wildcard value">
+                  <QuestionCircleOutlined />
+                </Tooltip>
+              </Flex>
+            }
+          >
             <Select
               defaultValue={pathProperties.entity}
               onChange={handleEntityChange}
@@ -95,14 +107,36 @@ export const EntitySettingsForm = ({
                 label: relation,
                 value: relation,
               }))}
+              style={{ width: 250 }}
+              disabled={readonly}
             />
           </Form.Item>
-          <Form.Item label="Relations: ">
+          <Form.Item
+            label={
+              <Flex gap="small">
+                <Typography.Text>Relations</Typography.Text>
+                <Tooltip
+                  overlayStyle={{ whiteSpace: "pre-line" }}
+                  title={`Default - Recursively checks if the entity is related in the chain of previous routes. 
+
+                        No Relation - No relationship checks are performed in the chain of previous routes. 
+
+                        Custom - Allows you to specify a specific entity for the relationship check in the chain. 
+                        
+                        Example (default): "/users/{#userid}/posts/{#postid}" checks if wildcard posts belongs to a user entity.`}
+                >
+                  <QuestionCircleOutlined />
+                </Tooltip>
+              </Flex>
+            }
+          >
             <Select
               defaultValue={relationType}
               onChange={handleRelationTypeChange}
               placeholder="Relation Type"
               options={relationTypeOptions}
+              style={{ width: 250 }}
+              disabled={readonly}
             />
             {toggleCustomRelation && (
               <Select

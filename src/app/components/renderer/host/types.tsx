@@ -2,6 +2,7 @@ interface HostProps {
   id?: string;
   value: HostValue;
   updateValue: (newValue: HostValue) => void;
+  readonly: boolean
 }
 interface HostValue {
   [host: string]: PathValue;
@@ -32,4 +33,5 @@ interface HostControlProps {
   data: HostValue;
   handleChange(path: string, value: HostValue): void;
   path: string;
+  enabled: boolean;
 }

@@ -1,7 +1,8 @@
-import { Form, Input, Typography } from "antd";
+import { Button, Flex, Form, Input, Tooltip, Typography } from "antd";
 import { AuthPermissionTable } from "./AuthorizationPermissionTable";
 import { AuthRelationTable } from "./AuthorizationRelationTable";
 import { PermissionRow, RelationRow } from "../util";
+import { QuestionCircleOutlined } from "@ant-design/icons";
 
 export const AuthPanel = ({
   value,
@@ -10,6 +11,7 @@ export const AuthPanel = ({
   relationList,
   permissionList,
   updateValue,
+  readonly,
   updateEntityName,
   deleteEntity,
 }: {
@@ -19,6 +21,7 @@ export const AuthPanel = ({
   relationList: RelationRow[];
   permissionList: PermissionRow[];
   updateValue: (newValue: AuthorizationDefinition) => void;
+  readonly: boolean;
   updateEntityName: (newEntity: string) => void;
   deleteEntity: () => void;
 }) => {
@@ -38,23 +41,27 @@ export const AuthPanel = ({
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <Form.Item label="Entity: ">
+    <Form layout={"vertical"}>
+      <Form.Item
+        label={
+          <Flex gap="small">
+            <Typography.Text>Entity</Typography.Text>
+            <Tooltip title="Name of entity">
+              <QuestionCircleOutlined />
+            </Tooltip>
+          </Flex>
+        }
+      >
         <Input
           defaultValue={entity}
           onBlur={(e) => {
             updateEntityName(e.target.value);
           }}
+          style={{ width: 250 }}
+          disabled={readonly}
         />
-        <button
-          className="text-red-500 rounded-md p-2"
-          onClick={() => deleteEntity()}
-        >
-          Delete
-        </button>
       </Form.Item>
-      <div className="flex flex-col gap-4">
-        <Typography.Text>Relations</Typography.Text>
+      <Form.Item label="Relations">
         <AuthRelationTable
           entity={entity}
           authData={value}
@@ -63,10 +70,10 @@ export const AuthPanel = ({
           updateValue={(newValue) => {
             handleRelationChange(entity, newValue);
           }}
+          readonly={readonly}
         />
-      </div>
-      <div className="flex flex-col gap-4">
-        <Typography.Text>Permissions</Typography.Text>
+      </Form.Item>
+      <Form.Item label="Permissions">
         <AuthPermissionTable
           entity={entity}
           authData={value}
@@ -75,8 +82,15 @@ export const AuthPanel = ({
           updateValue={(newValue) => {
             handlePermissionChange(newValue);
           }}
+          readonly={readonly}
         />
-      </div>
-    </div>
+      </Form.Item>
+
+      {!readonly && (
+        <Button color="danger" variant="solid" onClick={() => deleteEntity()}>
+          Delete
+        </Button>
+      )}
+    </Form>
   );
 };

@@ -19,7 +19,7 @@ class HostDataService {
         appID,
         rulesetID
       );
-      return response;
+      return response.host;
     } catch (error) {
       console.error("Error fetching ruleset by ID:", error);
       throw error;

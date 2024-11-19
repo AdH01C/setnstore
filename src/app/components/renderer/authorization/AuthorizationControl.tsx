@@ -1,23 +1,27 @@
-import { Collapse } from "antd";
+import { Button, Collapse, CollapseProps, Modal } from "antd";
 import { withJsonFormsControlProps } from "@jsonforms/react";
 import { AuthPanel } from "./AuthorizationPanel";
 import { PermissionRow, RelationRow } from "../util";
-const { Panel } = Collapse;
+import { useEffect } from "react";
+import { evalManifestWithRetries } from "next/dist/server/load-components";
 
 interface AuthorizationControlProps {
   data: AuthorizationValue;
   handleChange(path: string, value: AuthorizationValue): void;
   path: string;
+  enabled: boolean;
 }
 
 const AuthorizationControl = ({
   data,
   handleChange,
   path,
+  enabled,
 }: AuthorizationControlProps) => (
   <Authorization
     value={data}
     updateValue={(newValue: AuthorizationValue) => handleChange(path, newValue)}
+    readonly={!enabled}
   />
 );
 
@@ -27,28 +31,41 @@ interface AuthorizationProps {
   id?: string;
   value: AuthorizationValue;
   updateValue: (newValue: AuthorizationValue) => void;
+  readonly: boolean;
 }
 
-function Authorization({ id, value, updateValue }: AuthorizationProps) {
-  const entityList = Object.keys(value);
+function Authorization({
+  id,
+  value,
+  updateValue,
+  readonly,
+}: AuthorizationProps) {
+  useEffect(() => {
+    if (!value) {
+      updateValue({});
+    }
+  }, [value, updateValue]);
+
+  const currentValue = value || {};
+  const entityList = Object.keys(currentValue);
 
   const relationList: RelationRow[] = [];
-  for (const key in value) {
-    if (value[key].relations) {
-      for (const relationKey in value[key].relations) {
+  for (const key in currentValue) {
+    if (currentValue[key].relations) {
+      for (const relationKey in currentValue[key].relations) {
         relationList.push({
           parentEntity: key,
           relationName: relationKey,
-          relatedEntity: value[key].relations[relationKey],
+          relatedEntity: currentValue[key].relations[relationKey],
         });
       }
     }
   }
 
   const permissionList: PermissionRow[] = [];
-  for (const key in value) {
-    if (value[key].permissions) {
-      for (const permissionKey in value[key].permissions) {
+  for (const key in currentValue) {
+    if (currentValue[key].permissions) {
+      for (const permissionKey in currentValue[key].permissions) {
         permissionList.push({
           parentEntity: key,
           permissionName: permissionKey,
@@ -57,81 +74,79 @@ function Authorization({ id, value, updateValue }: AuthorizationProps) {
     }
   }
 
-  return (
-    <Collapse className="text-sm">
-      <Panel header="Authorization" key="1">
-        <Collapse
-          className="w-full flex flex-col"
-          expandIconPosition="right"
-        >
-          {Object.entries(value).map(([entity, entityAuthData]) => {
-            function handleAuthorizationValueChange(
-              newAuth: AuthorizationDefinition
-            ) {
-              const newValue: AuthorizationValue = { ...value };
-              newValue[entity] = newAuth;
-              updateValue(newValue);
-            }
+  const authItem: CollapseProps["items"] = Object.entries(currentValue).map(
+    ([entity, entityAuthData]) => ({
+      key: entity,
+      label: `Entity: ${entity}`,
+      children: (
+        <AuthPanel
+          value={entityAuthData}
+          entity={entity}
+          entityList={entityList}
+          relationList={relationList}
+          permissionList={permissionList}
+          updateValue={(newAuth: AuthorizationDefinition) => {
+            const newValue: AuthorizationValue = { ...currentValue };
+            newValue[entity] = newAuth;
+            updateValue(newValue);
+          }}
+          readonly={readonly}
+          updateEntityName={(newEntity: string) => {
+            if (newEntity === entity) return;
 
-            function handleEntityNameChange(newEntity: string) {
-              if (newEntity === entity) {
-                return;
+            const newValue = Object.keys(currentValue).reduce((acc, key) => {
+              if (key === entity) {
+                acc[newEntity] = currentValue[key];
+              } else {
+                acc[key] = currentValue[key];
               }
+              return acc;
+            }, {} as AuthorizationValue);
 
-              const newValue = Object.keys(value).reduce((acc, key) => {
-                if (key === entity) {
-                  acc[newEntity] = value[key];
-                } else {
-                  acc[key] = value[key];
-                }
-                return acc;
-              }, {} as AuthorizationValue);
+            updateValue(newValue);
+          }}
+          deleteEntity={() => {
+            Modal.confirm({
+              title: "Delete Entity",
+              content: "Are you sure you want to delete this entity?",
+              okText: "Yes",
+              okType: "danger",
+              cancelText: "No",
+              onOk() {
+                const newValue = { ...currentValue };
+                delete newValue[entity];
+                updateValue(newValue);
+              },
+            });
+          }}
+        />
+      ),
+    })
+  );
 
-              updateValue(newValue);
-            }
-
-            function handleDeleteEntity() {
-              const newValue = { ...value };
-              delete newValue[entity];
-              updateValue(newValue);
-            }
-
-            return (
-              <Collapse.Panel
-                className="text-sm"
-                header={"Entity: " + entity}
-                key={entity}
-              >
-                <AuthPanel
-                  value={entityAuthData}
-                  entity={entity}
-                  entityList={entityList}
-                  relationList={relationList}
-                  permissionList={permissionList}
-                  updateValue={handleAuthorizationValueChange}
-                  updateEntityName={handleEntityNameChange}
-                  deleteEntity={handleDeleteEntity}
-                />
-              </Collapse.Panel>
-            );
-          })}
-          <button
-            className="border border-dotted border-gray-300 rounded-md p-2 hover:bg-gray-100"
-            onClick={() => {
-              const newEntity = `new-entity-${Object.keys(value).length + 1}`;
-              updateValue({
-                ...value,
-                [newEntity]: {
-                  relations: {},
-                  permissions: {},
-                },
-              });
-            }}
-          >
-            Add Entity
-          </button>
-        </Collapse>
-      </Panel>
-    </Collapse>
+  return (
+    <>
+      <Collapse accordion className="text-sm" items={authItem} />
+      {!readonly && (
+        <Button
+          type="primary"
+          // className="border border-dotted border-gray-300 rounded-md p-2 hover:bg-gray-100"
+          onClick={() => {
+            const newEntity = `new-entity-${
+              Object.keys(currentValue).length + 1
+            }`;
+            updateValue({
+              ...currentValue,
+              [newEntity]: {
+                relations: {},
+                permissions: {},
+              },
+            });
+          }}
+        >
+          Add Entity
+        </Button>
+      )}
+    </>
   );
 }

@@ -2,7 +2,6 @@ import {
   App,
   AppDetailsWithID,
   ApplicationApi,
-  ID,
 } from "@inquisico/ruleset-editor-api";
 import configuration from "./apiConfig";
 
@@ -27,7 +26,7 @@ class ApplicationDataService {
     }
   }
 
-  async createApplication(companyID: string, app: App): Promise<ID> {
+  async createApplication(companyID: string, app: App): Promise<AppDetailsWithID> {
     try {
       const response = await this.appAPI.createApplication(companyID, app);
       const appDetailsWithID: AppDetailsWithID = await this.getApplicationByID(
