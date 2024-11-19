@@ -26,7 +26,6 @@ export default function ProjectCard({
 
   const router = useRouter();
 
-
   const handleDelete = async (e: React.MouseEvent) => {
     // Prevent the card click event from firing when delete is clicked
     e.stopPropagation();
@@ -38,6 +37,7 @@ export default function ProjectCard({
         try {
           await ApplicationDataService.deleteApplication(companyId, appId);
           console.log(`Application with ID ${appId} deleted successfully`);
+          onDelete(appId);
         } catch (error) {
           console.error("Error deleting application:", error);
         }
@@ -46,16 +46,17 @@ export default function ProjectCard({
   };
 
   return (
-    <Card title={appName} bordered={false} hoverable style={{ width: 300 }}>
-      <Typography.Text type="secondary">A sample description</Typography.Text>
+    <Card onClick={
+      () => {
+        router.push(`/applications/${appId}`);
+      }
+    } title={appName} bordered={false} hoverable style={{ width: 300 }}>
+      {/* <Typography.Text type="secondary">A sample description</Typography.Text> */}
+      <Typography.Text type="secondary">App ID: {appId}</Typography.Text>
       <div className="flex justify-between">
         <Button
           type="primary"
           onClick={() => {
-            setUserDetails({
-              ...userDetails,
-              appId: appId,
-            });
             router.push(`/applications/${appId}`);
           }}
           style={{ marginTop: "1rem" }}

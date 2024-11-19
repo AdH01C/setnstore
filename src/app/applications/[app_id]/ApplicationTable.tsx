@@ -8,6 +8,8 @@ import {
   AppDetailsWithID,
   RulesetWithRulesetJson,
 } from "@inquisico/ruleset-editor-api";
+import { userDetailsAtom } from "@/jotai/User";
+import { useAtom } from "jotai";
 
 interface RulesetTableType extends RulesetWithRulesetJson {
   key: string;
@@ -29,6 +31,8 @@ export default function ApplicationTable({
 }) {
   const [tableData, setTableData] = useState<ApplicationTableType[]>([]);
   const router = useRouter();
+
+  const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
 
   const handleApplicationDelete = async (e: React.MouseEvent) => {
     // Prevent the card click event from firing when delete is clicked
@@ -82,12 +86,17 @@ export default function ApplicationTable({
 
   const expandColumns: TableColumnsType<RulesetTableType> = [
     { title: "Ruleset ID", dataIndex: "id", key: "id" },
-    { title: "Host", dataIndex: "host", key: "host" },
+    { 
+      title: "Host",
+      dataIndex: "host",
+      key: "host",
+      render: (host: string) => host || "N/A",
+    },
     {
       title: "Date Last Modified",
       dataIndex: "lastModifiedDatetime",
       key: "lastModifiedDatetime",
-      render: (date: Date) => date.toString(),
+      render: (date: Date) => (date ? new Date(date).toLocaleString() : "N/A"),
     },
     {
       title: "Action",
@@ -97,6 +106,11 @@ export default function ApplicationTable({
           <Space size="middle">
             <a
               onClick={() => {
+                setUserDetails({
+                  ...userDetails,
+                  appId: application.id,
+                  rulesetId: row.id,
+                });
                 router.push(
                   `/applications/${application.id}/rulesets/${row.id}`
                 );
@@ -137,7 +151,7 @@ export default function ApplicationTable({
       title: "Date Created",
       dataIndex: "createdDatetime",
       key: "createdDatetime",
-      render: (date: Date) => date.toString(),
+      render: (date: Date) => (date ? new Date(date).toLocaleString() : "N/A"),
     },
     {
       title: "Number of Rulesets",
@@ -181,7 +195,7 @@ export default function ApplicationTable({
               application.id,
               rulesetID
             );
-            return { ...rulesetResponse, host: hostResponse };
+            return { ...rulesetResponse, host: hostResponse.host }; // Assuming name is the correct property
           })
         );
 
@@ -200,7 +214,7 @@ export default function ApplicationTable({
             };
           }),
         };
-        setTableData([tableData]);
+        setTableData([tableData as ApplicationTableType]);
         console.log(tableData);
       } catch (error) {
         console.error("Failed to fetch menu items:", error);

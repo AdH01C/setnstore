@@ -7,15 +7,22 @@ import { AppDetailsWithID } from "@inquisico/ruleset-editor-api";
 import { userDetailsAtom } from "@/jotai/User";
 import { useAtom } from "jotai";
 
-export default function AppDisplay() {
+interface AppDisplayProps {
+  appId: string;
+}
+
+export default function AppDisplay(
+  { appId }: AppDisplayProps
+) {
   const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
-  const [application, setApplication] = useState<AppDetailsWithID>();
+  const [application, setApplication] = useState<AppDetailsWithID | null>(null);
 
   useEffect(() => {
     const fetchApplications = async () => {
+      console.warn("Fetching application with ID", appId, "for company", userDetails.companyId);
       const response = await applicationDataService.getApplicationByID(
         userDetails.companyId,
-        userDetails.appId
+        appId
       );
       setApplication(response);
     };

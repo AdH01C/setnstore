@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "@/app/components/Providers";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
+import { useRouter } from "next/router";
 
 // const inter = Inter({ subsets: ["latin"] });
 

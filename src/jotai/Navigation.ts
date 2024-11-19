@@ -1,11 +1,11 @@
 import { atom } from "jotai";
 
-export type CurrentlySelected = {
-  type: string;
-  appId?: string;
-  companyId?: string;
+export type CurrentApplication = {
+  appId: string;
+  rulesetId: string;
 };
 
-export const currentlySelectedAtom = atom<CurrentlySelected>({
-  type: "Dashboard",
+export const currentApplicationAtom = atom<CurrentApplication>({
+  appId: "",
+  rulesetId: "",
 });

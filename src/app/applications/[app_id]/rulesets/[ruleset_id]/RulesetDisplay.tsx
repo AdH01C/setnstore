@@ -8,12 +8,17 @@ import { RulesetWithRulesetJson } from "@inquisico/ruleset-editor-api";
 import { userDetailsAtom } from "@/jotai/User";
 import { useAtom } from "jotai";
 
-export default function RulesetDisplay() {
+interface RulesetDisplayProps {
+  rulesetID: string;
+  appID: string;
+}
+
+export default function RulesetDisplay(
+  { rulesetID, appID }: RulesetDisplayProps
+) {
   const router = useRouter();
   const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
 
-  const appID = userDetails.appId;
-  const rulesetID = userDetails.rulesetId;
   const companyId = userDetails.companyId;
 
 
@@ -54,6 +59,7 @@ export default function RulesetDisplay() {
           isEditable
           isDeletable
           onEdit={() => {
+            setUserDetails((prev) => ({ ...prev, rulesetId: rulesetID }));
             router.push(`/applications/${appID}/rulesets/${rulesetID}/edit`);
           }}
           onDelete={() => {

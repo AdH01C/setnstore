@@ -8,13 +8,13 @@ import applicationDataService from "../services/NewAppDataService";
 import { AppDetailsWithID } from "@inquisico/ruleset-editor-api";
 import identityDataService from "../services/IdentityDataService";
 import CreateCompanyModal from "./CreateCompanyModal";
-import { userDetailsAtom } from "@/jotai/User"; // Adjust the import path as necessary
+import { userDetailsAtom, fetchedApplicationsAtom } from "@/jotai/User"; // Adjust the import path as necessary
 import { useAtom } from "jotai";
 import { redirect } from "next/navigation";
 import { useAuth } from "../hooks/useAuth";
 
 export default function Page() {
-  const [applications, setApplications] = useState<AppDetailsWithID[]>([]);
+  const [applications, setApplications] = useAtom(fetchedApplicationsAtom);
   const [isModalOpen, setIsModalOpen] = useState(false); // Control modal visibility
   const [identityId, setIdentityId] = useState<string | null>(null); // Track identity ID
   const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
@@ -74,7 +74,7 @@ export default function Page() {
 
   return (
     <AppLayout>
-      <Dashboard apps={applications} />
+      <Dashboard />
       <CreateCompanyModal
         identityId={identityId || ""}
         open={isModalOpen} // Use `open` instead of `visible`

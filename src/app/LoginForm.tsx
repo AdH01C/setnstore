@@ -30,7 +30,6 @@ export default function LoginForm() {
         email: "",
         companyId: "",
         companyName: "",
-        appId: "",
       });
 
       // router.push("/dashboard");
@@ -56,6 +55,7 @@ export default function LoginForm() {
         lastName: identity.lastName,
         email: "",
         companyId: "",
+        companyName: "",
       });
       console.log("User exists:", userDetails);
       router.push("/dashboard");

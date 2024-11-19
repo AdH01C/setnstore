@@ -11,13 +11,13 @@ import { AppDetailsWithID } from "@inquisico/ruleset-editor-api";
 import hostDataService from "../services/HostDataService";
 import { useAtom } from "jotai";
 import { userDetailsAtom } from "@/jotai/User";
+import { currentApplicationAtom } from "@/jotai/Navigation";
 
 export default function ApplicationSiderMenu() {
   const router = useRouter();
   const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
-  const appID = userDetails.appId;
+  const [currentApplication, setCurrentApplication] = useAtom(currentApplicationAtom);
   const companyId = userDetails.companyId;
-  const rulesetID = userDetails.rulesetId;
   const [items, setItems] = useState<MenuItem[]>([]);
 
   useEffect(() => {
@@ -26,20 +26,20 @@ export default function ApplicationSiderMenu() {
         // Fetch applications and rulesetIDs in parallel
         const [applications, rulesetIDs] = await Promise.all([
           applicationDataService.getApplications(companyId),
-          RulesetDataService.getRulesets(companyId, appID),
+          RulesetDataService.getRulesets(companyId, currentApplication.appId),
         ]);
 
         const createMenuItem = async (
           app: AppDetailsWithID
         ): Promise<MenuItem> => {
-          if (app.id !== appID) {
+          if (app.id !== currentApplication.appId) {
             // Return a menu item for a different app
             return getItem(
-              app.appName,
-              app.id,
-              <PieChartOutlined />,
-              undefined,
-              `/applications/${app.id}`
+              app.appName, // Use the app name as the label
+              app.id, // Use the app ID as the key
+              <PieChartOutlined />, // Use a pie chart icon
+              undefined, // No children
+              `/applications/${app.id}` // Link to the app
             );
           }
 
@@ -49,35 +49,35 @@ export default function ApplicationSiderMenu() {
               rulesetIDs.map(async (rulesetID: string): Promise<MenuItem> => {
                 const host = await hostDataService.getHostByRulesetID(
                   companyId,
-                  appID,
+                  currentApplication.appId,
                   rulesetID
                 );
                 return getItem(
-                  host,
-                  rulesetID,
-                  <PieChartOutlined />,
-                  undefined,
-                  `/applications/${appID}/rulesets/${rulesetID}`
+                  rulesetID, // Use rulesetID as the label
+                  rulesetID, // Use rulesetID as the key
+                  <PieChartOutlined />, // Use a pie chart icon
+                  undefined, // No children
+                  `/applications/${currentApplication.appId}/rulesets/${rulesetID}` // Link to the ruleset
                 );
               })
             );
 
             return getItem(
               app.appName,
-              appID,
+              currentApplication.appId,
               <PieChartOutlined />,
               rulesetMenuItems
             );
           }
 
           // Default case: No ruleset, add "Add a Ruleset" menu item
-          return getItem(app.appName, appID, <PieChartOutlined />, [
+          return getItem(app.appName, currentApplication.appId, <PieChartOutlined />, [
             getItem(
               "Add a Ruleset",
               "0",
               <PieChartOutlined />,
               undefined,
-              `/applications/${appID}/rulesets/new`
+              `/applications/${currentApplication.appId}/rulesets/new`
             ),
           ]);
         };
@@ -95,14 +95,14 @@ export default function ApplicationSiderMenu() {
     };
 
     fetchMenuItems();
-  }, [companyId, appID, router]);
+  }, [companyId, currentApplication.appId, router]);
 
   return (
     <Sider width={220}>
       <Menu
         mode="inline"
-        defaultSelectedKeys={[appID, rulesetID ?? ""]}
-        defaultOpenKeys={[appID]}
+        defaultSelectedKeys={[currentApplication.appId, currentApplication.rulesetId ?? ""]}
+        defaultOpenKeys={[currentApplication.appId]}
         style={{ height: "100%", borderRight: 0 }}
         items={items}
       />

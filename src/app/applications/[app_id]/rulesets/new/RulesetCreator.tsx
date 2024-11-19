@@ -8,6 +8,10 @@ import Step1 from "./Step1";
 import Step2 from "./Step2";
 import Step3 from "./Step3";
 
+interface RulesetCreatorProps {
+  appId: string;
+}
+
 const steps = [
   {
     title: "Host",
@@ -23,7 +27,9 @@ const steps = [
   },
 ];
 
-export default function RulesetCreator() {
+export default function RulesetCreator(
+  { appId }: RulesetCreatorProps
+) {
   const [current, setCurrent] = useState(0);
   const [formData, setFormData] = useState<any>(initialFormData);
 
@@ -57,7 +63,7 @@ export default function RulesetCreator() {
             prev={prev}
           />
         ) : current == 2 ? (
-          <Step3 ruleset={formData} prev={prev} />
+          <Step3 ruleset={formData} prev={prev} appID={appId} />
         ) : null}
       </div>
     </div>

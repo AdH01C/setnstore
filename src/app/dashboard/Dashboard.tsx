@@ -10,15 +10,12 @@ import newUserDataService from "../services/NewUserDataService";
 import companyDataService from "../services/NewCompanyDataService";
 import { AppDetailsWithID, Identity, UserApi } from "@inquisico/ruleset-editor-api";
 import configuration from "../services/apiConfig";
-import { userDetailsAtom } from "@/jotai/User";
+import { fetchedApplicationsAtom, userDetailsAtom } from "@/jotai/User";
 import { useAtom } from "jotai";
 
-interface DashboardProps {
-  apps: AppDetailsWithID[];
-}
 
-export default function Dashboard({ apps }: DashboardProps) {
-  console.warn("Dashboard props:", apps);
+export default function Dashboard() {
+  const [applications, setApplications] = useAtom(fetchedApplicationsAtom);
   // Use the provided data directly
   const [isLoading, setIsLoading] = useState(true);
   
@@ -29,16 +26,16 @@ export default function Dashboard({ apps }: DashboardProps) {
     }, 500);
 
 
-  }, []);
+  }, [applications]);
 
   // Function to remove a deleted application from the list
   const handleDelete = (appId: string) => {
-    // setApplications(applications.filter((app) => app.id !== appId));
+    setApplications(applications.filter((app) => app.id !== appId));
   };
 
   // Function to add a new application to the list
   const handleCreate = (newApp: AppDetailsWithID) => {
-    // setApplications((prevApps = []) => [...prevApps, newApp]); // Append the new application
+    setApplications((prevApps = []) => [...prevApps, newApp]); // Append the new application
   };
 
   return (
@@ -47,8 +44,8 @@ export default function Dashboard({ apps }: DashboardProps) {
         <Loading />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-3/4">
-          {apps &&
-            apps.map((app) => (
+          {applications &&
+            applications.map((app) => (
               <ProjectCard
                 key={app.id} // Ensure each card has a unique key
                 appId={app.id}
