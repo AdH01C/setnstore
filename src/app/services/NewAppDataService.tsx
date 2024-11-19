@@ -9,7 +9,7 @@ class ApplicationDataService {
   private appAPI: ApplicationApi;
 
   constructor() {
-    this.appAPI = new ApplicationApi(configuration);
+    this.appAPI = new ApplicationApi(configuration(false));
   }
 
   async getApplicationByID(

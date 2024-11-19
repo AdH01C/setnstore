@@ -1,18 +1,29 @@
-import { useAppContext } from "@/app/components/AppContext";
+"use client"
+
 import RulesetDetail from "@/app/components/RulesetDetail";
 import RulesetDataService from "@/app/services/NewRulesetDataService";
-import { Button } from "antd";
+import { userDetailsAtom } from "@/jotai/User";
+import { Button, Modal } from "antd";
+import { useAtom } from "jotai";
 import { useRouter } from "next/navigation";
 
-export default function Step3({
-  ruleset,
-  prev,
-}: {
+interface Step3Props {
   ruleset: any;
   prev: () => void;
-}) {
+  appID: string;
+}
+
+export default function Step3(
+  { ruleset, prev, appID }: Step3Props
+) {
   const router = useRouter();
-  const { appID, companyId } = useAppContext();
+  const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
+
+  
+  const companyId = userDetails.companyId;
+
+
+
   const handleSubmit = async () => {
     try {
       // Update the existing ruleset
@@ -24,7 +35,12 @@ export default function Step3({
 
       router.push(`/applications/${appID}/rulesets/${newRuleset.id}`);
     } catch (error) {
-      console.error("Error submitting ruleset:", error);
+      Modal.error(
+        {
+          title: "Error",
+          content: String(error)
+        }
+      )
     }
   };
   return (

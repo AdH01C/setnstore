@@ -3,14 +3,26 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import RulesetDataService from "@/app/services/NewRulesetDataService";
-import { useAppContext } from "@/app/components/AppContext";
 import RulesetDetail from "@/app/components/RulesetDetail";
 import { RulesetWithRulesetJson } from "@inquisico/ruleset-editor-api";
 import { Modal } from "antd";
+import { userDetailsAtom } from "@/jotai/User";
+import { useAtom } from "jotai";
 
-export default function RulesetDisplay() {
+interface RulesetDisplayProps {
+  rulesetID: string;
+  appID: string;
+}
+
+export default function RulesetDisplay(
+  { rulesetID, appID }: RulesetDisplayProps
+) {
   const router = useRouter();
-  const { appID, companyId, rulesetID } = useAppContext();
+  const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
+
+  const companyId = userDetails.companyId;
+
+
   const [ruleset, setRuleset] = useState<RulesetWithRulesetJson>();
 
   const handleRulesetDelete = async (rulesetID: string) => {
@@ -61,6 +73,7 @@ export default function RulesetDisplay() {
           isEditable
           isDeletable
           onEdit={() => {
+            setUserDetails((prev) => ({ ...prev, rulesetId: rulesetID }));
             router.push(`/applications/${appID}/rulesets/${rulesetID}/edit`);
           }}
           onDelete={() => {

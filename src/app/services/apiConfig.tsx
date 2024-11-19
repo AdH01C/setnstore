@@ -1,24 +1,66 @@
 import {
+  PromiseHttpLibrary,
+  RequestContext,
+  ResponseContext,
+  ServerConfiguration,
   createConfiguration,
-  server3 as customServer,
+  wrapHttpLibrary,
 } from "@inquisico/ruleset-editor-api";
 import NgrokMiddleware from "./middlewares/ngrok";
 import PreflightHeadersMiddleware from "./middlewares/preflightHeaders";
+const addTrailingSlash = (url: string) => url.replace(/\/?$/, "/");
 
-const url = process.env.NEXT_PUBLIC_BACKEND!;
-const [scheme, address] = url.split("://");
-const basePath = process.env.NEXT_PUBLIC_BACKEND_BASE_PATH!;
+class IsomorphicFetchHttpLibrary implements PromiseHttpLibrary {
+  _isRedirect = true;
 
-// Set custom server variables (i.e. scheme: 'http', address: 'localhost:3000', basePath: 'v0')
-customServer.setVariables({
-  scheme: scheme,
-  address: address,
-  basePath: basePath,
-});
+  constructor(isRedirect = true) {
+    this._isRedirect = isRedirect;
+  }
 
-const configuration = createConfiguration({
-  baseServer: customServer,
-  promiseMiddleware: [new NgrokMiddleware(), new PreflightHeadersMiddleware()],
-});
+  // eslint-disable-next-line class-methods-use-this
+  public send(request: RequestContext): Promise<ResponseContext> {
+    const method = request.getHttpMethod().toString();
+    const body = request.getBody();
+
+    const resultPromise = fetch(request.getUrl(), {
+      method,
+      body,
+      headers: request.getHeaders(),
+      credentials: "include",
+    })
+      .then(resp => {
+        const headers: { [name: string]: string } = {};
+        resp.headers.forEach((value: string, name: string) => {
+          headers[name] = value;
+        });
+
+        const resbody = {
+          text: () => resp.text(),
+          binary: () => resp.blob(),
+        };
+        return new ResponseContext(resp.status, headers, resbody);
+      })
+      .then(resp => {
+        if (resp.httpStatusCode === 401 && this._isRedirect) {
+          window.location.replace(new URL("login", addTrailingSlash(process.env.NEXT_PUBLIC_AUTH_ENDPOINT ?? "")));
+        }
+
+        return resp;
+      });
+
+    return resultPromise;
+  }
+}
+
+const portalApi: string = process.env.NEXT_PUBLIC_PORTAL_API_URL || "";
+const baseUrl = portalApi.endsWith("/") ? portalApi.slice(0, -1) : portalApi;
+
+const configuration = (isRedirect = true) =>
+  createConfiguration({
+    baseServer: new ServerConfiguration<{ basePath: string }>(`${baseUrl}/{basePath}`, {
+      basePath: "v0",
+    }),
+    httpApi: wrapHttpLibrary(new IsomorphicFetchHttpLibrary(isRedirect)),
+  });
 
 export default configuration;

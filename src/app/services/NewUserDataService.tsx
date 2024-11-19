@@ -5,47 +5,42 @@ class UserDataService {
   private userAPI: UserApi;
 
   constructor() {
-    this.userAPI = new UserApi(configuration);
+    this.userAPI = new UserApi(configuration());
   }
 
   async createUser(user: User): Promise<ID> {
-    try {
-      const response = await this.userAPI.createUser(user);
-      return response;
-    } catch (error) {
-      console.error("Error creating user:", error);
-      throw error;
-    }
+    return this.userAPI.createUser(user)
+      .then((response) => {
+        return response;
+      })
+      .catch((error) => {
+        console.error("Error creating user:", error);
+        throw error;
+      });
   }
 
-  // async getUserById(userId: string): Promise<UserDetails> {
-  //   try {
-  //     const response = await this.userAPI.getUserById(userId);
-  //     return response;
-  //   } catch (error) {
-  //     console.error("Error fetching user by ID:", error);
-  //     throw error;
-  //   }
-  // }
-
-  // async getUserByUsername(username: string): Promise<UserDetails> {
-  //   try {
-  //     const response = await this.userAPI.getUserByUsername(username);
-  //     return response;
-  //   } catch (error) {
-  //     console.error("Error fetching user by username:", error);
-  //     throw error;
-  //   }
-  // }
+  async getUserById(userId: string): Promise<User> {
+    return this.userAPI.getUserById(userId)
+      .then((response) => {
+        return response;
+      })
+      .catch((error) => {
+        console.error("Error fetching user by ID:", error);
+        throw error;
+      });
+  }
 
   async updateUser(userId: string, user: User): Promise<void> {
-    try {
-      await this.userAPI.updateUser(userId, user);
-    } catch (error) {
-      console.error("Error updating user:", error);
-      throw error;
-    }
+    return this.userAPI.updateUser(userId, user)
+      .then(() => {
+        // No response to return for void
+      })
+      .catch((error) => {
+        console.error("Error updating user:", error);
+        throw error;
+      });
   }
+
 }
 
 const userDataService = new UserDataService();

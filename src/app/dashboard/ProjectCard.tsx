@@ -1,11 +1,15 @@
+"use client";
+
 import ApplicationDataService from "@/app/services/NewAppDataService";
 import { useRouter } from "next/navigation";
 import { Button, Card, Modal, Typography } from "antd";
+import { useAtom } from "jotai";
+import { userDetailsAtom } from "@/jotai/User";
 
 interface ProjectCardProps {
   appId: string;
   appName: string;
-  companyName: string;
+  // companyName: string;
   companyId: string;
   onDelete: (appId: string) => void;
 }
@@ -17,9 +21,9 @@ export default function ProjectCard({
   companyId,
   onDelete,
 }: ProjectCardProps) {
-  // const [currentlySelected, setCurrentlySelected] = useAtom(
-  //   currentlySelectedAtom
-  // );
+  
+  const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
+
   const router = useRouter();
 
   const handleDelete = async (e: React.MouseEvent) => {
@@ -42,8 +46,13 @@ export default function ProjectCard({
   };
 
   return (
-    <Card title={appName} bordered={false} hoverable style={{ width: 300 }}>
-      <Typography.Text type="secondary">A sample description</Typography.Text>
+    <Card onClick={
+      () => {
+        router.push(`/applications/${appId}`);
+      }
+    } title={appName} bordered={false} hoverable style={{ width: 300 }}>
+      {/* <Typography.Text type="secondary">A sample description</Typography.Text> */}
+      <Typography.Text type="secondary">App ID: {appId}</Typography.Text>
       <div className="flex justify-between">
         <Button
           type="primary"

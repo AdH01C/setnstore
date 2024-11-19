@@ -1,16 +1,26 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import RulesetForm from "../../../../../components/RulesetForm";
 import RulesetDataService from "@/app/services/NewRulesetDataService";
-import { useAppContext } from "@/app/components/AppContext";
 import { Button } from "antd";
 import { RulesetWithRulesetJson } from "@inquisico/ruleset-editor-api";
+import { useAtom } from "jotai";
+import { userDetailsAtom } from "@/jotai/User";
+import router from "next/router";
 
-export default function RulesetEditor() {
-  const router = useRouter();
-  const { appID, companyId, rulesetID } = useAppContext();
+interface RulesetEditorProps {
+  rulesetId: string;
+  appId: string;
+}
+
+
+export default function RulesetEditor(
+  { rulesetId, appId }: RulesetEditorProps
+) {
+
+  const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
+
   const [ruleset, setRuleset] = useState<RulesetWithRulesetJson>();
 
   const handleFormChange = (data: any) => {
@@ -25,32 +35,36 @@ export default function RulesetEditor() {
 
   useEffect(() => {
     const fetchRuleset = async () => {
-      if (!rulesetID) {
+      
+      if (!rulesetId) {
         return;
       }
 
+      console.warn("Fetching ruleset with ID", rulesetId, "for company", userDetails.companyId);
       const response = await RulesetDataService.getRulesetByID(
-        companyId,
-        appID,
-        rulesetID
+        userDetails.companyId,
+        appId,
+        rulesetId
       );
+
+      console.log("Ruleset fetched:", response);
 
       setRuleset(response);
     };
 
     fetchRuleset();
-  }, [companyId, appID, rulesetID]);
+  }, []);
 
   const handleSubmit = async () => {
     if (ruleset?.rulesetJson) {
       try {
         await RulesetDataService.updateRuleset(
-          companyId,
-          appID,
+          userDetails.companyId,
+          appId,
           ruleset.id,
           ruleset
         );
-        router.push(`/applications/${appID}/rulesets/${ruleset.id}`);
+        router.push(`/applications/${appId}/rulesets/${ruleset.id}`);
       } catch (error) {
         console.error("Error submitting ruleset:", error);
       }

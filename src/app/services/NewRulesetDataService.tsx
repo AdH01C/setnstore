@@ -12,7 +12,7 @@ class RulesetDataService {
   private rulesetAPI: RulesetApi;
 
   constructor() {
-    this.rulesetAPI = new RulesetApi(configuration);
+    this.rulesetAPI = new RulesetApi(configuration(false));
   }
 
   async getRulesetByID(

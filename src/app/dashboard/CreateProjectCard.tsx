@@ -1,8 +1,11 @@
+"use client"
+
 import React, { useState } from "react";
 import ApplicationDataService from "@/app/services/NewAppDataService";
-import { useAppContext } from "../components/AppContext";
 import { Button, Card, Input } from "antd";
 import { App } from "@inquisico/ruleset-editor-api";
+import { useAtom } from "jotai";
+import { userDetailsAtom } from "@/jotai/User";
 
 interface CreateProjectCardProps {
   onCreate: (newApp: any) => void; // The function to call when a new app is created
@@ -11,14 +14,15 @@ interface CreateProjectCardProps {
 export default function CreateProjectCard({
   onCreate,
 }: CreateProjectCardProps) {
-  const { companyId } = useAppContext();
+  const [ userDetails, setUserDetails ] = useAtom(userDetailsAtom);
   const [appName, setAppName] = useState("");
 
   const handleCreateApplication = async () => {
     try {
+      console.warn("Creating application at company", userDetails.companyId);
       const payload: App = { appName: appName };
       const response = await ApplicationDataService.createApplication(
-        companyId,
+        userDetails.companyId,
         payload
       );
       console.log("Application created successfully", response);

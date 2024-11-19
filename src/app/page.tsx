@@ -1,18 +1,10 @@
-import LoginForm from "@/app/LoginForm";
-import { options } from "./api/auth/[...nextauth]/options";
-import { getServerSession } from "next-auth/next";
-import { redirect } from "next/navigation";
+// import { useRouter } from "next/navigation";
+import { useAuth } from "./hooks/useAuth";
 import { Layout } from "antd";
-import { Footer } from "antd/es/layout/layout";
-import { Content } from "antd/es/layout/layout";
+import { Content, Footer } from "antd/es/layout/layout";
+import LoginForm from "./LoginForm";
 
-export default async function Page() {
-  const session = await getServerSession(options);
-
-  if (session) {
-    redirect("/dashboard");
-  }
-
+export default function Page() {
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Content className="flex flex-col gap-4 items-center justify-center">

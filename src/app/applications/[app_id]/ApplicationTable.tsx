@@ -7,6 +7,8 @@ import {
   AppDetailsWithID,
   RulesetWithRulesetJson,
 } from "@inquisico/ruleset-editor-api";
+import { userDetailsAtom } from "@/jotai/User";
+import { useAtom } from "jotai";
 
 interface RulesetTableType extends RulesetWithRulesetJson {
   key: string;
@@ -22,6 +24,7 @@ export default function ApplicationTable({
 }) {
   const [tableData, setTableData] = useState<RulesetTableType[]>([]);
   const router = useRouter();
+  const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
 
   const handleRulesetDelete = async (
     e: React.MouseEvent,
@@ -51,12 +54,17 @@ export default function ApplicationTable({
 
   const columns: TableColumnsType<RulesetTableType> = [
     { title: "Ruleset ID", dataIndex: "id", key: "id" },
-    { title: "Host", dataIndex: "host", key: "host" },
+    { 
+      title: "Host",
+      dataIndex: "host",
+      key: "host",
+      render: (host: string) => host || "N/A",
+    },
     {
       title: "Date Last Modified",
       dataIndex: "lastModifiedDatetime",
       key: "lastModifiedDatetime",
-      render: (date: Date) => date.toString(),
+      render: (date: Date) => (date ? new Date(date).toLocaleString() : "N/A"),
     },
     {
       title: "Action",
@@ -66,6 +74,11 @@ export default function ApplicationTable({
           <Space size="middle">
             <a
               onClick={() => {
+                setUserDetails({
+                  ...userDetails,
+                  appId: application.id,
+                  rulesetId: row.id,
+                });
                 router.push(
                   `/applications/${application.id}/rulesets/${row.id}`
                 );
@@ -114,9 +127,10 @@ export default function ApplicationTable({
               application.id,
               rulesetID
             );
-            return { ...rulesetResponse, host: hostResponse };
+            return { ...rulesetResponse, host: hostResponse.host }; // Assuming name is the correct property
           })
         );
+
 
         const tableData = rulesetsData.map((ruleset) => {
           return {

@@ -1,18 +1,18 @@
-import { HostApi, RulesetJson } from "@inquisico/ruleset-editor-api";
+import { HostApi, RulesetJson, Host } from "@inquisico/ruleset-editor-api";
 import configuration from "./apiConfig";
 
 class HostDataService {
   private hostAPI: HostApi;
 
   constructor() {
-    this.hostAPI = new HostApi(configuration);
+    this.hostAPI = new HostApi(configuration(false));
   }
 
   async getHostByRulesetID(
     companyID: string,
     appID: string,
     rulesetID: string
-  ): Promise<string> {
+  ): Promise<Host> {
     try {
       const response = await this.hostAPI.getHostByRulesetId(
         companyID,
