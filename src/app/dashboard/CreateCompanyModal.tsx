@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import { Modal, Input, Button } from "antd";
-import configuration from "../services/apiConfig";
 import { CompanyApi } from "@inquisico/ruleset-editor-api";
 import { useMutation } from "@tanstack/react-query";
+import { Button, Input, Modal } from "antd";
+import React, { useState } from "react";
+
+import configuration from "../constants/apiConfig";
 
 interface CreateCompanyModalProps {
   userID: string | undefined; // The ID of the user's identity
@@ -11,12 +12,7 @@ interface CreateCompanyModalProps {
   onSuccess: () => void; // Callback for when the company is successfully created
 }
 
-const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({
-  userID,
-  open,
-  onClose,
-  onSuccess,
-}) => {
+function CreateCompanyModal({ userID, open, onClose, onSuccess }: CreateCompanyModalProps) {
   const [formCompanyName, setFormCompanyName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const companyApi = new CompanyApi(configuration());
@@ -31,13 +27,13 @@ const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({
       });
     },
 
-    onSuccess: (data, variables) => {
+    onSuccess: () => {
       void onSuccess();
       void onClose();
     },
-    onError: (error) => {
-      console.error("Error creating company:", error);
-    },
+    // onError: error => {
+    //   console.error("Error creating company:", error);
+    // },
     onSettled: () => {
       setIsSubmitting(false);
     },
@@ -54,24 +50,15 @@ const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({
       closable={false}
       maskClosable={false}
       footer={[
-        <Button
-          key="submit"
-          type="primary"
-          loading={isSubmitting}
-          onClick={()=>handleCreateCompany()}
-        >
+        <Button key="submit" type="primary" loading={isSubmitting} onClick={() => handleCreateCompany()}>
           OK
         </Button>,
       ]}
     >
       <p>You do not have a company yet.</p>
-      <Input
-        placeholder="Enter Company Name"
-        required
-        onChange={(e) => setFormCompanyName(e.target.value)}
-      />
+      <Input placeholder="Enter Company Name" required onChange={e => setFormCompanyName(e.target.value)} />
     </Modal>
   );
-};
+}
 
-export default CreateCompanyModal;
+export { CreateCompanyModal };

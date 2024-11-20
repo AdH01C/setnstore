@@ -1,18 +1,8 @@
-import {
-  Button,
-  Collapse,
-  CollapseProps,
-  Flex,
-  Form,
-  Input,
-  Modal,
-  Tooltip,
-  Typography,
-} from "antd";
-import React from "react";
-import { HostPermissionTable } from "./HostPermissionTable";
-import { EntitySettingsForm } from "./EntitySettingForm";
 import { QuestionCircleOutlined } from "@ant-design/icons";
+import { Button, Collapse, CollapseProps, Flex, Form, Input, Modal, Tooltip, Typography } from "antd";
+
+import { EntitySettingsForm } from "./EntitySettingForm";
+import { HostPermissionTable } from "./HostPermissionTable";
 
 interface PathProps {
   pathData: PathValue;
@@ -24,7 +14,7 @@ interface PathProps {
   readonly: boolean;
 }
 
-export const Path: React.FC<PathProps> = ({
+export const Path = ({
   pathData,
   absolutePath,
   updateValue,
@@ -32,7 +22,7 @@ export const Path: React.FC<PathProps> = ({
   authData,
   ancestorEntities,
   readonly,
-}) => {
+}: PathProps) => {
   const [path] = Object.keys(pathData);
   const isEntityPath = path === "#";
 
@@ -44,9 +34,7 @@ export const Path: React.FC<PathProps> = ({
       },
     };
 
-    const updatedChildren = pathData[path].children
-      ? { ...pathData[path].children, ...newChildren }
-      : newChildren;
+    const updatedChildren = pathData[path].children ? { ...pathData[path].children, ...newChildren } : newChildren;
 
     const updatedPath = { ...pathData[path], children: updatedChildren };
 
@@ -59,8 +47,7 @@ export const Path: React.FC<PathProps> = ({
   function handleDeletePath() {
     Modal.confirm({
       title: "Delete Path",
-      content:
-        "Are you sure you want to delete this path? All paths and its child routes will be deleted.",
+      content: "Are you sure you want to delete this path? All paths and its child routes will be deleted.",
       okText: "Yes",
       okType: "danger",
       cancelText: "No",
@@ -106,12 +93,11 @@ export const Path: React.FC<PathProps> = ({
             <Input
               addonBefore="/"
               defaultValue={path}
-              onBlur={(e) => {
+              onBlur={e => {
                 updatePathRoute(e.target.value);
               }}
               style={{ width: 250 }}
               disabled={readonly}
-              // disabled={path === "#"}
             />
           </Form.Item>
           {isEntityPath && (
@@ -135,12 +121,5 @@ export const Path: React.FC<PathProps> = ({
     },
   ];
 
-  return (
-    <Collapse
-      style={{ minWidth: 500 }}
-      accordion
-      className="text-sm w-fit"
-      items={items}
-    />
-  );
+  return <Collapse style={{ minWidth: 500 }} accordion className="w-fit text-sm" items={items} />;
 };

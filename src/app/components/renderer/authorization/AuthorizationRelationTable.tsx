@@ -1,21 +1,21 @@
-import {
-  Table,
-  Select,
-  Button,
-  Input,
-  TableColumnsType,
-  Tooltip,
-  Typography,
-  Flex,
-  Modal,
-} from "antd";
-import { RelationRow, authRelationOptions, sortedStringify } from "../util";
 import { QuestionCircleOutlined } from "@ant-design/icons";
+import { Button, Flex, Input, Modal, Select, Table, TableColumnsType, Tooltip, Typography } from "antd";
+
+import { RelationRow, authRelationOptions, sortedStringify } from "../../../utils/renderer";
 
 interface AuthRelationTableDataType {
   key: React.Key;
   relation: string;
   facets: AuthorizationRelation[];
+}
+
+interface AuthRelationTableProps {
+  entity: string;
+  authData: AuthorizationDefinition;
+  entityList: string[];
+  relationList: RelationRow[];
+  updateValue: (newValue: AuthorizationRelations) => void;
+  readonly: boolean;
 }
 
 export const AuthRelationTable = ({
@@ -25,15 +25,7 @@ export const AuthRelationTable = ({
   relationList,
   updateValue,
   readonly,
-}: {
-  entity: string;
-  authData: AuthorizationDefinition;
-  entityList: string[];
-  relationList: RelationRow[];
-  updateValue: (newValue: AuthorizationRelations) => void;
-  readonly: boolean;
-}) => {
-  //   const permissionData = authData.permissions;
+}: AuthRelationTableProps) => {
   const relationsData = authData.relations;
 
   function handleDeleteRelation(relation: string) {
@@ -60,24 +52,23 @@ export const AuthRelationTable = ({
     updateValue(newRelations);
   }
 
-  function handleRelationNameChange(
-    e: React.FocusEvent<HTMLInputElement, Element>,
-    relation: string
-  ) {
+  function handleRelationNameChange(e: React.FocusEvent<HTMLInputElement, Element>, relation: string) {
     const newRelationName = e.target.value;
 
     if (newRelationName === relation) {
       return;
     }
 
-    const newRelations = Object.keys(relationsData).reduce((acc, key) => {
-      if (key === relation) {
-        acc[newRelationName] = relationsData[relation];
-      } else {
-        acc[key] = relationsData[key];
-      }
-      return acc;
-    }, {} as typeof relationsData);
+    const newRelations = Object.keys(relationsData).reduce(
+      (acc, key) => {
+        if (key === relation) {
+          return { ...acc, [newRelationName]: relationsData[relation] };
+        } else {
+          return { ...acc, [key]: relationsData[key] };
+        }
+      },
+      {} as typeof relationsData,
+    );
 
     updateValue(newRelations);
   }
@@ -88,8 +79,8 @@ export const AuthRelationTable = ({
       [relation]: relationsData[relation],
     };
 
-    newRelations[relation] = selectedFacets.map((authRelation) => {
-      const jsonSelectedFacets = JSON.parse(authRelation);
+    newRelations[relation] = selectedFacets.map(authRelation => {
+      const jsonSelectedFacets = JSON.parse(authRelation) as AuthorizationRelation;
       return {
         facet: jsonSelectedFacets.facet,
         relation: jsonSelectedFacets.relation,
@@ -101,7 +92,7 @@ export const AuthRelationTable = ({
   const dataSource: AuthRelationTableDataType[] = relationsData
     ? Object.entries(relationsData).map(([relation, facetArray]) => ({
         key: relation,
-        relation: relation,
+        relation,
         facets: facetArray,
       }))
     : [];
@@ -121,7 +112,7 @@ export const AuthRelationTable = ({
         return (
           <Input
             defaultValue={relation}
-            onBlur={(e) => {
+            onBlur={(e: React.FocusEvent<HTMLInputElement, Element>) => {
               handleRelationNameChange(e, record.relation);
             }}
             disabled={readonly}
@@ -141,23 +132,19 @@ export const AuthRelationTable = ({
       dataIndex: "facets",
       render: (facets, record) => {
         const facetOptions = authRelationOptions([
-          ...relationList.filter(
-            (authRelation) => authRelation.parentEntity !== entity
-          ),
+          ...relationList.filter(authRelation => authRelation.parentEntity !== entity),
         ]);
 
         return (
           <Select
             mode="multiple"
-            value={facets.map((authRelation: AuthorizationRelation) =>
-              sortedStringify(authRelation)
-            )}
-            onChange={(selectedRelations) => {
+            value={facets.map((authRelation: AuthorizationRelation) => sortedStringify(authRelation))}
+            onChange={selectedRelations => {
               handleAuthFacetsChange(record.relation, selectedRelations);
             }}
             placeholder="Select entities"
             options={[
-              ...entityList.map((entity) => ({
+              ...entityList.map(entity => ({
                 value: sortedStringify({ facet: entity }),
                 label: <span>{entity}</span>,
               })),
@@ -189,11 +176,7 @@ export const AuthRelationTable = ({
       <Table<AuthRelationTableDataType>
         pagination={false}
         dataSource={dataSource}
-        columns={
-          !readonly
-            ? [...columns]
-            : columns.filter((column) => column.title !== "Actions")
-        }
+        columns={!readonly ? [...columns] : columns.filter(column => column.title !== "Actions")}
       />
       {!readonly && (
         <Button style={{ width: "100%" }} onClick={handleAddRelation}>

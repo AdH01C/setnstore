@@ -4,7 +4,7 @@ import { SerializedError, createSlice } from "@reduxjs/toolkit";
 import { fetchUserInit } from "../actions/userActions";
 
 export interface IdentityExtended extends Identity {
-  company?: CompanyDetails
+  company?: CompanyDetails;
 }
 
 export type UserState = {

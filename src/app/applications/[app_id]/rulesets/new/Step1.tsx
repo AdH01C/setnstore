@@ -1,21 +1,17 @@
 import { Button, Input } from "antd";
 import { useState } from "react";
 
-export default function Step1({
-  ruleset,
-  updateRuleset,
-  next,
-}: {
+interface Step1Props {
   ruleset: any;
   updateRuleset: (newRuleset: any) => void;
   next: () => void;
-}) {
+}
+
+export function Step1({ ruleset, updateRuleset, next }: Step1Props) {
   const initialHost = Object.keys(ruleset.host)[0] || "";
   const [host, setHost] = useState(initialHost);
 
-  const handleHostChange = (e: {
-    target: { value: React.SetStateAction<string> };
-  }) => {
+  const handleHostChange = (e: { target: { value: React.SetStateAction<string> } }) => {
     setHost(e.target.value);
   };
 
@@ -28,30 +24,21 @@ export default function Step1({
         },
       },
     };
-    // Clone formData to avoid mutating state directly
     const newFormData = { ...ruleset };
 
-    // Check if the old key exists in the host object
     if (oldHost in newFormData.host) {
-      // Get the value associated with the old dynamic key
       oldValue = newFormData.host[oldHost];
 
-      // Delete the old key
       delete newFormData.host[oldHost];
     }
     newFormData.host = { [host]: oldValue };
-    // Update the formData state with the new modified data
     updateRuleset(newFormData);
     next();
   };
 
   return (
     <>
-      <Input
-        placeholder="petstore.inquisico.com"
-        onChange={handleHostChange}
-        value={host}
-      />
+      <Input placeholder="petstore.inquisico.com" onChange={handleHostChange} value={host} />
       <div style={{ marginTop: 24 }}>
         <Button type="primary" onClick={handleOnNext}>
           Next

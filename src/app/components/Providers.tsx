@@ -1,9 +1,10 @@
-"use client"
+"use client";
 
-import { Provider } from 'react-redux';
 import { ReactNode } from "react";
-import { store } from '../store/store';
+import { Provider } from "react-redux";
+
+import { store } from "../store/store";
 
 export const Providers = ({ children }: { children: ReactNode }) => {
-  return <Provider store={ store }>{children}</Provider>;
+  return <Provider store={store}>{children}</Provider>;
 };

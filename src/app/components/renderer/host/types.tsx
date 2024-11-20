@@ -2,7 +2,7 @@ interface HostProps {
   id?: string;
   value: HostValue;
   updateValue: (newValue: HostValue) => void;
-  readonly: boolean
+  readonly: boolean;
 }
 interface HostValue {
   [host: string]: PathValue;
@@ -22,7 +22,7 @@ interface EntityPathSettings extends PathSettings {
 }
 
 interface Permission {
-  [method: string]: Requirement; // Allows only specified methods as keys
+  [method: string]: Requirement;
 }
 
 type HttpMethod = "GET" | "POST" | "PATCH" | "PUT" | "DELETE" | "OPTIONS";

@@ -1,38 +1,35 @@
-import { Button, Flex } from "antd";
-import CodeMirror, { EditorView, keymap } from "@uiw/react-codemirror";
-import { javascript } from "@codemirror/lang-javascript";
-import React from "react";
-import { barf } from "thememirror";
 import { defaultKeymap } from "@codemirror/commands";
+import { javascript } from "@codemirror/lang-javascript";
 import { JsonForms } from "@jsonforms/react";
-import schema from "@/app/json/schema.json";
-import uischema from "@/app/json/uischema.json";
-import { vanillaRenderers, vanillaCells } from "@jsonforms/vanilla-renderers";
-import metaDataControlTester from "@/app/components/renderer/metadata/MetaDataControlTester";
-import MetaDataControl from "@/app/components/renderer/metadata/MetaDataControl";
-import authorizationControlTester from "@/app/components/renderer/authorization/AuthorizationControlTester";
-import authorizationControl from "@/app/components/renderer/authorization/AuthorizationControl";
-import hostControlTester from "@/app/components/renderer/host/HostControlTester";
-import hostControl from "@/app/components/renderer/host/HostControl";
-import allowedOriginsTester from "@/app/components/renderer/allowedOrigins/AllowedOriginsTester";
+import { vanillaCells, vanillaRenderers } from "@jsonforms/vanilla-renderers";
+import CodeMirror, { EditorView, keymap } from "@uiw/react-codemirror";
+import { Button, Flex } from "antd";
+import { barf } from "thememirror";
+
 import allowedOriginsControl from "@/app/components/renderer/allowedOrigins/AllowedOriginsControl";
+import allowedOriginsTester from "@/app/components/renderer/allowedOrigins/AllowedOriginsTester";
+import authorizationControl from "@/app/components/renderer/authorization/AuthorizationControl";
+import authorizationControlTester from "@/app/components/renderer/authorization/AuthorizationControlTester";
+import hostControl from "@/app/components/renderer/host/HostControl";
+import hostControlTester from "@/app/components/renderer/host/HostControlTester";
+import MetaDataControl from "@/app/components/renderer/metadata/MetaDataControl";
+import metaDataControlTester from "@/app/components/renderer/metadata/MetaDataControlTester";
 import tabsCategorizationLayout from "@/app/components/renderer/tabs/TabsCategorizationLayout";
 import tabsCategorizationLayoutTester from "@/app/components/renderer/tabs/TabsCategorizationLayoutTester";
+import schema from "@/app/constants/schema.json";
+import uischema from "@/app/constants/uischema.json";
+
 import { RefsContext } from "./FormContext";
 
-export default function RulesetDetail({
-  ruleset,
-  isEditable = false,
-  isDeletable = false,
-  onEdit,
-  onDelete,
-}: {
+interface RulesetDetailProps {
   ruleset: any;
   isEditable?: boolean;
   isDeletable?: boolean;
   onEdit?: () => void;
   onDelete?: () => void;
-}) {
+}
+
+function RulesetDetail({ ruleset, isEditable = false, isDeletable = false, onEdit, onDelete }: RulesetDetailProps) {
   const renderers = [
     ...vanillaRenderers,
     {
@@ -50,11 +47,7 @@ export default function RulesetDetail({
     children: (
       <CodeMirror
         value={JSON.stringify(ruleset, null, 2)}
-        extensions={[
-          javascript(),
-          keymap.of(defaultKeymap),
-          EditorView.lineWrapping,
-        ]}
+        extensions={[javascript(), keymap.of(defaultKeymap), EditorView.lineWrapping]}
         theme={barf}
         height="85vh"
         editable={false}
@@ -63,10 +56,7 @@ export default function RulesetDetail({
   };
 
   const operations = (
-    <Flex
-      style={{ position: "absolute", top: 20, right: 20, zIndex: 10 }}
-      gap="middle"
-    >
+    <Flex style={{ position: "absolute", top: 20, right: 20, zIndex: 10 }} gap="middle">
       {isEditable && (
         <Button type="primary" onClick={onEdit}>
           Edit Ruleset
@@ -93,37 +83,9 @@ export default function RulesetDetail({
             readonly={true}
           />
         </RefsContext.Provider>
-        // <Card
-        //   title={<Title level={4}>Final Ruleset Details</Title>}
-        //   bordered={true}
-        //   style={{ width: "100%", marginTop: "20px" }}
-        // >
-        //   <CodeMirror
-        //     value={JSON.stringify(ruleset, null, 2)}
-        //     extensions={[
-        //       javascript(),
-        //       keymap.of(defaultKeymap),
-        //       EditorView.lineWrapping,
-        //     ]}
-        //     theme={barf}
-        //     height="100%" // Ensure CodeMirror takes up the full height
-        //     editable={false}
-        //   />
-
-        //   <Space style={{ marginTop: "20px" }}>
-        //     {isEditable && (
-        //       <Button type="primary" onClick={onEdit}>
-        //         Edit Ruleset
-        //       </Button>
-        //     )}
-        //     {isDeletable && (
-        //       <Button type="primary" danger onClick={onDelete}>
-        //         Delete Ruleset
-        //       </Button>
-        //     )}
-        //   </Space>
-        // </Card>
       )}
     </>
   );
 }
+
+export { RulesetDetail };

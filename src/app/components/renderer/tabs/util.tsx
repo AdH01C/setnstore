@@ -1,6 +1,6 @@
-import React from "react";
 import { JsonSchema, Layout } from "@jsonforms/core";
 import { JsonFormsDispatch, useJsonForms } from "@jsonforms/react";
+
 export interface RenderChildrenProps {
   layout: Layout;
   schema: JsonSchema;
@@ -8,12 +8,7 @@ export interface RenderChildrenProps {
   path: string;
 }
 
-export const renderChildren = (
-  layout: Layout,
-  schema: JsonSchema,
-  path: string,
-  enabled: boolean
-) => {
+export const renderChildren = (layout: Layout, schema: JsonSchema, path: string, enabled: boolean) => {
   if (layout.elements.length === 0) {
     return [];
   }

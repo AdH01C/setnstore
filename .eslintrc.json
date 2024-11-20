@@ -1,3 +1,131 @@
 {
-  "extends": "next/core-web-vitals"
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "extends": ["next/core-web-vitals", "eslint:recommended", "plugin:import/recommended", "next", "prettier"],
+  "plugins": ["import"],
+  "settings": {
+    "ecmaVersion": "latest",
+    "react": {
+      "version": "detect"
+    },
+    "import/resolver": {
+      "node": true,
+      "typescript": true
+    }
+  },
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "ignorePatterns": ["!*.js", ".*.js", "*.json", "scripts"],
+  "rules": {
+    "quotes": ["error", "double"],
+    "no-console": "warn",
+    "no-debugger": "warn",
+    "no-warning-comments": "warn",
+    "object-shorthand": "error",
+    "no-param-reassign": [
+      "warn",
+      {
+        "props": true
+      }
+    ],
+    "react/prop-types": "off",
+    "react/self-closing-comp": [
+      "error",
+      {
+        "component": true,
+        "html": true
+      }
+    ],
+    "react/jsx-props-no-spreading": "off",
+    "react/jsx-curly-brace-presence": [
+      "error",
+      {
+        "props": "never",
+        "children": "never"
+      }
+    ],
+    "@typescript-eslint/no-misused-promises": [
+      2,
+      {
+        "checksVoidReturn": {
+          "attributes": false
+        }
+      }
+    ],
+    "jsx-a11y/anchor-is-valid": [
+      "error",
+      {
+        "components": ["Link", "NextLink", "RouterLink"],
+        "aspects": ["invalidHref"]
+      }
+    ],
+    "import/order": [
+      "error",
+      {
+        "newlines-between": "always",
+        "pathGroups": [
+          {
+            "pattern": "$/**",
+            "group": "internal"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": ["builtin"],
+        "groups": [["builtin", "external"], ["internal"], ["parent", "sibling", "index"], "unknown"],
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        }
+      }
+    ],
+    "import/no-default-export": "warn",
+    "import/no-extraneous-dependencies": "error"
+  },
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "extends": [
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/recommended-requiring-type-checking",
+        "plugin:import/typescript"
+      ],
+      "plugins": ["@typescript-eslint/eslint-plugin"],
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "project": ["./tsconfig.json"]
+      },
+      "rules": {
+        "@typescript-eslint/no-use-before-define": [
+          "error",
+          {
+            "functions": false
+          }
+        ],
+        "@typescript-eslint/no-floating-promises": [
+          "error",
+          {
+            "ignoreVoid": true
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "src/pages/**/*.tsx",
+        "src/components/**/*.ts",
+        "src/components/**/*.tsx",
+        "src/constants/**/*.ts",
+        "additional.d.ts"
+      ],
+      "rules": {
+        "import/no-default-export": "off",
+        "import/prefer-default-export": "warn"
+      }
+    }
+  ]
 }

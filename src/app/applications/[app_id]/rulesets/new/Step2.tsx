@@ -1,17 +1,15 @@
-import RulesetForm from "@/app/components/RulesetForm";
 import { Button } from "antd";
 
-export default function Step2({
-  ruleset,
-  updateRuleset,
-  next,
-  prev,
-}: {
+import { RulesetForm } from "@/app/components/RulesetForm";
+
+interface Step2Props {
   ruleset: any;
   updateRuleset: (newRuleset: any) => void;
   next: () => void;
   prev: () => void;
-}) {
+}
+
+export function Step2({ ruleset, updateRuleset, next, prev }: Step2Props) {
   const handleFormChange = (data: any) => {
     updateRuleset(data);
   };
@@ -39,12 +37,8 @@ export default function Step2({
 
   return (
     <>
-      <div className="mb-4 flex justify-between pr-4"></div>
-      <RulesetForm
-        formData={ruleset}
-        onFormChange={handleFormChange}
-        operations={navOperations}
-      />
+      <div className="mb-4 flex justify-between pr-4" />
+      <RulesetForm formData={ruleset} onFormChange={handleFormChange} operations={navOperations} />
     </>
   );
 }

@@ -1,27 +1,21 @@
-import React, { ComponentType, useContext, useMemo } from "react";
 import {
   Categorization,
   Category,
+  StatePropsOfLayout,
   deriveLabelForUISchemaElement,
   getAjv,
   isCategory,
   isVisible,
-  StatePropsOfLayout,
 } from "@jsonforms/core";
+import { TranslateProps, useJsonForms, withJsonFormsLayoutProps, withTranslateProps } from "@jsonforms/react";
 import Ajv from "ajv";
-import {
-  TranslateProps,
-  useJsonForms,
-  withJsonFormsLayoutProps,
-  withTranslateProps,
-} from "@jsonforms/react";
 import { Tabs, TabsProps } from "antd";
+import { ComponentType, useContext, useMemo } from "react";
+
 import { renderChildren } from "./util";
 import { RefsContext } from "../../FormContext";
 
-interface TabsCategorizationLayoutRendererProps
-  extends StatePropsOfLayout,
-    TranslateProps {
+interface TabsCategorizationLayoutRendererProps extends StatePropsOfLayout, TranslateProps {
   ajv: Ajv;
   data?: any;
 }
@@ -38,9 +32,7 @@ const withAjvProps = <P extends {}>(Component: ComponentType<AjvProps & P>) =>
     return <Component {...props} ajv={ajv} />;
   };
 
-export const TabsCategorizationLayout = (
-  props: TabsCategorizationLayoutRendererProps
-) => {
+export const TabsCategorizationLayout = (props: TabsCategorizationLayoutRendererProps) => {
   const { data, path, schema, uischema, visible, enabled, ajv, t } = props;
   const { formRef, operations, tabs } = useContext(RefsContext) || {};
   const categorization = uischema as Categorization;
@@ -48,9 +40,9 @@ export const TabsCategorizationLayout = (
   const categories = useMemo(
     () =>
       categorization.elements
-        .filter((category): category is Category => isCategory(category)) // Type guard
-        .filter((category) => isVisible(category, data, "", ajv)),
-    [categorization, data, ajv]
+        .filter((category): category is Category => isCategory(category))
+        .filter(category => isVisible(category, data, "", ajv)),
+    [categorization, data, ajv],
   );
 
   const tabLabels = useMemo(() => {
@@ -80,7 +72,7 @@ export const TabsCategorizationLayout = (
   });
 
   if (tabs) {
-    items.push(tabs)
+    items.push(tabs);
   }
 
   return visible ? (
@@ -90,6 +82,4 @@ export const TabsCategorizationLayout = (
   ) : null;
 };
 
-export default withAjvProps(
-  withTranslateProps(withJsonFormsLayoutProps(TabsCategorizationLayout))
-);
+export default withAjvProps(withTranslateProps(withJsonFormsLayoutProps(TabsCategorizationLayout)));

@@ -30,12 +30,7 @@ type EntityCase = "none" | "lowercase" | "uppercase";
 type RedirectSlashes = "strip" | "append" | "";
 type TrailingSlashMode = "strict" | "fallback";
 
-const MetaDataControl = ({
-  data,
-  handleChange,
-  path,
-  enabled,
-}: MetaDataControlProps) => {
+const MetaDataControl = ({ data, handleChange, path, enabled }: MetaDataControlProps) => {
   return (
     <MetaData
       value={data}
@@ -47,7 +42,7 @@ const MetaDataControl = ({
 
 export default withJsonFormsControlProps(MetaDataControl);
 
-function MetaData({ id, value, updateValue, readonly }: MetaDataProps) {
+function MetaData({ value, updateValue, readonly }: MetaDataProps) {
   const trailingSlashModeOptions = [
     { label: "Strict", value: "strict" },
     { label: "Fallback", value: "fallback" },
@@ -71,7 +66,7 @@ function MetaData({ id, value, updateValue, readonly }: MetaDataProps) {
       entityValueCase: "none",
       optionsPassthrough: false,
     }),
-    []
+    [],
   );
 
   useEffect(() => {
@@ -99,7 +94,7 @@ function MetaData({ id, value, updateValue, readonly }: MetaDataProps) {
         </Flex>
         <Select
           value={currentValue.trailingSlashMode}
-          onChange={(val) =>
+          onChange={val =>
             updateValue({
               ...currentValue,
               trailingSlashMode: val as TrailingSlashMode,
@@ -126,7 +121,7 @@ function MetaData({ id, value, updateValue, readonly }: MetaDataProps) {
         </Flex>
         <Select
           value={currentValue.redirectSlashes}
-          onChange={(val) =>
+          onChange={val =>
             updateValue({
               ...currentValue,
               redirectSlashes: val as RedirectSlashes,
@@ -142,7 +137,7 @@ function MetaData({ id, value, updateValue, readonly }: MetaDataProps) {
       <div className="flex items-center justify-between">
         <Flex gap="small">
           <Typography.Text>Case Sensitive</Typography.Text>
-          <Tooltip title={`Specifies whether the Ruleset is case-sensitive.`}>
+          <Tooltip title="Specifies whether the Ruleset is case-sensitive.">
             <QuestionCircleOutlined />
           </Tooltip>
         </Flex>
@@ -150,7 +145,7 @@ function MetaData({ id, value, updateValue, readonly }: MetaDataProps) {
           <Input
             type="checkbox"
             checked={currentValue.caseSensitive}
-            onChange={(e) =>
+            onChange={e =>
               updateValue({
                 ...currentValue,
                 caseSensitive: e.target.checked,
@@ -165,15 +160,13 @@ function MetaData({ id, value, updateValue, readonly }: MetaDataProps) {
       <div className="flex items-center justify-between">
         <Flex gap="small">
           <Typography.Text>Entity Value Case</Typography.Text>
-          <Tooltip
-            title={`Specifies how to handle the case of entity values in the URL path.`}
-          >
+          <Tooltip title="Specifies how to handle the case of entity values in the URL path.">
             <QuestionCircleOutlined />
           </Tooltip>
         </Flex>
         <Select
           value={currentValue.entityValueCase}
-          onChange={(val) =>
+          onChange={val =>
             updateValue({
               ...currentValue,
               entityValueCase: val as EntityCase,
@@ -189,9 +182,7 @@ function MetaData({ id, value, updateValue, readonly }: MetaDataProps) {
       <div className="flex items-center justify-between">
         <Flex gap="small">
           <Typography.Text>Options Passthrough</Typography.Text>
-          <Tooltip
-            title={`Specifies whether OPTIONS requests are allowed without authentication checks.`}
-          >
+          <Tooltip title="Specifies whether OPTIONS requests are allowed without authentication checks.">
             <QuestionCircleOutlined />
           </Tooltip>
         </Flex>
@@ -199,7 +190,7 @@ function MetaData({ id, value, updateValue, readonly }: MetaDataProps) {
           <Input
             type="checkbox"
             checked={currentValue.optionsPassthrough}
-            onChange={(e) =>
+            onChange={e =>
               updateValue({
                 ...currentValue,
                 optionsPassthrough: e.target.checked,

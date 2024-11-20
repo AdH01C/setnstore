@@ -1,15 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import Loading from "../components/Loading";
-import { useAppContext } from "../components/AppContext";
-import ApplicationsTable from "./ApplicationsTable";
-import { Button, Input, Modal } from "antd";
 import { App, ApplicationApi } from "@inquisico/ruleset-editor-api";
-import configuration from "../services/apiConfig";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { Button, Input, Modal } from "antd";
+import { useState } from "react";
 
-export default function Dashboard() {
+import { ApplicationsTable } from "./ApplicationsTable";
+import { useAppContext } from "../components/AppContext";
+import { Loading } from "../components/Loading";
+import configuration from "../constants/apiConfig";
+
+function Dashboard() {
   const { companyID } = useAppContext();
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,18 +39,18 @@ export default function Dashboard() {
         throw new Error("companyID is undefined");
       }
       return applicationApi.createApplication(companyID, {
-        appName: appName,
+        appName,
       } as App);
     },
-    onSuccess: (data, variables) => {
+    onSuccess: () => {
       void refetchApplications();
       setConfirmLoading(false);
       setIsModalOpen(false);
       setAppName("");
     },
-    onError: (error) => {
-      console.error("Error deleting ruleset:", error);
-    },
+    // onError: error => {
+    //   console.error("Error deleting ruleset:", error);
+    // },
   });
 
   const handleApplicationCreate = () => {
@@ -68,12 +69,12 @@ export default function Dashboard() {
       }
       return applicationApi.deleteApplication(companyID, appID);
     },
-    onSuccess: (data, variables) => {
+    onSuccess: () => {
       void refetchApplications();
     },
-    onError: (error) => {
-      console.error("Error deleting ruleset:", error);
-    },
+    // onError: error => {
+    //   console.error("Error deleting ruleset:", error);
+    // },
   });
 
   const handleApplicationDelete = (appID: string) => {
@@ -95,11 +96,7 @@ export default function Dashboard() {
         <Loading />
       ) : (
         <div>
-          <Button
-            type="primary"
-            onClick={showModal}
-            style={{ marginBottom: 16, marginTop: 16 }}
-          >
+          <Button type="primary" onClick={showModal} style={{ marginBottom: 16, marginTop: 16 }}>
             Add Application
           </Button>
           <Modal
@@ -109,22 +106,12 @@ export default function Dashboard() {
             confirmLoading={confirmLoading}
             onCancel={handleCancel}
           >
-            <Input
-              placeholder="App Name"
-              value={appName}
-              onChange={(e) => setAppName(e.target.value)}
-            />
+            <Input placeholder="App Name" value={appName} onChange={e => setAppName(e.target.value)} />
           </Modal>
           {companyID && (
             <ApplicationsTable
               companyID={companyID}
-              applications={
-                applications
-                  ? applications.filter(
-                      (application) => application !== undefined
-                    )
-                  : []
-              }
+              applications={applications ? applications.filter(application => application !== undefined) : []}
               handleDelete={handleApplicationDelete}
             />
           )}
@@ -133,3 +120,5 @@ export default function Dashboard() {
     </div>
   );
 }
+
+export { Dashboard };

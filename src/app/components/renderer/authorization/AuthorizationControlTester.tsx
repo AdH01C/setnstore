@@ -1,6 +1,3 @@
-import { rankWith, scopeEndsWith } from '@jsonforms/core';
+import { rankWith, scopeEndsWith } from "@jsonforms/core";
 
-export default rankWith(
-  3, //increase rank as needed
-  scopeEndsWith('authorization')
-);
+export default rankWith(3, scopeEndsWith("authorization"));

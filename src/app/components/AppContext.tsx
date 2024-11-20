@@ -1,9 +1,10 @@
-import { createContext, useContext, useState } from "react";
-import { useParams } from "next/navigation";
-import { useAuth } from "../hooks/useAuth";
-import CreateCompanyModal from "../dashboard/CreateCompanyModal";
-import Loading from "./Loading";
 import { Layout } from "antd";
+import { useParams } from "next/navigation";
+import { createContext, useContext, useState } from "react";
+
+import { Loading } from "./Loading";
+import { CreateCompanyModal } from "../dashboard/CreateCompanyModal";
+import { useAuth } from "../hooks/useAuth";
 
 interface AppContextType {
   companyID?: string;
@@ -11,10 +12,9 @@ interface AppContextType {
   rulesetID?: string;
 }
 
-// Create the context
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export const useAppContext = () => {
+const useAppContext = () => {
   const context = useContext(AppContext);
   if (!context) {
     throw new Error("useAppContext must be used within an AppProvider");
@@ -22,10 +22,12 @@ export const useAppContext = () => {
   return context;
 };
 
-export const AppProvider: React.FC<{
+interface AppProviderProps {
   forceSignin: boolean;
   children: React.ReactNode;
-}> = ({ forceSignin, children }) => {
+}
+
+const AppProvider = ({ forceSignin, children }: AppProviderProps) => {
   const { app_id, ruleset_id } = useParams<{
     app_id: string;
     ruleset_id?: string;
@@ -36,13 +38,7 @@ export const AppProvider: React.FC<{
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  if (
-    !isFetching &&
-    dataFetched &&
-    identity &&
-    !identity.company &&
-    !isModalOpen
-  ) {
+  if (!isFetching && dataFetched && identity && !identity.company && !isModalOpen) {
     setIsModalOpen(true);
   }
 
@@ -95,3 +91,5 @@ export const AppProvider: React.FC<{
     </AppContext.Provider>
   );
 };
+
+export { useAppContext, AppProvider };

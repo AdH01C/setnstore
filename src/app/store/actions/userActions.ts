@@ -1,7 +1,7 @@
-import configuration from "@/app/services/apiConfig";
 import { ApiException, CompanyApi, Identity, IdentityApi, User, UserApi } from "@inquisico/ruleset-editor-api";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
+import configuration from "@/app/constants/apiConfig";
 
 export const fetchUserInit = createAsyncThunk<Identity, { isRedirect: boolean } | undefined>(
   "user/fetchUserInit",
@@ -9,23 +9,26 @@ export const fetchUserInit = createAsyncThunk<Identity, { isRedirect: boolean } 
     try {
       const identityApi = new IdentityApi(configuration(isRedirect));
       const identityRes = await identityApi.getIdentity();
-      let companyRes
+      let companyRes;
       try {
         const companyApi = new CompanyApi(configuration(isRedirect));
         companyRes = await companyApi.getCompanyByUserId(identityRes.id);
       } catch {
-        
+        // do something?
       }
 
       const serializableIdentity = {
         ...identityRes,
-        ...(companyRes && { company: companyRes ? {
-          ...companyRes,
-          createdDatetime: companyRes.createdDatetime?.toISOString(), // Convert Date to string
-        } : null, })
+        ...(companyRes && {
+          company: companyRes
+            ? {
+                ...companyRes,
+                createdDatetime: companyRes.createdDatetime?.toISOString(), // Convert Date to string
+              }
+            : null,
+        }),
       };
       return serializableIdentity;
-
     } catch (e) {
       //check if 404 -> create user
       if (e instanceof ApiException && e.code === 404) {

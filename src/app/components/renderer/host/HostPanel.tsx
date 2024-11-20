@@ -1,62 +1,32 @@
 import { Button, Tree, TreeDataNode } from "antd";
 import { useMemo } from "react";
+
 import { Path } from "./Path";
 
-export const HostPanel = ({
-  value,
-  updateValue,
-  authData,
-  readonly,
-}: {
-  value: HostValue;
-  updateValue: (newValue: PathValue) => void;
-  authData: AuthorizationValue;
-  readonly: boolean;
-}) => {
-  const [host] = Object.keys(value);
+const addPathButton = (
+  value: PathValue,
+  updateValue: (newValue: PathValue) => void,
+  absolutePath: string,
+  path?: string,
+): TreeDataNode => {
+  const handleAddSiblingPath = () => {
+    const newPathName = `untitled-${Date.now()}`;
+    const newValue = { ...value };
 
-  const pathData = useMemo(() => {
-    const generatedData = generatePathData(
-      value[host],
-      updateValue,
-      authData,
-      readonly
-    );
-    if (generatedData.length > 0 && !readonly) {
-      return [...generatedData, addPathButton(value[host], updateValue, host)];
-    }
-    return generatedData;
-  }, [value, authData, host, updateValue, readonly]);
-  //   const pathData = generatePathData(value[host], updateValue, relations, host);
+    newValue[newPathName] = {
+      permission: {},
+    };
 
-  return (
-    <>
-      {pathData.length ? (
-        <Tree
-          // defaultExpandAll
-          checkStrictly
-          virtual={false}
-          motion={false}
-          showLine
-          treeData={pathData}
-        />
-      ) : readonly ? null : (
-        <Button
-          onClick={() => {
-            updateValue({
-              "": {
-                permission: {
-                  GET: null,
-                },
-              },
-            });
-          }}
-        >
-          Add Root Path
-        </Button>
-      )}
-    </>
-  );
+    updateValue(newValue);
+  };
+
+  return {
+    title: () => <Button onClick={handleAddSiblingPath}>Add Sibling Path</Button>,
+    key: path ? `$${absolutePath}/${path}/end` : `${absolutePath}/end`,
+    selectable: false,
+    disableCheckbox: true,
+    isLeaf: true,
+  };
 };
 
 const generatePathData = (
@@ -65,7 +35,7 @@ const generatePathData = (
   authData: AuthorizationValue,
   readonly: boolean,
   absolutePath: string = "",
-  ancestorEntities: string[] = []
+  ancestorEntities: string[] = [],
 ): TreeDataNode[] => {
   return Object.entries(value).map(([path, untypedProperties]) => {
     const isEntityPath = path === "#";
@@ -113,12 +83,7 @@ const generatePathData = (
           authData,
           readonly,
           `${absolutePath}/${path}`,
-          isEntityPath
-            ? [
-                ...ancestorEntities,
-                (pathProperties as EntityPathSettings).entity,
-              ]
-            : ancestorEntities
+          isEntityPath ? [...ancestorEntities, (pathProperties as EntityPathSettings).entity] : ancestorEntities,
         )
       : [];
 
@@ -141,44 +106,51 @@ const generatePathData = (
       children: [
         ...childrenNodes,
         ...(childrenNodes.length > 0 && !readonly
-          ? [
-              addPathButton(
-                { ...value[path].children },
-                handleAddSiblingPath,
-                absolutePath,
-                path
-              ),
-            ]
+          ? [addPathButton({ ...value[path].children }, handleAddSiblingPath, absolutePath, path)]
           : []),
       ],
     };
   });
 };
 
-const addPathButton = (
-  value: PathValue,
-  updateValue: (newValue: PathValue) => void,
-  absolutePath: string,
-  path?: string
-): TreeDataNode => {
-  const handleAddSiblingPath = () => {
-    const newPathName = `untitled-${Date.now()}`;
-    const newValue = { ...value };
+interface HostPanelProps {
+  value: HostValue;
+  updateValue: (newValue: PathValue) => void;
+  authData: AuthorizationValue;
+  readonly: boolean;
+}
 
-    newValue[newPathName] = {
-      permission: {},
-    };
+export const HostPanel = ({ value, updateValue, authData, readonly }: HostPanelProps) => {
+  const [host] = Object.keys(value);
 
-    updateValue(newValue);
-  };
+  const pathData = useMemo(() => {
+    const generatedData = generatePathData(value[host], updateValue, authData, readonly);
+    if (generatedData.length > 0 && !readonly) {
+      return [...generatedData, addPathButton(value[host], updateValue, host)];
+    }
+    return generatedData;
+  }, [value, authData, host, updateValue, readonly]);
+  //   const pathData = generatePathData(value[host], updateValue, relations, host);
 
-  return {
-    title: () => (
-      <Button onClick={handleAddSiblingPath}>Add Sibling Path</Button>
-    ),
-    key: path ? `$${absolutePath}/${path}/end` : `${absolutePath}/end`,
-    selectable: false,
-    disableCheckbox: true,
-    isLeaf: true,
-  };
+  return (
+    <>
+      {pathData.length ? (
+        <Tree checkStrictly virtual={false} motion={false} showLine treeData={pathData} />
+      ) : readonly ? null : (
+        <Button
+          onClick={() => {
+            updateValue({
+              "": {
+                permission: {
+                  GET: null,
+                },
+              },
+            });
+          }}
+        >
+          Add Root Path
+        </Button>
+      )}
+    </>
+  );
 };

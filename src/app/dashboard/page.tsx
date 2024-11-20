@@ -1,6 +1,5 @@
-import React from "react";
-import Dashboard from "./Dashboard";
-import AppLayout from "../components/AppLayout";
+import { Dashboard } from "./Dashboard";
+import { AppLayout } from "../components/AppLayout";
 
 export default function Page() {
   return (

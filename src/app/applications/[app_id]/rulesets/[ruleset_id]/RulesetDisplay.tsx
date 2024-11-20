@@ -1,20 +1,25 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import RulesetDetail from "@/app/components/RulesetDetail";
 import { RulesetApi } from "@inquisico/ruleset-editor-api";
-import { Modal } from "antd";
-import { useAppContext } from "@/app/components/AppContext";
-import configuration from "@/app/services/apiConfig";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { Modal } from "antd";
+import { useRouter } from "next/navigation";
 
-export default function RulesetDisplay() {
+import { useAppContext } from "@/app/components/AppContext";
+import { RulesetDetail } from "@/app/components/RulesetDetail";
+import configuration from "@/app/constants/apiConfig";
+
+export function RulesetDisplay() {
   const router = useRouter();
   const { companyID, appID, rulesetID } = useAppContext();
 
   const rulesetApi = new RulesetApi(configuration());
 
-  const handleRulesetDelete = async (companyID: string, rulesetID: string) => {
+  const handleDeleteRuleset = () => {
+    void deleteRulesetMutation.mutateAsync();
+  };
+
+  const handleRulesetDelete = async () => {
     Modal.confirm({
       title: "Delete Ruleset",
       content: "Are you sure you want to delete this ruleset?",
@@ -30,9 +35,7 @@ export default function RulesetDisplay() {
   const { data: ruleset } = useQuery({
     queryKey: ["ruleset", companyID, appID, rulesetID],
     queryFn: () => {
-      return companyID && rulesetID
-        ? rulesetApi.getRulesetById(companyID, appID, rulesetID)
-        : null;
+      return companyID && rulesetID ? rulesetApi.getRulesetById(companyID, appID, rulesetID) : null;
     },
     enabled: !!companyID && !!appID && !!rulesetID,
   });
@@ -47,14 +50,10 @@ export default function RulesetDisplay() {
     onSuccess: (data, variables) => {
       void router.push(`/applications/${appID}`);
     },
-    onError: (error) => {
-      console.error("Error deleting ruleset:", error);
-    },
+    // onError: error => {
+    //   console.error("Error deleting ruleset:", error);
+    // },
   });
-
-  const handleDeleteRuleset = () => {
-    void deleteRulesetMutation.mutateAsync();
-  };
 
   return (
     <>
@@ -68,7 +67,7 @@ export default function RulesetDisplay() {
           }}
           onDelete={() => {
             if (companyID && rulesetID) {
-              handleRulesetDelete(companyID, rulesetID);
+              handleRulesetDelete();
             }
           }}
         />

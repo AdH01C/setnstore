@@ -1,10 +1,9 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
+import { addTrailingSlash } from "../utils/common";
 import { fetchUserInit } from "../store/actions/userActions";
-import { useAppSelector, useAppDispatch } from "../store/hooks";
-
-const addTrailingSlash = (url: string) => url.replace(/\/?$/, "/");
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 
 type useAuthProps = {
   forceRefetch?: boolean;

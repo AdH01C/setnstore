@@ -18,8 +18,8 @@ const methods = ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"];
 
 export function methodOptions(permissions: string[]): LabeledValue[] {
   return methods
-    .filter((method) => !permissions.includes(method))
-    .map((method) => ({
+    .filter(method => !permissions.includes(method))
+    .map(method => ({
       label: method,
       value: method,
     }));
@@ -39,28 +39,25 @@ export class LabelManager {
   }
 }
 
-export function entityTypeOptions(
-  authData: AuthorizationValue,
-  entity: string
-): LabeledValue[] {
+export function entityTypeOptions(authData: AuthorizationValue, entity: string): LabeledValue[] {
   const options: LabeledValue[] = [];
 
   Object.entries(authData).forEach(([entityKey, authProperties]) => {
     if (authProperties.permissions && entityKey === entity) {
       options.push(
-        ...Object.keys(authProperties.permissions).map((type) => ({
+        ...Object.keys(authProperties.permissions).map(type => ({
           label: type,
           value: type,
-        }))
+        })),
       );
     }
 
     if (authProperties.relations && entityKey === entity) {
       options.push(
-        ...Object.keys(authProperties.relations).map((type) => ({
+        ...Object.keys(authProperties.relations).map(type => ({
           label: type,
           value: type,
-        }))
+        })),
       );
     }
   });
@@ -73,32 +70,21 @@ export function getPermissionValue(requirement: Requirement): string {
     return "Public";
   }
 
-  if (
-    typeof requirement === "object" &&
-    Object.keys(requirement).length === 0
-  ) {
+  if (typeof requirement === "object" && Object.keys(requirement).length === 0) {
     return "Only Authentication";
   }
 
-  if (
-    typeof requirement === "object" &&
-    "entity" in requirement &&
-    "type" in requirement
-  ) {
+  if (typeof requirement === "object" && "entity" in requirement && "type" in requirement) {
     return "Both Authentication and Authorization";
   }
   return "";
 }
 
-export function isAuthorizationOperations(
-  obj: AuthorizationType
-): obj is AuthorizationOperations {
+export function isAuthorizationOperations(obj: AuthorizationType): obj is AuthorizationOperations {
   return "operations" in obj;
 }
 
-export function isAuthorizationRule(
-  obj: AuthorizationType
-): obj is AuthorizationRule {
+export function isAuthorizationRule(obj: AuthorizationType): obj is AuthorizationRule {
   return "relation" in obj;
 }
 
@@ -118,17 +104,13 @@ export function getAuthorizationTypeValue(type: AuthorizationType): string {
 
 export function getAuthorizationTypeObject(
   typeString: string,
-  relationString: string = ""
+  relationString: string = "",
 ): AuthorizationType | undefined {
   if (typeString === "single") {
     return { relation: relationString } as AuthorizationRule;
   }
 
-  if (
-    typeString === "union" ||
-    typeString === "intersect" ||
-    typeString === "except"
-  ) {
+  if (typeString === "union" || typeString === "intersect" || typeString === "except") {
     return {
       type: typeString,
       operations: [],
@@ -138,14 +120,7 @@ export function getAuthorizationTypeObject(
 }
 
 export function getAvailableMethod(methodList: string[]): HttpMethod | null {
-  const validMethods: HttpMethod[] = [
-    "GET",
-    "POST",
-    "PATCH",
-    "PUT",
-    "DELETE",
-    "OPTIONS",
-  ];
+  const validMethods: HttpMethod[] = ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"];
 
   for (const method of validMethods) {
     if (!methodList.includes(method)) {
@@ -182,6 +157,6 @@ function sortObjectKeys(obj: any): any {
         return result;
       }, {});
   } else {
-    return obj; // Primitive value
+    return obj;
   }
 }

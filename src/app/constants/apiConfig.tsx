@@ -6,7 +6,8 @@ import {
   createConfiguration,
   wrapHttpLibrary,
 } from "@inquisico/ruleset-editor-api";
-const addTrailingSlash = (url: string) => url.replace(/\/?$/, "/");
+
+import { addTrailingSlash } from "../utils/common";
 
 class IsomorphicFetchHttpLibrary implements PromiseHttpLibrary {
   _isRedirect = true;
@@ -15,7 +16,6 @@ class IsomorphicFetchHttpLibrary implements PromiseHttpLibrary {
     this._isRedirect = isRedirect;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   public send(request: RequestContext): Promise<ResponseContext> {
     const method = request.getHttpMethod().toString();
     const body = request.getBody();

@@ -1,11 +1,13 @@
 "use client";
 
-import RulesetTable from "@/app/applications/[app_id]/RulesetTable";
 import { Button } from "antd";
 import { useRouter } from "next/navigation";
+
 import { useAppContext } from "@/app/components/AppContext";
 
-export default function AppDisplay() {
+import { RulesetTable } from "./RulesetTable";
+
+function AppDisplay() {
   const { companyID, appID } = useAppContext();
   const router = useRouter();
 
@@ -24,3 +26,5 @@ export default function AppDisplay() {
     </>
   );
 }
+
+export { AppDisplay };

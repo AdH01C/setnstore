@@ -1,6 +1,6 @@
-import React from "react";
-import RulesetCreator from "./RulesetCreator";
-import AppLayout from "@/app/components/AppLayout";
+import { AppLayout } from "@/app/components/AppLayout";
+
+import { RulesetCreator } from "./RulesetCreator";
 
 export default function Page() {
   return (

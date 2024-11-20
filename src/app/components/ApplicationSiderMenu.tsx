@@ -1,8 +1,4 @@
-import { Menu, MenuProps } from "antd";
-import Sider from "antd/es/layout/Sider";
-type MenuItem = Required<MenuProps>["items"][number];
 import { PieChartOutlined } from "@ant-design/icons";
-import Link from "next/link";
 import {
   AppDetailsWithID,
   ApplicationApi,
@@ -11,12 +7,17 @@ import {
   RulesetApi,
   RulesetWithRulesetJson,
 } from "@inquisico/ruleset-editor-api";
-import { useAppContext } from "./AppContext";
-import configuration from "../services/apiConfig";
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { ItemType } from "antd/es/menu/interface";
+import { Menu, MenuProps } from "antd";
+import Sider from "antd/es/layout/Sider";
+import Link from "next/link";
 
-export default function ApplicationSiderMenu() {
+import { useAppContext } from "./AppContext";
+import configuration from "../constants/apiConfig";
+
+type MenuItem = Required<MenuProps>["items"][number];
+
+function ApplicationSiderMenu() {
   const { companyID, appID, rulesetID } = useAppContext();
   const applicationApi = new ApplicationApi(configuration());
   const rulesetApi = new RulesetApi(configuration());
@@ -42,11 +43,7 @@ export default function ApplicationSiderMenu() {
     enabled: !!companyID && !!appID,
   });
 
-  const fetchRulesetAndHost = async (
-    companyID: string,
-    appID: string,
-    rulesetID: string
-  ): Promise<RulesetWithHost> => {
+  const fetchRulesetAndHost = async (companyID: string, appID: string, rulesetID: string): Promise<RulesetWithHost> => {
     const [rulesetResponse, hostResponse] = await Promise.all([
       rulesetApi.getRulesetById(companyID, appID, rulesetID),
       hostApi.getHostByRulesetId(companyID, appID, rulesetID),
@@ -58,7 +55,7 @@ export default function ApplicationSiderMenu() {
     };
   };
 
-  const rulesetWithHostItem: ItemType[] = useQueries({
+  const rulesetWithHostItem = useQueries({
     queries:
       companyID && rulesetsID
         ? rulesetsID.map((rulesetID: string) => ({
@@ -67,7 +64,7 @@ export default function ApplicationSiderMenu() {
           }))
         : [],
   })
-    .map((query) => {
+    .map(query => {
       const data = query.data;
       if (!data) {
         return;
@@ -77,41 +74,24 @@ export default function ApplicationSiderMenu() {
         data.ruleset.id,
         <PieChartOutlined />,
         undefined,
-        `/applications/${appID}/rulesets/${data.ruleset.id}`
+        `/applications/${appID}/rulesets/${data.ruleset.id}`,
       );
     })
-    .filter((item): item is ItemType => item !== undefined);
+    .filter((item): item is MenuItem => item !== undefined);
 
-  const createMenuItem = (app: AppDetailsWithID): ItemType => {
+  const createMenuItem = (app: AppDetailsWithID) => {
     if (app.id !== appID) {
       // Return a menu item for a different app
-      return getItem(
-        app.appName, // Use the app name as the label
-        app.id, // Use the app ID as the key
-        <PieChartOutlined />, // Use a pie chart icon
-        undefined, // No children
-        `/applications/${app.id}` // Link to the app
-      );
+      return getItem(app.appName, app.id, <PieChartOutlined />, undefined, `/applications/${app.id}`);
     }
 
     if (rulesetsID && rulesetsID.length > 0) {
-      return getItem(
-        app.appName,
-        appID,
-        <PieChartOutlined />,
-        rulesetWithHostItem
-      );
+      return getItem(app.appName, appID, <PieChartOutlined />, rulesetWithHostItem);
     }
 
     // Default case: No ruleset, add "Add a Ruleset" menu item
     return getItem(app.appName, appID, <PieChartOutlined />, [
-      getItem(
-        "Add a Ruleset",
-        "0",
-        <PieChartOutlined />,
-        undefined,
-        `/applications/${appID}/rulesets/new`
-      ),
+      getItem("Add a Ruleset", "0", <PieChartOutlined />, undefined, `/applications/${appID}/rulesets/new`),
     ]);
   };
 
@@ -135,7 +115,7 @@ function getItem(
   key: React.Key,
   icon?: React.ReactNode,
   children?: MenuItem[],
-  url?: string
+  url?: string,
 ): MenuItem {
   return {
     label: url ? <Link href={url}>{label}</Link> : <span>{label}</span>,
@@ -144,3 +124,5 @@ function getItem(
     children,
   } as MenuItem;
 }
+
+export { ApplicationSiderMenu };

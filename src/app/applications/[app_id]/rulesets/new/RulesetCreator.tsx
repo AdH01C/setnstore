@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import React from "react";
 import { Steps } from "antd";
-import { initialFormData } from "@/app/data/initialFormData";
-import Step1 from "./Step1";
-import Step2 from "./Step2";
-import Step3 from "./Step3";
+import { useState } from "react";
+
+import { initialFormData } from "@/app/constants/initialFormData";
+
+import { Step1 } from "./Step1";
+import { Step2 } from "./Step2";
+import { Step3 } from "./Step3";
 
 const steps = [
   {
@@ -23,7 +24,7 @@ const steps = [
   },
 ];
 
-export default function RulesetCreator() {
+export function RulesetCreator() {
   const [current, setCurrent] = useState(0);
   const [formData, setFormData] = useState<any>(initialFormData);
 
@@ -35,27 +36,23 @@ export default function RulesetCreator() {
     setCurrent(current - 1);
   };
 
-  const items = steps.map((item) => ({ key: item.title, title: item.title }));
+  const items = steps.map(item => ({ key: item.title, title: item.title }));
 
   return (
     <div>
-      <Steps current={current} items={items} style={
-        { 
+      <Steps
+        current={current}
+        items={items}
+        style={{
           marginBottom: "2rem",
           paddingRight: "2rem",
-        }
-
-      } />
+        }}
+      />
       <div>
         {current == 0 ? (
           <Step1 ruleset={formData} updateRuleset={setFormData} next={next} />
         ) : current == 1 ? (
-          <Step2
-            ruleset={formData}
-            updateRuleset={setFormData}
-            next={next}
-            prev={prev}
-          />
+          <Step2 ruleset={formData} updateRuleset={setFormData} next={next} prev={prev} />
         ) : current == 2 ? (
           <Step3 ruleset={formData} prev={prev} />
         ) : null}

@@ -1,17 +1,18 @@
-import { useAppContext } from "@/app/components/AppContext";
-import RulesetDetail from "@/app/components/RulesetDetail";
-import configuration from "@/app/services/apiConfig";
 import { RulesetApi } from "@inquisico/ruleset-editor-api";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "antd";
 import { useRouter } from "next/navigation";
+
+import { useAppContext } from "@/app/components/AppContext";
+import { RulesetDetail } from "@/app/components/RulesetDetail";
+import configuration from "@/app/constants/apiConfig";
 
 interface Step3Props {
   ruleset: any;
   prev: () => void;
 }
 
-export default function Step3({ ruleset, prev }: Step3Props) {
+export function Step3({ ruleset, prev }: Step3Props) {
   const router = useRouter();
   const { companyID, appID } = useAppContext();
   const rulesetApi = new RulesetApi(configuration());
@@ -25,12 +26,12 @@ export default function Step3({ ruleset, prev }: Step3Props) {
         rulesetJson: ruleset,
       });
     },
-    onSuccess: (data, variables) => {
+    onSuccess: data => {
       void router.push(`/applications/${appID}/rulesets/${data.id}`);
     },
-    onError: (error) => {
-      console.error("Error creating ruleset:", error);
-    },
+    // onError: error => {
+    //   console.error("Error creating ruleset:", error);
+    // },
   });
 
   const handleSubmit = () => {
@@ -39,7 +40,7 @@ export default function Step3({ ruleset, prev }: Step3Props) {
 
   return (
     <>
-      <div className="flex justify-between mb-4 pr-4">
+      <div className="mb-4 flex justify-between pr-4">
         <Button
           type="primary"
           onClick={() => {

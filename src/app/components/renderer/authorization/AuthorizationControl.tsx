@@ -1,8 +1,9 @@
-import { Button, Collapse, CollapseProps, Modal } from "antd";
 import { withJsonFormsControlProps } from "@jsonforms/react";
-import { AuthPanel } from "./AuthorizationPanel";
-import { PermissionRow, RelationRow } from "../util";
+import { Button, Collapse, CollapseProps, Modal } from "antd";
 import { useEffect } from "react";
+
+import { PermissionRow, RelationRow } from "../../../utils/renderer";
+import { AuthPanel } from "./AuthorizationPanel";
 
 interface AuthorizationControlProps {
   data: AuthorizationValue;
@@ -11,12 +12,7 @@ interface AuthorizationControlProps {
   enabled: boolean;
 }
 
-const AuthorizationControl = ({
-  data,
-  handleChange,
-  path,
-  enabled,
-}: AuthorizationControlProps) => (
+const AuthorizationControl = ({ data, handleChange, path, enabled }: AuthorizationControlProps) => (
   <Authorization
     value={data}
     updateValue={(newValue: AuthorizationValue) => handleChange(path, newValue)}
@@ -33,12 +29,7 @@ interface AuthorizationProps {
   readonly: boolean;
 }
 
-function Authorization({
-  id,
-  value,
-  updateValue,
-  readonly,
-}: AuthorizationProps) {
+function Authorization({ value, updateValue, readonly }: AuthorizationProps) {
   useEffect(() => {
     if (!value) {
       updateValue({});
@@ -73,55 +64,52 @@ function Authorization({
     }
   }
 
-  const authItem: CollapseProps["items"] = Object.entries(currentValue).map(
-    ([entity, entityAuthData]) => ({
-      key: entity,
-      label: `Entity: ${entity}`,
-      children: (
-        <AuthPanel
-          value={entityAuthData}
-          entity={entity}
-          entityList={entityList}
-          relationList={relationList}
-          permissionList={permissionList}
-          updateValue={(newAuth: AuthorizationDefinition) => {
-            const newValue: AuthorizationValue = { ...currentValue };
-            newValue[entity] = newAuth;
-            updateValue(newValue);
-          }}
-          readonly={readonly}
-          updateEntityName={(newEntity: string) => {
-            if (newEntity === entity) return;
+  const authItem: CollapseProps["items"] = Object.entries(currentValue).map(([entity, entityAuthData]) => ({
+    key: entity,
+    label: `Entity: ${entity}`,
+    children: (
+      <AuthPanel
+        value={entityAuthData}
+        entity={entity}
+        entityList={entityList}
+        relationList={relationList}
+        permissionList={permissionList}
+        updateValue={(newAuth: AuthorizationDefinition) => {
+          const newValue: AuthorizationValue = { ...currentValue };
+          newValue[entity] = newAuth;
+          updateValue(newValue);
+        }}
+        readonly={readonly}
+        updateEntityName={(newEntity: string) => {
+          if (newEntity === entity) return;
 
-            const newValue = Object.keys(currentValue).reduce((acc, key) => {
-              if (key === entity) {
-                acc[newEntity] = currentValue[key];
-              } else {
-                acc[key] = currentValue[key];
-              }
-              return acc;
-            }, {} as AuthorizationValue);
+          const newValue = Object.keys(currentValue).reduce((acc, key) => {
+            if (key === entity) {
+              return { ...acc, [newEntity]: currentValue[key] };
+            } else {
+              return { ...acc, [key]: currentValue[key] };
+            }
+          }, {} as AuthorizationValue);
 
-            updateValue(newValue);
-          }}
-          deleteEntity={() => {
-            Modal.confirm({
-              title: "Delete Entity",
-              content: "Are you sure you want to delete this entity?",
-              okText: "Yes",
-              okType: "danger",
-              cancelText: "No",
-              onOk() {
-                const newValue = { ...currentValue };
-                delete newValue[entity];
-                updateValue(newValue);
-              },
-            });
-          }}
-        />
-      ),
-    })
-  );
+          updateValue(newValue);
+        }}
+        deleteEntity={() => {
+          Modal.confirm({
+            title: "Delete Entity",
+            content: "Are you sure you want to delete this entity?",
+            okText: "Yes",
+            okType: "danger",
+            cancelText: "No",
+            onOk() {
+              const newValue = { ...currentValue };
+              delete newValue[entity];
+              updateValue(newValue);
+            },
+          });
+        }}
+      />
+    ),
+  }));
 
   return (
     <>
@@ -129,11 +117,8 @@ function Authorization({
       {!readonly && (
         <Button
           type="primary"
-          // className="border border-dotted border-gray-300 rounded-md p-2 hover:bg-gray-100"
           onClick={() => {
-            const newEntity = `new-entity-${
-              Object.keys(currentValue).length + 1
-            }`;
+            const newEntity = `new-entity-${Object.keys(currentValue).length + 1}`;
             updateValue({
               ...currentValue,
               [newEntity]: {

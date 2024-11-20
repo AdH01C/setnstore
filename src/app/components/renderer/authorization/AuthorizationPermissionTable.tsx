@@ -1,29 +1,29 @@
+import { QuestionCircleOutlined } from "@ant-design/icons";
+import { Button, Flex, Input, Modal, Select, Table, TableColumnsType, Tooltip, Typography } from "antd";
+
 import {
-  TableColumnsType,
-  Select,
-  Button,
-  Table,
-  Input,
-  Flex,
-  Tooltip,
-  Typography,
-  Modal,
-} from "antd";
-import {
-  getAuthorizationTypeValue,
-  getAuthorizationTypeObject,
-  isAuthorizationOperations,
-  isAuthorizationRule,
   PermissionRow,
   RelationRow,
+  getAuthorizationTypeObject,
+  getAuthorizationTypeValue,
+  isAuthorizationOperations,
+  isAuthorizationRule,
   sortedStringify,
-} from "../util";
-import { QuestionCircleOutlined } from "@ant-design/icons";
+} from "../../../utils/renderer";
 
 interface AuthPermissionTableDataType {
   key: React.Key;
   permission: string;
   type: AuthorizationType;
+}
+
+interface AuthPermissionTableProps {
+  entity: string;
+  authData: AuthorizationDefinition;
+  relationList: RelationRow[];
+  permissionList: PermissionRow[];
+  updateValue: (newValue: AuthorizationPermissions) => void;
+  readonly: boolean;
 }
 
 export const AuthPermissionTable = ({
@@ -33,25 +33,17 @@ export const AuthPermissionTable = ({
   permissionList,
   updateValue,
   readonly,
-}: {
-  entity: string;
-  authData: AuthorizationDefinition;
-  relationList: RelationRow[];
-  permissionList: PermissionRow[];
-  updateValue: (newValue: AuthorizationPermissions) => void;
-  readonly: boolean;
-}) => {
+}: AuthPermissionTableProps) => {
   const permissionData = authData.permissions;
 
   function handleAddPermission() {
     const newPermissions = {
       ...permissionData,
     };
-    newPermissions[`new-permission-${Object.keys(newPermissions).length + 1}`] =
-      {
-        type: "union",
-        operations: [],
-      };
+    newPermissions[`new-permission-${Object.keys(newPermissions).length + 1}`] = {
+      type: "union",
+      operations: [],
+    };
     updateValue(newPermissions);
   }
 
@@ -77,22 +69,19 @@ export const AuthPermissionTable = ({
       ...permissionData,
     };
 
-    const updatedAuthorizationRule = JSON.parse(
-      selectedRelation
-    ) as AuthorizationRule;
+    const updatedAuthorizationRule = JSON.parse(selectedRelation) as AuthorizationRule;
     newPermissions[permission] = updatedAuthorizationRule;
+    updateValue(newPermissions);
   }
-  function handleAuthOperationsChange(
-    permission: string,
-    selectedRelations: string[]
-  ) {
+
+  function handleAuthOperationsChange(permission: string, selectedRelations: string[]) {
     const newPermissions = {
       ...permissionData,
     };
 
     const updatedPermission = {
       ...(newPermissions[permission] || {}),
-      operations: selectedRelations.map((relation) => JSON.parse(relation)),
+      operations: selectedRelations.map(relation => JSON.parse(relation) as AuthorizationRule),
     };
 
     newPermissions[permission] = updatedPermission;
@@ -109,28 +98,27 @@ export const AuthPermissionTable = ({
       };
       updateValue(newPermissions);
     } else {
-      console.warn(`Invalid selected type: ${selectedType}`);
+      // console.warn(`Invalid selected type: ${selectedType}`);
     }
   }
 
-  function handlePermissionNameChange(
-    e: React.FocusEvent<HTMLInputElement, Element>,
-    permission: string
-  ) {
+  function handlePermissionNameChange(e: React.FocusEvent<HTMLInputElement, Element>, permission: string) {
     const newPermissionName = e.target.value;
 
     if (newPermissionName === permission) {
       return;
     }
 
-    const newPermissions = Object.keys(permissionData).reduce((acc, key) => {
-      if (key === permission) {
-        acc[newPermissionName] = permissionData[permission];
-      } else {
-        acc[key] = permissionData[key];
-      }
-      return acc;
-    }, {} as typeof permissionData);
+    const newPermissions = Object.keys(permissionData).reduce(
+      (acc, key) => {
+        if (key === permission) {
+          return { ...acc, [newPermissionName]: permissionData[permission] };
+        } else {
+          return { ...acc, [key]: permissionData[key] };
+        }
+      },
+      {} as typeof permissionData,
+    );
 
     updateValue(newPermissions);
   }
@@ -138,8 +126,8 @@ export const AuthPermissionTable = ({
   function renderSettings(record: AuthPermissionTableDataType) {
     {
       const entityRelations = relationList
-        .filter((authRelation) => authRelation.parentEntity === entity)
-        .map((authRelation) => ({
+        .filter(authRelation => authRelation.parentEntity === entity)
+        .map(authRelation => ({
           value: sortedStringify({
             relation: authRelation.relationName,
           }),
@@ -148,11 +136,10 @@ export const AuthPermissionTable = ({
 
       const entityPermissions = permissionList
         .filter(
-          (authPermission) =>
-            authPermission.parentEntity === entity &&
-            authPermission.permissionName !== record.permission
+          authPermission =>
+            authPermission.parentEntity === entity && authPermission.permissionName !== record.permission,
         )
-        .map((authPermission) => ({
+        .map(authPermission => ({
           value: sortedStringify({
             relation: authPermission.permissionName,
           }),
@@ -160,31 +147,29 @@ export const AuthPermissionTable = ({
         }));
 
       const inheritedEntity = relationList
-        .filter((relationRow) => relationRow.parentEntity === entity)
-        .flatMap((relationRow) =>
-          relationRow.relatedEntity.map((authRelation) => ({
+        .filter(relationRow => relationRow.parentEntity === entity)
+        .flatMap(relationRow =>
+          relationRow.relatedEntity.map(authRelation => ({
             facet: authRelation.facet,
             relationName: relationRow.relationName,
             ...(authRelation.relation !== undefined && {
               relation: authRelation.relation,
             }),
-          }))
+          })),
         );
 
-      const resultArray = inheritedEntity.flatMap((authRelation) => {
+      const resultArray = inheritedEntity.flatMap(authRelation => {
         const inheritedRelation = relationList
-          .filter((relation) => relation.parentEntity === authRelation.facet)
-          .map((relation) => relation.relationName);
+          .filter(relation => relation.parentEntity === authRelation.facet)
+          .map(relation => relation.relationName);
 
         const inheritedPermission = permissionList
-          .filter(
-            (permission) => permission.parentEntity === authRelation.facet
-          )
-          .map((permission) => permission.permissionName);
+          .filter(permission => permission.parentEntity === authRelation.facet)
+          .map(permission => permission.permissionName);
 
         const combinedValues = [...inheritedRelation, ...inheritedPermission];
 
-        const valueLabelObjects = combinedValues.map((combinedValue) => ({
+        const valueLabelObjects = combinedValues.map(combinedValue => ({
           value: sortedStringify({
             relation: authRelation.relationName,
             permission: combinedValue,
@@ -198,11 +183,9 @@ export const AuthPermissionTable = ({
       if (isAuthorizationOperations(record.type)) {
         return (
           <Select
-            mode={"multiple"}
-            value={record.type.operations.map((authOp) =>
-              sortedStringify(authOp)
-            )}
-            onChange={(selectedRelations) => {
+            mode="multiple"
+            value={record.type.operations.map(authOp => sortedStringify(authOp))}
+            onChange={selectedRelations => {
               handleAuthOperationsChange(record.permission, selectedRelations);
             }}
             placeholder="Select relations"
@@ -215,12 +198,11 @@ export const AuthPermissionTable = ({
         return (
           <Select
             value={
-              record.type &&
-              sortedStringify(record.type) !== sortedStringify({ relation: "" })
+              record.type && sortedStringify(record.type) !== sortedStringify({ relation: "" })
                 ? sortedStringify(record.type)
                 : undefined
             }
-            onChange={(selectedRelation) => {
+            onChange={selectedRelation => {
               handleAuthRuleChange(record.permission, selectedRelation);
             }}
             placeholder="Select relation"
@@ -235,8 +217,8 @@ export const AuthPermissionTable = ({
   const dataSource: AuthPermissionTableDataType[] = permissionData
     ? Object.entries(permissionData).map(([permission, type]) => ({
         key: permission,
-        permission: permission,
-        type: type,
+        permission,
+        type,
       }))
     : [];
 
@@ -255,7 +237,9 @@ export const AuthPermissionTable = ({
         return (
           <Input
             defaultValue={permission}
-            onBlur={(e) => handlePermissionNameChange(e, record.permission)}
+            onBlur={(e: React.FocusEvent<HTMLInputElement, Element>) =>
+              handlePermissionNameChange(e, record.permission)
+            }
             disabled={readonly}
           />
         );
@@ -281,9 +265,7 @@ export const AuthPermissionTable = ({
         return (
           <Select
             value={getAuthorizationTypeValue(type)}
-            onChange={(selectedType) =>
-              handleAuthTypeChange(record.permission, selectedType)
-            }
+            onChange={selectedType => handleAuthTypeChange(record.permission, selectedType)}
             options={[
               { label: "Single", value: "single" },
               { label: "Union", value: "union" },
@@ -334,11 +316,7 @@ export const AuthPermissionTable = ({
       <Table<AuthPermissionTableDataType>
         pagination={false}
         dataSource={dataSource}
-        columns={
-          !readonly
-            ? [...columns]
-            : columns.filter((column) => column.title !== "Actions")
-        }
+        columns={!readonly ? [...columns] : columns.filter(column => column.title !== "Actions")}
       />
       {!readonly && (
         <Button style={{ width: "100%" }} onClick={handleAddPermission}>

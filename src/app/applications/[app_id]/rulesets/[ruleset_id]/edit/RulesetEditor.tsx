@@ -1,39 +1,32 @@
-import RulesetForm from "../../../../../components/RulesetForm";
-import { Button } from "antd";
-import {
-  RulesetApi,
-  RulesetWithRulesetJson,
-} from "@inquisico/ruleset-editor-api";
-import { useRouter } from "next/navigation";
-import { useAppContext } from "@/app/components/AppContext";
-import configuration from "@/app/services/apiConfig";
+import { RulesetApi, RulesetWithRulesetJson } from "@inquisico/ruleset-editor-api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Button } from "antd";
+import { useRouter } from "next/navigation";
 
-export default function RulesetEditor() {
+import { useAppContext } from "@/app/components/AppContext";
+import configuration from "@/app/constants/apiConfig";
+
+import { RulesetForm } from "../../../../../components/RulesetForm";
+
+export function RulesetEditor() {
   const router = useRouter();
   const { appID, companyID, rulesetID } = useAppContext();
-  // const [ruleset, setRuleset] = useState<RulesetWithRulesetJson>();
   const rulesetApi = new RulesetApi(configuration());
   const queryClient = useQueryClient();
 
   const handleFormChange = (newRuleset: any) => {
-    queryClient.setQueryData(
-      ["ruleset", companyID, appID, rulesetID],
-      (oldRuleset: RulesetWithRulesetJson) => {
-        return {
-          ...oldRuleset,
-          rulesetJson: newRuleset,
-        };
-      }
-    );
+    queryClient.setQueryData(["ruleset", companyID, appID, rulesetID], (oldRuleset: RulesetWithRulesetJson) => {
+      return {
+        ...oldRuleset,
+        rulesetJson: newRuleset,
+      };
+    });
   };
 
   const { data: ruleset } = useQuery({
     queryKey: ["ruleset", companyID, appID, rulesetID],
     queryFn: () => {
-      return companyID && rulesetID
-        ? rulesetApi.getRulesetById(companyID, appID, rulesetID)
-        : null;
+      return companyID && rulesetID ? rulesetApi.getRulesetById(companyID, appID, rulesetID) : null;
     },
     enabled: !!companyID && !!appID && !!rulesetID,
   });
@@ -45,12 +38,12 @@ export default function RulesetEditor() {
       }
       return rulesetApi.updateRuleset(companyID, appID, rulesetID, ruleset);
     },
-    onSuccess: (data, variables) => {
+    onSuccess: () => {
       void router.push(`/applications/${appID}/rulesets/${rulesetID}`);
     },
-    onError: (error) => {
-      console.error("Error editing ruleset:", error);
-    },
+    // onError: error => {
+    //   console.error("Error editing ruleset:", error);
+    // },
   });
 
   const handleSubmit = () => {
@@ -73,11 +66,7 @@ export default function RulesetEditor() {
     <>
       {ruleset && (
         <>
-          <RulesetForm
-            formData={ruleset.rulesetJson}
-            onFormChange={handleFormChange}
-            operations={saveOperation}
-          />
+          <RulesetForm formData={ruleset.rulesetJson} onFormChange={handleFormChange} operations={saveOperation} />
         </>
       )}
     </>

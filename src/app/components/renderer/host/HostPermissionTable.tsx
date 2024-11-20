@@ -1,27 +1,26 @@
+import { QuestionCircleOutlined } from "@ant-design/icons";
+import { Button, Flex, Form, Modal, Select, Table, TableColumnsType, Tooltip, Typography } from "antd";
+
 import {
-  Modal,
-  TableColumnsType,
-  Select,
-  Button,
-  Table,
-  Flex,
-  Form,
-  Typography,
-  Tooltip,
-} from "antd";
-import {
-  methodOptions,
-  getPermissionValue,
+  LabelManager,
   entityTypeOptions,
   getAvailableMethod,
-  LabelManager,
-} from "../util";
-import { QuestionCircleOutlined } from "@ant-design/icons";
+  getPermissionValue,
+  methodOptions,
+} from "../../../utils/renderer";
 
 interface PermissionTableDataType {
   key: React.Key;
   method: string;
   permission: Requirement;
+}
+
+interface HostPermissionTableProps {
+  pathData: PathValue;
+  updateValue: (newValue: PathValue) => void;
+  authData: AuthorizationValue;
+  ancestorEntities: string[];
+  readonly: boolean;
 }
 
 export const HostPermissionTable = ({
@@ -30,13 +29,7 @@ export const HostPermissionTable = ({
   authData,
   ancestorEntities,
   readonly,
-}: {
-  pathData: PathValue;
-  updateValue: (newValue: PathValue) => void;
-  authData: AuthorizationValue;
-  ancestorEntities: string[];
-  readonly: boolean;
-}) => {
+}: HostPermissionTableProps) => {
   const [[path, pathProperties]] = Object.entries(pathData);
   const connectedEntities = [
     ...ancestorEntities,
@@ -105,14 +98,11 @@ export const HostPermissionTable = ({
 
   function handleEntitySettingsChange(method: string, entity: string) {
     const newValue = { ...pathProperties };
-    if (
-      newValue.permission &&
-      typeof newValue.permission[method] === "object"
-    ) {
+    if (newValue.permission && typeof newValue.permission[method] === "object") {
       const requirement = newValue.permission[method] as Requirement;
 
       if (requirement !== null && "entity" in requirement) {
-        const updatedRequirement = { ...requirement, entity: entity, type: "" };
+        const updatedRequirement = { ...requirement, entity, type: "" };
 
         const updatedPermission = {
           ...newValue.permission,
@@ -128,14 +118,11 @@ export const HostPermissionTable = ({
 
   function handleTypeSettingsChange(method: string, type: string) {
     const newValue = { ...pathProperties };
-    if (
-      newValue.permission &&
-      typeof newValue.permission[method] === "object"
-    ) {
+    if (newValue.permission && typeof newValue.permission[method] === "object") {
       const requirement = newValue.permission[method] as Requirement;
 
       if (requirement !== null && "type" in requirement) {
-        const updatedRequirement = { ...requirement, type: type };
+        const updatedRequirement = { ...requirement, type };
 
         const updatedPermission = {
           ...newValue.permission,
@@ -161,13 +148,11 @@ export const HostPermissionTable = ({
 
   const dataSource: PermissionTableDataType[] =
     pathProperties && pathProperties.permission
-      ? Object.entries(pathProperties.permission).map(
-          ([method, requirement]) => ({
-            key: method,
-            method: method,
-            permission: requirement,
-          })
-        )
+      ? Object.entries(pathProperties.permission).map(([method, requirement]) => ({
+          key: method,
+          method,
+          permission: requirement,
+        }))
       : [];
 
   const columns: TableColumnsType<PermissionTableDataType> = [
@@ -181,12 +166,12 @@ export const HostPermissionTable = ({
         </Flex>
       ),
       dataIndex: "method",
-      render: (method, record) => {
+      render: (method: string, record) => {
         const usedPermission = Object.keys(pathProperties.permission || {});
         return (
           <Select
             value={method}
-            onChange={(newMethod) => {
+            onChange={newMethod => {
               handleMethodChange(record.method, newMethod);
             }}
             options={methodOptions(usedPermission)}
@@ -213,7 +198,7 @@ export const HostPermissionTable = ({
         </Flex>
       ),
       dataIndex: "permission",
-      render: (permission, record) => {
+      render: (permission: Requirement, record) => {
         const options = [
           { label: "Only Authentication", value: "authentication_only" },
           { label: "Public Access", value: "public_access" },
@@ -226,7 +211,7 @@ export const HostPermissionTable = ({
         return (
           <Select
             defaultValue={getPermissionValue(permission)}
-            onChange={(selectedPermissionType) => {
+            onChange={selectedPermissionType => {
               handlePermissionChange(record.method, selectedPermissionType);
             }}
             options={options}
@@ -251,22 +236,16 @@ export const HostPermissionTable = ({
         </Flex>
       ),
       dataIndex: "permission",
-      render: (permission, record) => {
+      render: (permission: Requirement, record) => {
         if (permission && "entity" in permission && "type" in permission) {
           const labelManager = new LabelManager();
           return (
             <Flex style={{ minWidth: 150 }} vertical>
               <Select
-                defaultValue={
-                  permission && "entity" in permission
-                    ? permission.entity
-                    : "Entity"
-                }
-                onChange={(selectedEntity) =>
-                  handleEntitySettingsChange(record.method, selectedEntity)
-                }
+                defaultValue={permission && "entity" in permission ? permission.entity : "Entity"}
+                onChange={selectedEntity => handleEntitySettingsChange(record.method, selectedEntity)}
                 placeholder="Entity"
-                options={connectedEntities.map((entity) => {
+                options={connectedEntities.map(entity => {
                   const uniqueLabel = labelManager.getUniqueLabel(entity);
                   return {
                     key: uniqueLabel,
@@ -277,14 +256,8 @@ export const HostPermissionTable = ({
                 disabled={readonly}
               />
               <Select
-                value={
-                  permission && "type" in permission
-                    ? permission.type
-                    : "Permission"
-                }
-                onChange={(selectedType) =>
-                  handleTypeSettingsChange(record.method, selectedType)
-                }
+                value={permission && "type" in permission ? permission.type : "Permission"}
+                onChange={selectedType => handleTypeSettingsChange(record.method, selectedType)}
                 placeholder="Permission"
                 options={entityTypeOptions(authData, permission.entity)}
                 disabled={readonly}
@@ -317,11 +290,7 @@ export const HostPermissionTable = ({
         label={
           <Flex gap="small">
             <Typography.Text>Access Control Settings</Typography.Text>
-            <Tooltip
-              title={
-                "Define authentication and authorization rules of the HTTP methods for the route"
-              }
-            >
+            <Tooltip title="Define authentication and authorization rules of the HTTP methods for the route">
               <QuestionCircleOutlined />
             </Tooltip>
           </Flex>
@@ -330,11 +299,7 @@ export const HostPermissionTable = ({
         <Table<PermissionTableDataType>
           pagination={false}
           dataSource={dataSource}
-          columns={
-            !readonly
-              ? [...columns]
-              : columns.filter((column) => column.title !== "Actions")
-          }
+          columns={!readonly ? [...columns] : columns.filter(column => column.title !== "Actions")}
         />
         {!readonly && (
           <Button style={{ width: "100%" }} onClick={handleAddPermission}>

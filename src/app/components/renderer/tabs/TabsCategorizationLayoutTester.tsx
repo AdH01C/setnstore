@@ -1,3 +1,3 @@
-import { rankWith, uiTypeIs } from '@jsonforms/core';
+import { rankWith, uiTypeIs } from "@jsonforms/core";
 
-export default rankWith(3, uiTypeIs('Categorization'));
+export default rankWith(3, uiTypeIs("Categorization"));

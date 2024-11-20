@@ -1,8 +1,8 @@
-import React from "react";
-import RulesetDisplay from "./RulesetDisplay";
-import AppLayout from "@/app/components/AppLayout";
+import { AppLayout } from "@/app/components/AppLayout";
 
-export default function Page(){
+import { RulesetDisplay } from "./RulesetDisplay";
+
+export default function Page() {
   return (
     <AppLayout hasSider hasBreadcrumb>
       <RulesetDisplay />

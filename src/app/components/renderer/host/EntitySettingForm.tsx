@@ -1,30 +1,31 @@
+import { QuestionCircleOutlined } from "@ant-design/icons";
 import { Flex, Form, Select, Tooltip, Typography } from "antd";
 import { useState } from "react";
-import { LabelManager } from "../util";
-import { QuestionCircleOutlined } from "@ant-design/icons";
+
+import { LabelManager } from "../../../utils/renderer";
+
+interface EntitySettingsFormProps {
+  pathData: PathValue;
+  updateValue: (newValue: PathValue) => void;
+  relations: string[];
+  ancestorEntities: string[];
+  readonly: boolean;
+}
 
 export const EntitySettingsForm = ({
   pathData,
   updateValue,
   relations,
   ancestorEntities,
-  readonly
-}: {
-  pathData: PathValue;
-  updateValue: (newValue: PathValue) => void;
-  relations: string[];
-  ancestorEntities: string[];
-  readonly: boolean;
-}) => {
+  readonly,
+}: EntitySettingsFormProps) => {
   const [[path, untypedProperties]] = Object.entries(pathData);
   const pathProperties = untypedProperties as EntityPathSettings;
 
   const relationType = getRelationTypeValue(pathProperties);
   const relationValue = getRelationValue(pathProperties);
 
-  const [toggleCustomRelation, setToggleCustomRelation] = useState<boolean>(
-    relationType === "Custom" ? true : false
-  );
+  const [toggleCustomRelation, setToggleCustomRelation] = useState<boolean>(relationType === "Custom" ? true : false);
 
   function handleEntityChange(entity: string) {
     const newValue = { ...pathProperties } as EntityPathSettings;
@@ -33,20 +34,17 @@ export const EntitySettingsForm = ({
     updateValue({ [path]: newValue });
   }
 
-  function getRelationTypeValue(
-    entityPathSettings: EntityPathSettings
-  ): string {
+  function getRelationTypeValue(entityPathSettings: EntityPathSettings): string {
     const { relations } = entityPathSettings;
 
     if (relations === undefined) {
-      return "Default"; // Relation key does not exist
+      return "Default";
     }
 
     if (relations.length === 0) {
-      return "No relation"; // Empty array
+      return "No relation";
     }
 
-    // Relation array contains elements
     return "Custom";
   }
 
@@ -103,7 +101,7 @@ export const EntitySettingsForm = ({
               defaultValue={pathProperties.entity}
               onChange={handleEntityChange}
               placeholder="Entity"
-              options={relations.map((relation) => ({
+              options={relations.map(relation => ({
                 label: relation,
                 value: relation,
               }))}
@@ -144,7 +142,7 @@ export const EntitySettingsForm = ({
                 defaultValue={relationValue}
                 onChange={handleRelationChange}
                 placeholder="Select relations"
-                options={ancestorEntities.map((entity) => {
+                options={ancestorEntities.map(entity => {
                   const uniqueLabel = labelManager.getUniqueLabel(entity);
                   return {
                     key: uniqueLabel,

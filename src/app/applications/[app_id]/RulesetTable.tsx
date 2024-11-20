@@ -1,26 +1,21 @@
-import { TableColumnsType, Space, Table } from "antd";
-import { useRouter } from "next/navigation";
-import {
-  Host,
-  HostApi,
-  RulesetApi,
-  RulesetWithRulesetJson,
-} from "@inquisico/ruleset-editor-api";
-import configuration from "@/app/services/apiConfig";
+import { Host, HostApi, RulesetApi, RulesetWithRulesetJson } from "@inquisico/ruleset-editor-api";
 import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
+import { Space, Table, TableColumnsType } from "antd";
+import { useRouter } from "next/navigation";
+
+import configuration from "@/app/constants/apiConfig";
 
 interface RulesetTableType extends RulesetWithRulesetJson {
   key: string;
   host: string;
 }
 
-export default function RulesetTable({
-  companyID,
-  appID,
-}: {
+interface RulesetTableProps {
   companyID: string;
   appID: string;
-}) {
+}
+
+export function RulesetTable({ companyID, appID }: RulesetTableProps) {
   const router = useRouter();
   const hostApi = new HostApi(configuration());
   const rulesetApi = new RulesetApi(configuration());
@@ -38,11 +33,7 @@ export default function RulesetTable({
     host: Host;
   }
 
-  const fetchRulesetAndHost = async (
-    companyID: string,
-    appID: string,
-    rulesetID: string
-  ): Promise<RulesetWithHost> => {
+  const fetchRulesetAndHost = async (companyID: string, appID: string, rulesetID: string): Promise<RulesetWithHost> => {
     const [rulesetResponse, hostResponse] = await Promise.all([
       rulesetApi.getRulesetById(companyID, appID, rulesetID),
       hostApi.getHostByRulesetId(companyID, appID, rulesetID),
@@ -62,7 +53,7 @@ export default function RulesetTable({
         }))
       : [],
   })
-    .map((query) => {
+    .map(query => {
       const data = query.data;
 
       if (!data || !data.ruleset || !data.host) {
@@ -80,14 +71,13 @@ export default function RulesetTable({
     .filter((ruleset): ruleset is RulesetTableType => ruleset !== undefined);
 
   const deleteRulesetMutation = useMutation({
-    mutationFn: (rulesetID: string) =>
-      rulesetApi.deleteRulesetById(companyID, appID, rulesetID),
-    onSuccess: (data, variables) => {
+    mutationFn: (rulesetID: string) => rulesetApi.deleteRulesetById(companyID, appID, rulesetID),
+    onSuccess: () => {
       void refetchRulesetsID();
     },
-    onError: (error) => {
-      console.error("Error deleting ruleset:", error);
-    },
+    // onError: error => {
+    //   console.error("Error deleting ruleset:", error);
+    // },
   });
 
   const handleRulesetDelete = (rulesetID: string) => {
@@ -95,7 +85,7 @@ export default function RulesetTable({
   };
 
   const columns: TableColumnsType<RulesetTableType> = [
-    { title: "Ruleset ID", dataIndex: "id", key: "id" },
+    // { title: "Ruleset ID", dataIndex: "id", key: "id" },
     {
       title: "Host",
       dataIndex: "host",
@@ -129,7 +119,7 @@ export default function RulesetTable({
               Edit
             </a>
             <a
-              onClick={(e) => {
+              onClick={() => {
                 handleRulesetDelete(row.id);
               }}
             >
@@ -145,9 +135,9 @@ export default function RulesetTable({
     <Table<RulesetTableType>
       columns={columns}
       dataSource={rulesetWithHost
-        .filter((ruleset) => ruleset !== undefined)
-        .map((ruleset) => ({
-          ...(ruleset as RulesetTableType),
+        .filter(ruleset => ruleset !== undefined)
+        .map(ruleset => ({
+          ...ruleset,
         }))}
       pagination={false}
     />

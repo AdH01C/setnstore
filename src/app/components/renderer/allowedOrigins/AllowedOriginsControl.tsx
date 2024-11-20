@@ -1,7 +1,7 @@
-import { Button, Flex, Input, Modal, Table, Tooltip, Typography } from "antd";
-import { withJsonFormsControlProps } from "@jsonforms/react";
-import { useEffect } from "react";
 import { QuestionCircleOutlined } from "@ant-design/icons";
+import { withJsonFormsControlProps } from "@jsonforms/react";
+import { Button, Flex, Input, Modal, Table, Tooltip, Typography } from "antd";
+import { ChangeEvent, useEffect } from "react";
 
 interface AllowedOriginsControlProps {
   data: string[];
@@ -17,27 +17,13 @@ interface AllowedOriginsProps {
   readonly: boolean;
 }
 
-const AllowedOriginsControl = ({
-  data,
-  handleChange,
-  path,
-  enabled,
-}: AllowedOriginsControlProps) => (
-  <AllowedOrigins
-    value={data}
-    updateValue={(newValue: string[]) => handleChange(path, newValue)}
-    readonly={!enabled}
-  />
+const AllowedOriginsControl = ({ data, handleChange, path, enabled }: AllowedOriginsControlProps) => (
+  <AllowedOrigins value={data} updateValue={(newValue: string[]) => handleChange(path, newValue)} readonly={!enabled} />
 );
 
 export default withJsonFormsControlProps(AllowedOriginsControl);
 
-function AllowedOrigins({
-  id,
-  value,
-  updateValue,
-  readonly,
-}: AllowedOriginsProps) {
+function AllowedOrigins({ value, updateValue, readonly }: AllowedOriginsProps) {
   useEffect(() => {
     if (!value) {
       updateValue([]);
@@ -45,10 +31,7 @@ function AllowedOrigins({
   }, [value, updateValue]);
 
   const currentValue = value || [];
-  const dataSource =
-    currentValue === undefined
-      ? []
-      : currentValue.map((origin, index) => ({ key: index, origin }));
+  const dataSource = currentValue === undefined ? [] : currentValue.map((origin, index) => ({ key: index, origin }));
 
   function handleDeleteOrigin(index: number) {
     Modal.confirm({
@@ -89,7 +72,7 @@ function AllowedOrigins({
           render={(text, record, index) => (
             <Input
               value={text}
-              onChange={(e) => {
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 const newValue = [...value];
                 newValue[index] = e.target.value;
                 updateValue(newValue);

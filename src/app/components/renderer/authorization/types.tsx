@@ -20,7 +20,7 @@ interface AuthorizationPermissions {
   [permission: string]: AuthorizationType;
 }
 
-type AuthorizationType = AuthorizationOperations | AuthorizationRule
+type AuthorizationType = AuthorizationOperations | AuthorizationRule;
 
 type AuthorizationOperationType = "union" | "intersect" | "except";
 
