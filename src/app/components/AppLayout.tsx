@@ -1,15 +1,14 @@
-"use client"
+"use client";
 
-import { signOut } from "next-auth/react";
 import { Breadcrumb, Dropdown, Layout, MenuProps, Typography } from "antd";
 import { Header, Footer, Content } from "antd/es/layout/layout";
 import ApplicationSiderMenu from "./ApplicationSiderMenu";
-import { redirect, usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ReactNode } from "react";
 import { UserOutlined } from "@ant-design/icons";
 import { AppProvider } from "../components/AppContext";
-
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 export default function AppLayout({
   children,
@@ -30,73 +29,80 @@ export default function AppLayout({
   const router = useRouter();
   const addTrailingSlash = (url: string) => url.replace(/\/?$/, "/");
   const items: MenuProps["items"] = [
-  //   {
-  //     key: "1",
-  //     label: <a>Profile</a>,
-  //   },
-  //   {
-  //     key: "2",
-  //     label: <a>Permissions</a>,
-  //     disabled: true,
-  //   },
-  //   {
-  //     key: "3",
-  //     label: <a>Settings</a>,
-  //     disabled: true,
-  //   },
+    //   {
+    //     key: "1",
+    //     label: <a>Profile</a>,
+    //   },
+    //   {
+    //     key: "2",
+    //     label: <a>Permissions</a>,
+    //     disabled: true,
+    //   },
+    //   {
+    //     key: "3",
+    //     label: <a>Settings</a>,
+    //     disabled: true,
+    //   },
     {
       key: "1",
       danger: true,
       label: "Log out",
       onClick: () => {
-        router.push(addTrailingSlash(process.env.NEXT_PUBLIC_AUTH_ENDPOINT ?? "") + "logout_unified")
-        
+        void router.push(
+          addTrailingSlash(process.env.NEXT_PUBLIC_AUTH_ENDPOINT ?? "") +
+            "logout_unified"
+        );
       },
     },
   ];
+  const queryClient = new QueryClient();
 
   return (
-    <AppProvider>
-      <Layout style={{ minHeight: "100vh" }}>
-        <Header className="flex items-center justify-between">
-          <Link href="/dashboard" className="text-white text-2xl font-bold">
-            Inquisico
-          </Link>
+    <QueryClientProvider client={queryClient}>
+      <AppProvider forceSignin={true}>
+        <Layout style={{ minHeight: "100vh" }}>
+          <Header className="flex items-center justify-between">
+            <Link href="/dashboard" className="text-white text-2xl font-bold">
+              Inquisico
+            </Link>
 
-          <Dropdown menu={{ items }}>
-            <a onClick={(e) => e.preventDefault()}>
-              <UserOutlined className="text-2xl hover:cursor-pointer" />
-            </a>
-          </Dropdown>
-        </Header>
-        <Layout hasSider>
-          {hasSider && <ApplicationSiderMenu />}
-          <Layout>
-            <Content
-              style={{
-                padding: contentPadding,
-                margin: 0,
-                minHeight: 280,
-              }}
-            >
-              {title && <Typography.Title level={2}>{title}</Typography.Title>}
-              {subtitle && <Typography.Text>{subtitle}</Typography.Text>}
-              {hasBreadcrumb && (
-                <Breadcrumb
-                  itemRender={itemRender}
-                  style={{ padding: "16px 0" }}
-                  items={generateBreadCrumb(pathname)}
-                />
-              )}
-              {children}
-            </Content>
+            <Dropdown menu={{ items }}>
+              <a onClick={(e) => e.preventDefault()}>
+                <UserOutlined className="text-2xl hover:cursor-pointer" />
+              </a>
+            </Dropdown>
+          </Header>
+          <Layout hasSider>
+            {hasSider && <ApplicationSiderMenu />}
+            <Layout>
+              <Content
+                style={{
+                  padding: contentPadding,
+                  margin: 0,
+                  minHeight: 280,
+                }}
+              >
+                {title && (
+                  <Typography.Title level={2}>{title}</Typography.Title>
+                )}
+                {subtitle && <Typography.Text>{subtitle}</Typography.Text>}
+                {hasBreadcrumb && (
+                  <Breadcrumb
+                    itemRender={itemRender}
+                    style={{ padding: "16px 0" }}
+                    items={generateBreadCrumb(pathname)}
+                  />
+                )}
+                {children}
+              </Content>
+            </Layout>
           </Layout>
+          <Footer className="text-center">
+            Inquisico ©{new Date().getFullYear()} Created by Adrians Worker
+          </Footer>
         </Layout>
-        <Footer className="text-center">
-          Inquisico ©{new Date().getFullYear()} Created by Adrians Worker
-        </Footer>
-      </Layout>
-    </AppProvider>
+      </AppProvider>
+    </QueryClientProvider>
   );
 }
 
@@ -156,5 +162,3 @@ const generateBreadCrumb = (pathname: string) => {
 
   return items;
 };
-
-

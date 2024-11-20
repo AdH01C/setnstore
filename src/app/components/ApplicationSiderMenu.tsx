@@ -1,111 +1,131 @@
 import { Menu, MenuProps } from "antd";
 import Sider from "antd/es/layout/Sider";
 type MenuItem = Required<MenuProps>["items"][number];
-import { useEffect, useState } from "react";
-import applicationDataService from "../services/NewAppDataService";
-import RulesetDataService from "../services/NewRulesetDataService";
-import { useRouter } from "next/navigation";
 import { PieChartOutlined } from "@ant-design/icons";
 import Link from "next/link";
-import { AppDetailsWithID } from "@inquisico/ruleset-editor-api";
-import hostDataService from "../services/HostDataService";
-import { useAtom } from "jotai";
-import { userDetailsAtom } from "@/jotai/User";
-import { currentApplicationAtom } from "@/jotai/Navigation";
+import {
+  AppDetailsWithID,
+  ApplicationApi,
+  Host,
+  HostApi,
+  RulesetApi,
+  RulesetWithRulesetJson,
+} from "@inquisico/ruleset-editor-api";
+import { useAppContext } from "./AppContext";
+import configuration from "../services/apiConfig";
+import { useQueries, useQuery } from "@tanstack/react-query";
+import { ItemType } from "antd/es/menu/interface";
 
 export default function ApplicationSiderMenu() {
-  const router = useRouter();
-  const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
-  const [currentApplication, setCurrentApplication] = useAtom(currentApplicationAtom);
-  const companyId = userDetails.companyId;
-  const [items, setItems] = useState<MenuItem[]>([]);
+  const { companyID, appID, rulesetID } = useAppContext();
+  const applicationApi = new ApplicationApi(configuration());
+  const rulesetApi = new RulesetApi(configuration());
+  const hostApi = new HostApi(configuration());
 
-  useEffect(() => {
-    const fetchMenuItems = async () => {
-      try {
-        // Fetch applications and rulesetIDs in parallel
-        const [applications, rulesetIDs] = await Promise.all([
-          applicationDataService.getApplications(companyId),
-          RulesetDataService.getRulesets(companyId, currentApplication.appId),
-        ]);
+  const { data: applications } = useQuery({
+    queryKey: ["applications", companyID],
+    queryFn: () => {
+      return companyID ? applicationApi.getApplications(companyID) : undefined;
+    },
+    enabled: !!companyID,
+  });
+  interface RulesetWithHost {
+    ruleset: RulesetWithRulesetJson;
+    host: Host;
+  }
 
-        const createMenuItem = async (
-          app: AppDetailsWithID
-        ): Promise<MenuItem> => {
-          if (app.id !== currentApplication.appId) {
-            // Return a menu item for a different app
-            return getItem(
-              app.appName, // Use the app name as the label
-              app.id, // Use the app ID as the key
-              <PieChartOutlined />, // Use a pie chart icon
-              undefined, // No children
-              `/applications/${app.id}` // Link to the app
-            );
-          }
+  const { data: rulesetsID } = useQuery({
+    queryKey: ["rulesetsID", companyID, appID],
+    queryFn: () => {
+      return companyID ? rulesetApi.getRulesets(companyID, appID) : undefined;
+    },
+    enabled: !!companyID && !!appID,
+  });
 
-          if (rulesetIDs.length > 0) {
-            // Fetch hosts for the rulesetIDs and create menu items
-            const rulesetMenuItems = await Promise.all(
-              rulesetIDs.map(async (rulesetID: string): Promise<MenuItem> => {
-                const host = await hostDataService.getHostByRulesetID(
-                  companyId,
-                  currentApplication.appId,
-                  rulesetID
-                );
-                return getItem(
-                  rulesetID, // Use rulesetID as the label
-                  rulesetID, // Use rulesetID as the key
-                  <PieChartOutlined />, // Use a pie chart icon
-                  undefined, // No children
-                  `/applications/${currentApplication.appId}/rulesets/${rulesetID}` // Link to the ruleset
-                );
-              })
-            );
+  const fetchRulesetAndHost = async (
+    companyID: string,
+    appID: string,
+    rulesetID: string
+  ): Promise<RulesetWithHost> => {
+    const [rulesetResponse, hostResponse] = await Promise.all([
+      rulesetApi.getRulesetById(companyID, appID, rulesetID),
+      hostApi.getHostByRulesetId(companyID, appID, rulesetID),
+    ]);
 
-            return getItem(
-              app.appName,
-              currentApplication.appId,
-              <PieChartOutlined />,
-              rulesetMenuItems
-            );
-          }
-
-          // Default case: No ruleset, add "Add a Ruleset" menu item
-          return getItem(app.appName, currentApplication.appId, <PieChartOutlined />, [
-            getItem(
-              "Add a Ruleset",
-              "0",
-              <PieChartOutlined />,
-              undefined,
-              `/applications/${currentApplication.appId}/rulesets/new`
-            ),
-          ]);
-        };
-
-        // Create menu items for all applications
-        const menuItems: MenuItem[] = await Promise.all(
-          applications.map(createMenuItem)
-        );
-
-        // Set the menu items in state
-        setItems(menuItems);
-      } catch (error) {
-        console.error("Failed to fetch menu items:", error);
-      }
+    return {
+      ruleset: { ...rulesetResponse },
+      host: { ...hostResponse },
     };
+  };
 
-    fetchMenuItems();
-  }, [companyId, currentApplication.appId, router]);
+  const rulesetWithHostItem: ItemType[] = useQueries({
+    queries:
+      companyID && rulesetsID
+        ? rulesetsID.map((rulesetID: string) => ({
+            queryKey: ["rulesetsAndHost", companyID, appID, rulesetID],
+            queryFn: () => fetchRulesetAndHost(companyID, appID, rulesetID),
+          }))
+        : [],
+  })
+    .map((query) => {
+      const data = query.data;
+      if (!data) {
+        return;
+      }
+      return getItem(
+        data.host.host,
+        data.ruleset.id,
+        <PieChartOutlined />,
+        undefined,
+        `/applications/${appID}/rulesets/${data.ruleset.id}`
+      );
+    })
+    .filter((item): item is ItemType => item !== undefined);
+
+  const createMenuItem = (app: AppDetailsWithID): ItemType => {
+    if (app.id !== appID) {
+      // Return a menu item for a different app
+      return getItem(
+        app.appName, // Use the app name as the label
+        app.id, // Use the app ID as the key
+        <PieChartOutlined />, // Use a pie chart icon
+        undefined, // No children
+        `/applications/${app.id}` // Link to the app
+      );
+    }
+
+    if (rulesetsID && rulesetsID.length > 0) {
+      return getItem(
+        app.appName,
+        appID,
+        <PieChartOutlined />,
+        rulesetWithHostItem
+      );
+    }
+
+    // Default case: No ruleset, add "Add a Ruleset" menu item
+    return getItem(app.appName, appID, <PieChartOutlined />, [
+      getItem(
+        "Add a Ruleset",
+        "0",
+        <PieChartOutlined />,
+        undefined,
+        `/applications/${appID}/rulesets/new`
+      ),
+    ]);
+  };
 
   return (
     <Sider width={220}>
-      <Menu
-        mode="inline"
-        defaultSelectedKeys={[currentApplication.appId, currentApplication.rulesetId ?? ""]}
-        defaultOpenKeys={[currentApplication.appId]}
-        style={{ height: "100%", borderRight: 0 }}
-        items={items}
-      />
+      {applications && (
+        <Menu
+          mode="inline"
+          defaultSelectedKeys={[appID, rulesetID ?? ""]}
+          defaultOpenKeys={[appID]}
+          style={{ height: "100%", borderRight: 0 }}
+          items={applications.map(createMenuItem)}
+        />
+      )}
     </Sider>
   );
 }

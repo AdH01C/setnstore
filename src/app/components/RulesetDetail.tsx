@@ -19,7 +19,6 @@ import allowedOriginsControl from "@/app/components/renderer/allowedOrigins/Allo
 import tabsCategorizationLayout from "@/app/components/renderer/tabs/TabsCategorizationLayout";
 import tabsCategorizationLayoutTester from "@/app/components/renderer/tabs/TabsCategorizationLayoutTester";
 import { RefsContext } from "./FormContext";
-const { Title } = Typography;
 
 export default function RulesetDetail({
   ruleset,

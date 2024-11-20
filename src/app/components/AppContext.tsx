@@ -1,27 +1,13 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  Dispatch,
-  SetStateAction,
-  useEffect,
-} from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import { useAuth } from "../hooks/useAuth";
+import CreateCompanyModal from "../dashboard/CreateCompanyModal";
+import Loading from "./Loading";
+import { Layout } from "antd";
 
 interface AppContextType {
-  userId: string;
-  setUserId: Dispatch<SetStateAction<string>>;
-  firstName: string;
-  setFirstName: Dispatch<SetStateAction<string>>;
-  lastName: string;
-  setLastName: Dispatch<SetStateAction<string>>;
-  email: string;
-  setEmail: Dispatch<SetStateAction<string>>;
+  companyID?: string;
   appID: string;
-  companyName: string;
-  setCompanyName: Dispatch<SetStateAction<string>>;
-  companyId: string;
-  setCompanyId: Dispatch<SetStateAction<string>>;
   rulesetID?: string;
 }
 
@@ -37,64 +23,75 @@ export const useAppContext = () => {
 };
 
 export const AppProvider: React.FC<{
+  forceSignin: boolean;
   children: React.ReactNode;
-}> = ({ children }) => {
+}> = ({ forceSignin, children }) => {
   const { app_id, ruleset_id } = useParams<{
     app_id: string;
     ruleset_id?: string;
   }>();
 
-  // Load initial values from local storage
-  const [companyId, setCompanyId] = useState<string>(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("companyId") || "";
-    }
-    return "";
+  const { isFetching, dataFetched, identity, refetch } = useAuth({
+    forceSignin,
   });
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [companyName, setCompanyName] = useState<string>(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("companyName") || "";
-    }
-    return "";
-  });
-
-  // Save values to local storage whenever they change
-  useEffect(() => {
-    if (companyId) {
-      localStorage.setItem("companyId", companyId);
-    }
-  }, [companyId]);
-
-  useEffect(() => {
-    if (companyName) {
-      localStorage.setItem("companyName", companyName);
-    }
-  }, [companyName]);
-
-  const [userId, setUserId] = useState<string>("");
-  const [firstName, setFirstName] = useState<string>("");
-  const [lastName, setLastName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  
+  if (
+    !isFetching &&
+    dataFetched &&
+    identity &&
+    !identity.company &&
+    !isModalOpen
+  ) {
+    setIsModalOpen(true);
+  }
 
   // Values provided by the context
   const value = {
-    companyId,
-    setCompanyId,
-    companyName,
-    setCompanyName,
-    userId,
-    setUserId,
-    firstName,
-    setFirstName,
-    lastName,
-    setLastName,
-    email,
-    setEmail,
+    // identity: identity,
+    companyID: identity?.company?.id,
     appID: app_id,
     rulesetID: ruleset_id,
   };
 
-  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+  if (isFetching || !dataFetched)
+    return (
+      <div className="flex h-screen w-screen items-center justify-center">
+        <div className="flex flex-col items-center gap-y-5">
+          <Loading />
+          <h1>Loading</h1>
+        </div>
+      </div>
+    );
+
+  if (!isFetching && dataFetched && !identity && forceSignin) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center">
+        <div className="flex flex-col items-center gap-y-5">
+          <Loading />
+          <h1>Redirecting to signin</h1>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <AppContext.Provider value={value}>
+      {identity?.id && value.companyID ? (
+        children
+      ) : (
+        <Layout style={{ minHeight: "100vh" }}>
+          <CreateCompanyModal
+            userID={identity?.id}
+            open={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onSuccess={() => {
+              setIsModalOpen(false);
+              refetch();
+            }}
+          />
+        </Layout>
+      )}
+    </AppContext.Provider>
+  );
 };

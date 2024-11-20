@@ -1,57 +1,59 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Loading from "../components/Loading";
-import ApplicationDataService from "../services/NewAppDataService";
-// import ProjectCard from "./ProjectCard";
-// import CreateProjectCard from "./CreateProjectCard";
 import { useAppContext } from "../components/AppContext";
-import { getSession } from "next-auth/react";
-import oldUserDataService from "../services/OldUserDataService";
-import oldCompanyDataService from "../services/OldCompanyDataService";
-import companyDataService from "../services/NewCompanyDataService";
-import newUserDataService from "../services/NewUserDataService";
-import { redirect } from "next/navigation";
-import { AppDetailsWithID, Identity, UserApi } from "@inquisico/ruleset-editor-api";
 import ApplicationsTable from "./ApplicationsTable";
 import { Button, Input, Modal } from "antd";
-import { App } from "@inquisico/ruleset-editor-api";
-import { fetchedApplicationsAtom, userDetailsAtom } from "@/jotai/User";
-import { useAtom } from "jotai";
-import { Input, Modal } from "antd";
-    
+import { App, ApplicationApi } from "@inquisico/ruleset-editor-api";
+import configuration from "../services/apiConfig";
+import { useMutation, useQuery } from "@tanstack/react-query";
+
 export default function Dashboard() {
-  const [applications, setApplications] = useAtom(fetchedApplicationsAtom);
-  const { companyName, setCompanyName, companyId, setCompanyId } =
-    useAppContext();
-  const [isLoading, setIsLoading] = useState(true);
-  // const [applications, setApplications] = useState<AppDetailsWithID[]>([]);
+  const { companyID } = useAppContext();
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [appName, setAppName] = useState("");
-
-  useEffect(() => {
-    
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-
-
-  }, [applications]);
+  const applicationApi = new ApplicationApi(configuration());
 
   const showModal = () => {
     setIsModalOpen(true);
   };
 
-  const handleOk = async () => {
-    setConfirmLoading(true);
-    const response = await ApplicationDataService.createApplication(companyId, {
-      appName: appName,
-    } as App);
-    setApplications((prevApps) => [...(prevApps || []), response]);
-    setConfirmLoading(false);
-    setIsModalOpen(false);
-    setAppName("");
+  const {
+    data: applications,
+    refetch: refetchApplications,
+    isLoading,
+  } = useQuery({
+    queryKey: ["applications", companyID],
+    queryFn: () => {
+      return companyID ? applicationApi.getApplications(companyID) : undefined;
+    },
+    enabled: !!companyID,
+  });
+
+  const createApplicationMutation = useMutation({
+    mutationFn: () => {
+      if (!companyID) {
+        throw new Error("companyID is undefined");
+      }
+      return applicationApi.createApplication(companyID, {
+        appName: appName,
+      } as App);
+    },
+    onSuccess: (data, variables) => {
+      void refetchApplications();
+      setConfirmLoading(false);
+      setIsModalOpen(false);
+      setAppName("");
+    },
+    onError: (error) => {
+      console.error("Error deleting ruleset:", error);
+    },
+  });
+
+  const handleApplicationCreate = () => {
+    void createApplicationMutation.mutateAsync();
   };
 
   const handleCancel = () => {
@@ -59,7 +61,22 @@ export default function Dashboard() {
     setAppName("");
   };
 
-  const handleApplicationDelete = async (appID: string) => {
+  const deleteApplicationMutation = useMutation({
+    mutationFn: (appID: string) => {
+      if (!companyID || !appID) {
+        throw new Error("companyID or appID is undefined");
+      }
+      return applicationApi.deleteApplication(companyID, appID);
+    },
+    onSuccess: (data, variables) => {
+      void refetchApplications();
+    },
+    onError: (error) => {
+      console.error("Error deleting ruleset:", error);
+    },
+  });
+
+  const handleApplicationDelete = (appID: string) => {
     Modal.confirm({
       title: "Delete Application",
       content: "Are you sure you want to delete this application?",
@@ -67,15 +84,7 @@ export default function Dashboard() {
       okType: "danger",
       cancelText: "No",
       async onOk() {
-        try {
-          await ApplicationDataService.deleteApplication(companyId, appID);
-          setApplications((prevApps) =>
-            prevApps ? prevApps.filter((app) => app.id !== appID) : []
-          );
-          console.log(`Application with ID ${appID} deleted successfully`);
-        } catch (error) {
-          console.error("Error deleting application:", error);
-        }
+        void deleteApplicationMutation.mutateAsync(appID);
       },
     });
   };
@@ -86,17 +95,6 @@ export default function Dashboard() {
         <Loading />
       ) : (
         <div>
-          {/* {applications &&
-            applications.map((application) => (
-              <ProjectCard
-                key={app.id} // Ensure each card has a unique key
-                appId={app.id}
-                appName={app.appName}
-                companyId={app.companyId}
-                onDelete={handleDelete}
-              />
-            ))}
-          <CreateProjectCard onCreate={handleCreate} /> */}
           <Button
             type="primary"
             onClick={showModal}
@@ -107,7 +105,7 @@ export default function Dashboard() {
           <Modal
             title="Add Application"
             open={isModalOpen}
-            onOk={handleOk}
+            onOk={handleApplicationCreate}
             confirmLoading={confirmLoading}
             onCancel={handleCancel}
           >
@@ -117,11 +115,19 @@ export default function Dashboard() {
               onChange={(e) => setAppName(e.target.value)}
             />
           </Modal>
-          <ApplicationsTable
-            companyId={companyId}
-            applications={applications}
-            handleDelete={handleApplicationDelete}
-          />
+          {companyID && (
+            <ApplicationsTable
+              companyID={companyID}
+              applications={
+                applications
+                  ? applications.filter(
+                      (application) => application !== undefined
+                    )
+                  : []
+              }
+              handleDelete={handleApplicationDelete}
+            />
+          )}
         </div>
       )}
     </div>

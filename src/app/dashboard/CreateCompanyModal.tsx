@@ -1,68 +1,73 @@
 import React, { useState } from "react";
-import { Modal, Input } from "antd";
-import companyDataService from "@/app/services/NewCompanyDataService";
+import { Modal, Input, Button } from "antd";
+import configuration from "../services/apiConfig";
+import { CompanyApi } from "@inquisico/ruleset-editor-api";
+import { useMutation } from "@tanstack/react-query";
 
 interface CreateCompanyModalProps {
-  identityId: string; // The ID of the user's identity
+  userID: string | undefined; // The ID of the user's identity
   open: boolean; // Whether the modal is open
   onClose: () => void; // Function to close the modal
-  onSuccess?: () => void; // Callback for when the company is successfully created
+  onSuccess: () => void; // Callback for when the company is successfully created
 }
 
 const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({
-  identityId,
+  userID,
   open,
   onClose,
   onSuccess,
 }) => {
-  const [formCompanyName, setFormCompanyName] = useState(""); // Track company name input
-  const [isSubmitting, setIsSubmitting] = useState(false); // Track loading state
+  const [formCompanyName, setFormCompanyName] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const companyApi = new CompanyApi(configuration());
 
-  const handleCreateCompany = async () => {
-    if (!formCompanyName.trim()) {
-      Modal.error({
-        title: "Error",
-        content: "Company name cannot be empty.",
+  const createCompanyMutation = useMutation({
+    mutationFn: () => {
+      if (!userID) {
+        throw new Error("userID is undefined");
+      }
+      return companyApi.createCompany(userID, {
+        companyName: formCompanyName,
       });
-      return;
-    }
+    },
 
-    setIsSubmitting(true);
-
-    try {
-      await companyDataService.createCompany(identityId, { companyName: formCompanyName });
-      Modal.success({
-        title: "Success",
-        content: "Company created successfully!",
-      });
-
-      // Trigger success callback
-      if (onSuccess) onSuccess();
-
-      // Close the modal
-      onClose();
-    } catch (error) {
+    onSuccess: (data, variables) => {
+      void onSuccess();
+      void onClose();
+    },
+    onError: (error) => {
       console.error("Error creating company:", error);
-      Modal.error({
-        title: "Error",
-        content: "Failed to create the company. Please try again.",
-      });
-    } finally {
+    },
+    onSettled: () => {
       setIsSubmitting(false);
-    }
+    },
+  });
+
+  const handleCreateCompany = () => {
+    void createCompanyMutation.mutateAsync();
   };
 
   return (
     <Modal
       title="Create Company"
-      open={open} // Use `open` instead of `visible`
-      onCancel={onClose}
-      onOk={handleCreateCompany}
-      okButtonProps={{ loading: isSubmitting }}
+      open={open}
+      closable={false}
+      maskClosable={false}
+      footer={[
+        <Button
+          key="submit"
+          type="primary"
+          loading={isSubmitting}
+          onClick={()=>handleCreateCompany()}
+        >
+          OK
+        </Button>,
+      ]}
     >
       <p>You do not have a company yet.</p>
       <Input
         placeholder="Enter Company Name"
+        required
         onChange={(e) => setFormCompanyName(e.target.value)}
       />
     </Modal>

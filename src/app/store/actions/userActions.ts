@@ -1,5 +1,5 @@
 import configuration from "@/app/services/apiConfig";
-import { ApiException, Identity, IdentityApi, User, UserApi } from "@inquisico/ruleset-editor-api";
+import { ApiException, CompanyApi, Identity, IdentityApi, User, UserApi } from "@inquisico/ruleset-editor-api";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 
@@ -9,10 +9,20 @@ export const fetchUserInit = createAsyncThunk<Identity, { isRedirect: boolean } 
     try {
       const identityApi = new IdentityApi(configuration(isRedirect));
       const identityRes = await identityApi.getIdentity();
+      let companyRes
+      try {
+        const companyApi = new CompanyApi(configuration(isRedirect));
+        companyRes = await companyApi.getCompanyByUserId(identityRes.id);
+      } catch {
+        
+      }
 
       const serializableIdentity = {
         ...identityRes,
-        // Remove or convert non-serializable fields
+        ...(companyRes && { company: companyRes ? {
+          ...companyRes,
+          createdDatetime: companyRes.createdDatetime?.toISOString(), // Convert Date to string
+        } : null, })
       };
       return serializableIdentity;
 
@@ -25,7 +35,10 @@ export const fetchUserInit = createAsyncThunk<Identity, { isRedirect: boolean } 
         try {
           const identityApi = new IdentityApi(configuration(isRedirect));
           const identityRes = await identityApi.getIdentity();
-          return identityRes;
+          const serializableIdentity = {
+            ...identityRes,
+          };
+          return serializableIdentity;
         } catch (e) {
           return thunkAPI.rejectWithValue(e);
         }

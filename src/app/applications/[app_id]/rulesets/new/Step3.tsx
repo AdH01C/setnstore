@@ -1,51 +1,44 @@
-"use client"
-
+import { useAppContext } from "@/app/components/AppContext";
 import RulesetDetail from "@/app/components/RulesetDetail";
-import RulesetDataService from "@/app/services/NewRulesetDataService";
-import { userDetailsAtom } from "@/jotai/User";
-import { Button, Modal } from "antd";
-import { useAtom } from "jotai";
+import configuration from "@/app/services/apiConfig";
+import { RulesetApi } from "@inquisico/ruleset-editor-api";
+import { useMutation } from "@tanstack/react-query";
+import { Button } from "antd";
 import { useRouter } from "next/navigation";
 
 interface Step3Props {
   ruleset: any;
   prev: () => void;
-  appID: string;
 }
 
-export default function Step3(
-  { ruleset, prev, appID }: Step3Props
-) {
+export default function Step3({ ruleset, prev }: Step3Props) {
   const router = useRouter();
-  const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
+  const { companyID, appID } = useAppContext();
+  const rulesetApi = new RulesetApi(configuration());
 
-  
-  const companyId = userDetails.companyId;
+  const createRulesetMutation = useMutation({
+    mutationFn: () => {
+      if (!companyID || !appID || !ruleset) {
+        throw new Error("companyID, appID, rulesetID or ruleset is undefined");
+      }
+      return rulesetApi.createRuleset(companyID, appID, {
+        rulesetJson: ruleset,
+      });
+    },
+    onSuccess: (data, variables) => {
+      void router.push(`/applications/${appID}/rulesets/${data.id}`);
+    },
+    onError: (error) => {
+      console.error("Error creating ruleset:", error);
+    },
+  });
 
-
-
-  const handleSubmit = async () => {
-    try {
-      // Update the existing ruleset
-      const newRuleset = await RulesetDataService.createRuleset(
-        companyId,
-        appID,
-        { rulesetJson: ruleset }
-      );
-
-      router.push(`/applications/${appID}/rulesets/${newRuleset.id}`);
-    } catch (error) {
-      Modal.error(
-        {
-          title: "Error",
-          content: String(error)
-        }
-      )
-    }
+  const handleSubmit = () => {
+    void createRulesetMutation.mutateAsync();
   };
+
   return (
     <>
-      
       <div className="flex justify-between mb-4 pr-4">
         <Button
           type="primary"

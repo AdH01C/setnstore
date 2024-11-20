@@ -1,31 +1,20 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import RulesetDataService from "@/app/services/NewRulesetDataService";
 import RulesetDetail from "@/app/components/RulesetDetail";
-import { RulesetWithRulesetJson } from "@inquisico/ruleset-editor-api";
+import { RulesetApi } from "@inquisico/ruleset-editor-api";
 import { Modal } from "antd";
-import { userDetailsAtom } from "@/jotai/User";
-import { useAtom } from "jotai";
+import { useAppContext } from "@/app/components/AppContext";
+import configuration from "@/app/services/apiConfig";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-interface RulesetDisplayProps {
-  rulesetID: string;
-  appID: string;
-}
-
-export default function RulesetDisplay(
-  { rulesetID, appID }: RulesetDisplayProps
-) {
+export default function RulesetDisplay() {
   const router = useRouter();
-  const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
+  const { companyID, appID, rulesetID } = useAppContext();
 
-  const companyId = userDetails.companyId;
+  const rulesetApi = new RulesetApi(configuration());
 
-
-  const [ruleset, setRuleset] = useState<RulesetWithRulesetJson>();
-
-  const handleRulesetDelete = async (rulesetID: string) => {
+  const handleRulesetDelete = async (companyID: string, rulesetID: string) => {
     Modal.confirm({
       title: "Delete Ruleset",
       content: "Are you sure you want to delete this ruleset?",
@@ -33,37 +22,39 @@ export default function RulesetDisplay(
       okType: "danger",
       cancelText: "No",
       async onOk() {
-        try {
-          await RulesetDataService.deleteRulesetByID(
-            companyId,
-            appID,
-            rulesetID
-          );
-          router.push(`/applications/${appID}`);
-        } catch (error) {
-          console.error("Error deleting application:", error);
-        }
+        handleDeleteRuleset();
       },
     });
   };
 
-  useEffect(() => {
-    const fetchRuleset = async () => {
-      if (!rulesetID) {
-        return;
+  const { data: ruleset } = useQuery({
+    queryKey: ["ruleset", companyID, appID, rulesetID],
+    queryFn: () => {
+      return companyID && rulesetID
+        ? rulesetApi.getRulesetById(companyID, appID, rulesetID)
+        : null;
+    },
+    enabled: !!companyID && !!appID && !!rulesetID,
+  });
+
+  const deleteRulesetMutation = useMutation({
+    mutationFn: () => {
+      if (!companyID || !appID || !rulesetID) {
+        throw new Error("companyID, appID, or rulesetID is undefined");
       }
+      return rulesetApi.deleteRulesetById(companyID, appID, rulesetID);
+    },
+    onSuccess: (data, variables) => {
+      void router.push(`/applications/${appID}`);
+    },
+    onError: (error) => {
+      console.error("Error deleting ruleset:", error);
+    },
+  });
 
-      const response = await RulesetDataService.getRulesetByID(
-        companyId,
-        appID,
-        rulesetID
-      );
-
-      setRuleset(response);
-    };
-
-    fetchRuleset();
-  }, [companyId, appID, rulesetID]);
+  const handleDeleteRuleset = () => {
+    void deleteRulesetMutation.mutateAsync();
+  };
 
   return (
     <>
@@ -73,11 +64,12 @@ export default function RulesetDisplay(
           isEditable
           isDeletable
           onEdit={() => {
-            setUserDetails((prev) => ({ ...prev, rulesetId: rulesetID }));
             router.push(`/applications/${appID}/rulesets/${rulesetID}/edit`);
           }}
           onDelete={() => {
-            handleRulesetDelete(ruleset.id);
+            if (companyID && rulesetID) {
+              handleRulesetDelete(companyID, rulesetID);
+            }
           }}
         />
       )}

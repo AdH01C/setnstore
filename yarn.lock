@@ -618,6 +618,18 @@
     "@swc/counter" "^0.1.3"
     tslib "^2.4.0"
 
+"@tanstack/query-core@5.60.6":
+  version "5.60.6"
+  resolved "https://registry.npmjs.org/@tanstack/query-core/-/query-core-5.60.6.tgz#0dd33fe231b0d18bf66d0c615b29899738300658"
+  integrity sha512-tI+k0KyCo1EBJ54vxK1kY24LWj673ujTydCZmzEZKAew4NqZzTaVQJEuaG1qKj2M03kUHN46rchLRd+TxVq/zQ==
+
+"@tanstack/react-query@^5.60.6":
+  version "5.60.6"
+  resolved "https://registry.npmjs.org/@tanstack/react-query/-/react-query-5.60.6.tgz#c53b2520297e67352d12ac0e3ec9f6c6e61c6e4a"
+  integrity sha512-FUzSDaiPkuZCmuGqrixfRRXJV9u+nrUh9lAlA5Q3ZFrOw1Js1VeBfxi1NIcJO3ZWJdKceBqKeBJdNcWStCYZnw==
+  dependencies:
+    "@tanstack/query-core" "5.60.6"
+
 "@types/cookie@^0.6.0":
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/@types/cookie/-/cookie-0.6.0.tgz#eac397f28bf1d6ae0ae081363eca2f425bedf0d5"
@@ -3696,7 +3708,7 @@ set-function-name@^2.0.1, set-function-name@^2.0.2:
     react-dom "^18"
     react-hook-form "^7.53.0"
     react-redux "^9.1.2"
-    setnstore "file:../../../../../../AppData/Local/Yarn/Cache/v6/npm-setnstore-0.1.0-4cb90551-2ea1-463a-83ec-56a48d598abe-1731295698516/node_modules/setnstore"
+    setnstore "file:../../../../../../AppData/Local/Yarn/Cache/v6/npm-setnstore-0.1.0-99fd4427-9bcb-4dcc-bd3c-654f61d2843d-1732038853584/node_modules/setnstore"
     thememirror "^2.0.1"
 
 shallowequal@^1.1.0:

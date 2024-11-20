@@ -1,14 +1,19 @@
-import { Identity } from "@inquisico/ruleset-editor-api";
+import { CompanyDetails, Identity } from "@inquisico/ruleset-editor-api";
 import { SerializedError, createSlice } from "@reduxjs/toolkit";
 
 import { fetchUserInit } from "../actions/userActions";
+
+export interface IdentityExtended extends Identity {
+  company?: CompanyDetails
+}
 
 export type UserState = {
   dataFetched: boolean;
   isFetching: boolean;
   isError: boolean;
   error?: SerializedError;
-  identity: Identity | null;
+  // identity: Identity | null;
+  identity: IdentityExtended | null;
 };
 
 const initialState: UserState = {

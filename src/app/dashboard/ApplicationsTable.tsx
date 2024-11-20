@@ -1,13 +1,8 @@
 import { TableColumnsType, Space, Table } from "antd";
-import { useState, useEffect } from "react";
-import RulesetDataService from "../services/NewRulesetDataService";
-import ApplicationDataService from "../services/NewAppDataService";
-import HostDataService from "../services/HostDataService";
 import { useRouter } from "next/navigation";
-import {
-  AppDetailsWithID,
-  RulesetWithRulesetJson,
-} from "@inquisico/ruleset-editor-api";
+import { AppDetailsWithID, RulesetApi } from "@inquisico/ruleset-editor-api";
+import configuration from "../services/apiConfig";
+import { useQueries } from "@tanstack/react-query";
 
 interface ApplicationsTableType extends AppDetailsWithID {
   key: string;
@@ -15,46 +10,38 @@ interface ApplicationsTableType extends AppDetailsWithID {
 }
 
 export default function ApplicationsTable({
-  companyId,
+  companyID,
   applications,
   handleDelete,
 }: {
-  companyId: string;
+  companyID: string;
   applications: AppDetailsWithID[];
-  handleDelete: (appID: string) => Promise<void>;
+  handleDelete: (appID: string) => void;
 }) {
-  const [isLoading, setIsLoading] = useState(true);
-  const [tableData, setTableData] = useState<ApplicationsTableType[]>([]);
   const router = useRouter();
+  const rulesetApi = new RulesetApi(configuration());
 
-  useEffect(() => {
-    // Fetch all applications by company name
-    const fetchApplications = async () => {
-      try {
-        const tableData = await Promise.all(
-          (applications || []).map(async (application) => {
-            const rulesets = await RulesetDataService.getRulesets(
-              companyId,
-              application.id
-            );
-            return {
-              ...application,
-              key: application.id,
-              rulesetCount: rulesets.length,
-            };
-          })
-        );
+  const fetchAppsWithRulesetCount = async (
+    companyID: string,
+    application: AppDetailsWithID
+  ): Promise<ApplicationsTableType> => {
+    const rulesetRes = await rulesetApi.getRulesets(companyID, application.id);
 
-        setTableData(tableData);
-      } catch (error) {
-        console.error("Error fetching applications:", error);
-      } finally {
-        setIsLoading(false);
-      }
+    return {
+      ...application,
+      key: application.id,
+      rulesetCount: rulesetRes.length,
     };
+  };
 
-    fetchApplications();
-  }, [companyId, applications]);
+  const applicationsWithRulesetCount = useQueries({
+    queries: applications
+      ?  applications.map((application: AppDetailsWithID) => ({
+        queryKey: ["rulesetsID", companyID, application.id],
+        queryFn: () => fetchAppsWithRulesetCount(companyID, application),
+        }))
+      : []
+  }).map((query) => query.data);
 
   const columns: TableColumnsType<ApplicationsTableType> = [
     { title: "Application ID", dataIndex: "id", key: "id" },
@@ -101,9 +88,11 @@ export default function ApplicationsTable({
   return (
     <Table<ApplicationsTableType>
       columns={columns}
-      dataSource={tableData.map((app) => ({
-        ...app,
-      }))}
+      dataSource={applicationsWithRulesetCount
+        .filter((application) => application !== undefined)
+        .map((application) => ({
+          ...(application as ApplicationsTableType),
+        }))}
       pagination={false}
     />
   );

@@ -6,8 +6,6 @@ import {
   createConfiguration,
   wrapHttpLibrary,
 } from "@inquisico/ruleset-editor-api";
-import NgrokMiddleware from "./middlewares/ngrok";
-import PreflightHeadersMiddleware from "./middlewares/preflightHeaders";
 const addTrailingSlash = (url: string) => url.replace(/\/?$/, "/");
 
 class IsomorphicFetchHttpLibrary implements PromiseHttpLibrary {

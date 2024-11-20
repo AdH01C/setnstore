@@ -1,19 +1,15 @@
 "use client";
 
-import { LockOutlined, UserOutlined, GoogleOutlined } from "@ant-design/icons";
+import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Form, Flex, Checkbox, Button, Input } from "antd";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Loading from "@/app/components/Loading";
 import { useAuth } from "./hooks/useAuth";
-import { userDetailsAtom } from "@/jotai/User";
-import { useAtom } from "jotai";
 
 export default function LoginForm() {
   const router = useRouter();
   const { isFetching, identity } = useAuth({ forceRefetch: false });
-  const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
 
   const onAuthlinkLogin = () => {
     if (!isFetching && identity ) {
@@ -23,16 +19,7 @@ export default function LoginForm() {
         return;
       }
 
-      setUserDetails({
-        id: identity.id,
-        firstName: identity.firstName,
-        lastName: identity.lastName,
-        email: "",
-        companyId: "",
-        companyName: "",
-      });
-
-      // router.push("/dashboard");
+      router.push("/dashboard");
     } else {
       router.push(process.env.NEXT_PUBLIC_AUTH_ENDPOINT + "/login");
     }
@@ -49,15 +36,6 @@ export default function LoginForm() {
         return;
       }
 
-      setUserDetails({
-        id: identity.id,
-        firstName: identity.firstName,
-        lastName: identity.lastName,
-        email: "",
-        companyId: "",
-        companyName: "",
-      });
-      console.log("User exists:", userDetails);
       router.push("/dashboard");
       return;
     }
@@ -69,7 +47,7 @@ export default function LoginForm() {
 
     // Cleanup the timer on component unmount
     return () => clearTimeout(timer);
-  }, [isFetching, identity]);
+  }, [isFetching, identity, router]);
 
   return (
     <>

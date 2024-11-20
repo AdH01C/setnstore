@@ -1,74 +1,60 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import RulesetForm from "../../../../../components/RulesetForm";
-import RulesetDataService from "@/app/services/NewRulesetDataService";
 import { Button } from "antd";
-import { RulesetWithRulesetJson } from "@inquisico/ruleset-editor-api";
-import { useAtom } from "jotai";
-import { userDetailsAtom } from "@/jotai/User";
-import router from "next/router";
+import {
+  RulesetApi,
+  RulesetWithRulesetJson,
+} from "@inquisico/ruleset-editor-api";
+import { useRouter } from "next/navigation";
+import { useAppContext } from "@/app/components/AppContext";
+import configuration from "@/app/services/apiConfig";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-interface RulesetEditorProps {
-  rulesetId: string;
-  appId: string;
-}
+export default function RulesetEditor() {
+  const router = useRouter();
+  const { appID, companyID, rulesetID } = useAppContext();
+  // const [ruleset, setRuleset] = useState<RulesetWithRulesetJson>();
+  const rulesetApi = new RulesetApi(configuration());
+  const queryClient = useQueryClient();
 
-
-export default function RulesetEditor(
-  { rulesetId, appId }: RulesetEditorProps
-) {
-
-  const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
-
-  const [ruleset, setRuleset] = useState<RulesetWithRulesetJson>();
-
-  const handleFormChange = (data: any) => {
-    setRuleset(
-      (prevRuleset) =>
-        ({
-          ...prevRuleset,
-          rulesetJson: data,
-        } as RulesetWithRulesetJson)
+  const handleFormChange = (newRuleset: any) => {
+    queryClient.setQueryData(
+      ["ruleset", companyID, appID, rulesetID],
+      (oldRuleset: RulesetWithRulesetJson) => {
+        return {
+          ...oldRuleset,
+          rulesetJson: newRuleset,
+        };
+      }
     );
   };
 
-  useEffect(() => {
-    const fetchRuleset = async () => {
-      
-      if (!rulesetId) {
-        return;
+  const { data: ruleset } = useQuery({
+    queryKey: ["ruleset", companyID, appID, rulesetID],
+    queryFn: () => {
+      return companyID && rulesetID
+        ? rulesetApi.getRulesetById(companyID, appID, rulesetID)
+        : null;
+    },
+    enabled: !!companyID && !!appID && !!rulesetID,
+  });
+
+  const editRulesetMutation = useMutation({
+    mutationFn: () => {
+      if (!companyID || !appID || !rulesetID || !ruleset) {
+        throw new Error("companyID, appID, rulesetID or ruleset is undefined");
       }
+      return rulesetApi.updateRuleset(companyID, appID, rulesetID, ruleset);
+    },
+    onSuccess: (data, variables) => {
+      void router.push(`/applications/${appID}/rulesets/${rulesetID}`);
+    },
+    onError: (error) => {
+      console.error("Error editing ruleset:", error);
+    },
+  });
 
-      console.warn("Fetching ruleset with ID", rulesetId, "for company", userDetails.companyId);
-      const response = await RulesetDataService.getRulesetByID(
-        userDetails.companyId,
-        appId,
-        rulesetId
-      );
-
-      console.log("Ruleset fetched:", response);
-
-      setRuleset(response);
-    };
-
-    fetchRuleset();
-  }, []);
-
-  const handleSubmit = async () => {
-    if (ruleset?.rulesetJson) {
-      try {
-        await RulesetDataService.updateRuleset(
-          userDetails.companyId,
-          appId,
-          ruleset.id,
-          ruleset
-        );
-        router.push(`/applications/${appId}/rulesets/${ruleset.id}`);
-      } catch (error) {
-        console.error("Error submitting ruleset:", error);
-      }
-    }
+  const handleSubmit = () => {
+    void editRulesetMutation.mutateAsync();
   };
 
   const saveOperation = [
