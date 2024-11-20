@@ -75,27 +75,27 @@ export const AuthPermissionTable = ({
   function handleAuthRuleChange(permission: string, selectedRelation: string) {
     const newPermissions = {
       ...permissionData,
-      [permission]: permissionData[permission],
     };
 
-    (newPermissions[permission] as AuthorizationRule) = JSON.parse(
+    const updatedAuthorizationRule = JSON.parse(
       selectedRelation
     ) as AuthorizationRule;
-
-    updateValue(newPermissions);
+    newPermissions[permission] = updatedAuthorizationRule;
   }
-
   function handleAuthOperationsChange(
     permission: string,
     selectedRelations: string[]
   ) {
     const newPermissions = {
       ...permissionData,
-      [permission]: permissionData[permission],
     };
 
-    (newPermissions[permission] as AuthorizationOperations).operations =
-      selectedRelations.map((relation) => JSON.parse(relation));
+    const updatedPermission = {
+      ...(newPermissions[permission] || {}),
+      operations: selectedRelations.map((relation) => JSON.parse(relation)),
+    };
+
+    newPermissions[permission] = updatedPermission;
     updateValue(newPermissions);
   }
 

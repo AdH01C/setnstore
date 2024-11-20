@@ -37,8 +37,6 @@ export const Path: React.FC<PathProps> = ({
   const isEntityPath = path === "#";
 
   function handleAddChildPath() {
-    const newValue = { ...pathData };
-
     const newChildrenPath = `untitled-${Date.now()}`;
     const newChildren = {
       [newChildrenPath]: {
@@ -46,13 +44,16 @@ export const Path: React.FC<PathProps> = ({
       },
     };
 
-    if (newValue[path]?.children) {
-      newValue[path].children = { ...newValue[path].children, ...newChildren };
-    } else {
-      newValue[path].children = newChildren;
-    }
+    const updatedChildren = pathData[path].children
+      ? { ...pathData[path].children, ...newChildren }
+      : newChildren;
 
-    updateValue(newValue);
+    const updatedPath = { ...pathData[path], children: updatedChildren };
+
+    updateValue({
+      ...pathData,
+      [path]: updatedPath,
+    });
   }
 
   function handleDeletePath() {

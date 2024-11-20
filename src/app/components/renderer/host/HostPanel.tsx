@@ -98,6 +98,7 @@ const generatePathData = (
 
       updateValue(newValue);
     };
+
     const handleAddSiblingPath = (newPathProperties: PathValue) => {
       updateValue({
         ...value,

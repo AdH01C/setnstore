@@ -55,7 +55,9 @@ export const HostPermissionTable = ({
       onOk() {
         const newValue = { ...pathProperties };
         if (newValue && newValue.permission) {
-          delete newValue.permission[method];
+          const updatedPermission = { ...newValue.permission };
+          delete updatedPermission[method];
+          newValue.permission = updatedPermission;
           updateValue({ [path]: newValue });
         }
       },
@@ -85,18 +87,17 @@ export const HostPermissionTable = ({
   function handlePermissionChange(method: string, selectedPermission: string) {
     const newValue = { ...pathProperties };
 
-    if (newValue.permission && selectedPermission === "authentication_only") {
+    newValue.permission = newValue.permission ? { ...newValue.permission } : {};
+
+    if (selectedPermission === "authentication_only") {
       newValue.permission[method] = {};
     }
 
-    if (newValue.permission && selectedPermission === "public_access") {
+    if (selectedPermission === "public_access") {
       newValue.permission[method] = null;
     }
 
-    if (
-      newValue.permission &&
-      selectedPermission === "authentication_and_authorization"
-    ) {
+    if (selectedPermission === "authentication_and_authorization") {
       newValue.permission[method] = { entity: "", type: "" };
     }
     updateValue({ [path]: newValue });
@@ -111,8 +112,15 @@ export const HostPermissionTable = ({
       const requirement = newValue.permission[method] as Requirement;
 
       if (requirement !== null && "entity" in requirement) {
-        requirement.entity = entity;
-        requirement.type = "";
+        const updatedRequirement = { ...requirement, entity: entity, type: "" };
+
+        const updatedPermission = {
+          ...newValue.permission,
+          [method]: updatedRequirement,
+        };
+
+        newValue.permission = updatedPermission;
+
         updateValue({ [path]: newValue });
       }
     }
@@ -127,7 +135,15 @@ export const HostPermissionTable = ({
       const requirement = newValue.permission[method] as Requirement;
 
       if (requirement !== null && "type" in requirement) {
-        requirement.type = type;
+        const updatedRequirement = { ...requirement, type: type };
+
+        const updatedPermission = {
+          ...newValue.permission,
+          [method]: updatedRequirement,
+        };
+
+        newValue.permission = updatedPermission;
+
         updateValue({ [path]: newValue });
       }
     }
@@ -135,9 +151,7 @@ export const HostPermissionTable = ({
 
   function handleAddPermission() {
     const newValue = { ...pathProperties };
-    if (!newValue.permission) {
-      newValue.permission = {};
-    }
+    newValue.permission = newValue.permission ? { ...newValue.permission } : {};
     const method = getAvailableMethod(Object.keys(newValue.permission));
     if (method) {
       newValue.permission[method] = null;
