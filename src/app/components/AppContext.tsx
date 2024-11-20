@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
 import { useParams } from "next/navigation";
 import { useAuth } from "../hooks/useAuth";
 import CreateCompanyModal from "../dashboard/CreateCompanyModal";

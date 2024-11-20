@@ -3,7 +3,6 @@ import { withJsonFormsControlProps } from "@jsonforms/react";
 import { AuthPanel } from "./AuthorizationPanel";
 import { PermissionRow, RelationRow } from "../util";
 import { useEffect } from "react";
-import { evalManifestWithRetries } from "next/dist/server/load-components";
 
 interface AuthorizationControlProps {
   data: AuthorizationValue;
