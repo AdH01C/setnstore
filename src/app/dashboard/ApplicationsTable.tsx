@@ -1,7 +1,7 @@
 import { AppDetailsWithID, RulesetApi } from "@inquisico/ruleset-editor-api";
 import { useQueries } from "@tanstack/react-query";
-import { Space, Table, TableColumnsType } from "antd";
-import { useRouter } from "next/navigation";
+import { Button, Space, Table, TableColumnsType } from "antd";
+import Link from "next/link";
 
 import configuration from "../constants/apiConfig";
 
@@ -17,7 +17,6 @@ interface ApplicationsTableProps {
 }
 
 function ApplicationsTable({ companyID, applications, handleDelete }: ApplicationsTableProps) {
-  const router = useRouter();
   const rulesetApi = new RulesetApi(configuration());
 
   const fetchAppsWithRulesetCount = async (
@@ -65,20 +64,21 @@ function ApplicationsTable({ companyID, applications, handleDelete }: Applicatio
       key: "operation",
       render: (_, record) => (
         <Space size="middle">
-          <a
-            onClick={() => {
-              router.push(`/applications/${record.id}`);
-            }}
-          >
-            View
-          </a>
-          <a
+          <Link href={`/applications/${record.id}`}>
+            <Button color="primary" variant="link" type="text">
+              View
+            </Button>
+          </Link>
+          <Button
+            danger
+            variant="link"
+            type="text"
             onClick={() => {
               handleDelete(record.id);
             }}
           >
             Delete
-          </a>
+          </Button>
         </Space>
       ),
     },
@@ -90,7 +90,7 @@ function ApplicationsTable({ companyID, applications, handleDelete }: Applicatio
       dataSource={applicationsWithRulesetCount
         .filter(application => application !== undefined)
         .map(application => ({
-          ...application,
+          ...(application as ApplicationsTableType),
         }))}
       pagination={false}
     />

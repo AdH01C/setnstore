@@ -7,7 +7,9 @@ import { CreateCompanyModal } from "../dashboard/CreateCompanyModal";
 import { useAuth } from "../hooks/useAuth";
 
 interface AppContextType {
+  name?: string;
   companyID?: string;
+  companyName?: string;
   appID: string;
   rulesetID?: string;
 }
@@ -45,7 +47,9 @@ const AppProvider = ({ forceSignin, children }: AppProviderProps) => {
   // Values provided by the context
   const value = {
     // identity: identity,
+    name: identity?.firstName + " " + identity?.lastName,
     companyID: identity?.company?.id,
+    companyName: identity?.company?.companyName,
     appID: app_id,
     rulesetID: ruleset_id,
   };

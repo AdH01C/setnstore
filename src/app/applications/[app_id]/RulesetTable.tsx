@@ -1,7 +1,7 @@
 import { Host, HostApi, RulesetApi, RulesetWithRulesetJson } from "@inquisico/ruleset-editor-api";
 import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
-import { Space, Table, TableColumnsType } from "antd";
-import { useRouter } from "next/navigation";
+import { Button, Space, Table, TableColumnsType } from "antd";
+import Link from "next/link";
 
 import configuration from "@/app/constants/apiConfig";
 
@@ -16,7 +16,6 @@ interface RulesetTableProps {
 }
 
 export function RulesetTable({ companyID, appID }: RulesetTableProps) {
-  const router = useRouter();
   const hostApi = new HostApi(configuration());
   const rulesetApi = new RulesetApi(configuration());
 
@@ -101,30 +100,30 @@ export function RulesetTable({ companyID, appID }: RulesetTableProps) {
     {
       title: "Action",
       key: "operation",
-      render: (text, row) => {
+      render: row => {
         return (
           <Space size="middle">
-            <a
-              onClick={() => {
-                router.push(`/applications/${appID}/rulesets/${row.id}`);
-              }}
-            >
-              View
-            </a>
-            <a
-              onClick={() => {
-                router.push(`/applications/${appID}/rulesets/${row.id}/edit`);
-              }}
-            >
-              Edit
-            </a>
-            <a
+            <Link href={`/applications/${appID}/rulesets/${row.id}`}>
+              <Button color="primary" variant="link" type="text">
+                View
+              </Button>
+            </Link>
+
+            <Link href={`/applications/${appID}/rulesets/${row.id}/edit`}>
+              <Button color="primary" variant="link" type="text">
+                Edit
+              </Button>
+            </Link>
+            <Button
+              danger
+              variant="link"
+              type="text"
               onClick={() => {
                 handleRulesetDelete(row.id);
               }}
             >
               Delete
-            </a>
+            </Button>
           </Space>
         );
       },
