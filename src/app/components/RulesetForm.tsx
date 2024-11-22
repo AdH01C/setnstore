@@ -60,7 +60,7 @@ function RulesetForm({ formData, onFormChange, operations }: RulesetFormProps) {
       const parsedData = JSON.parse(value);
       onFormChange(parsedData);
     } catch (error) {
-      // console.error("Invalid JSON:", error);
+      return;
     }
   };
 

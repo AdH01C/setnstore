@@ -97,8 +97,6 @@ export const AuthPermissionTable = ({
         [permission]: newAuthorizationObject,
       };
       updateValue(newPermissions);
-    } else {
-      // console.warn(`Invalid selected type: ${selectedType}`);
     }
   }
 

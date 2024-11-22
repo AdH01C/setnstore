@@ -1,9 +1,12 @@
 import { CompanyApi } from "@inquisico/ruleset-editor-api";
 import { useMutation } from "@tanstack/react-query";
-import { Button, Input, Modal } from "antd";
+import { Input, Modal } from "antd";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import configuration from "../constants/apiConfig";
+import { addTrailingSlash } from "../utils/common";
+import { Loading } from "../components/Loading";
 
 interface CreateCompanyModalProps {
   userID: string | undefined; // The ID of the user's identity
@@ -13,8 +16,8 @@ interface CreateCompanyModalProps {
 }
 
 function CreateCompanyModal({ userID, open, onClose, onSuccess }: CreateCompanyModalProps) {
+  const router = useRouter();
   const [formCompanyName, setFormCompanyName] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const companyApi = new CompanyApi(configuration());
 
   const createCompanyMutation = useMutation({
@@ -26,16 +29,9 @@ function CreateCompanyModal({ userID, open, onClose, onSuccess }: CreateCompanyM
         companyName: formCompanyName,
       });
     },
-
     onSuccess: () => {
       void onSuccess();
       void onClose();
-    },
-    // onError: error => {
-    //   console.error("Error creating company:", error);
-    // },
-    onSettled: () => {
-      setIsSubmitting(false);
     },
   });
 
@@ -49,14 +45,19 @@ function CreateCompanyModal({ userID, open, onClose, onSuccess }: CreateCompanyM
       open={open}
       closable={false}
       maskClosable={false}
-      footer={[
-        <Button key="submit" type="primary" loading={isSubmitting} onClick={() => handleCreateCompany()}>
-          OK
-        </Button>,
-      ]}
+      onOk={handleCreateCompany}
+      onCancel={() => router.push(addTrailingSlash(process.env.NEXT_PUBLIC_AUTH_ENDPOINT ?? "") + "logout_unified")}
     >
-      <p>You do not have a company yet.</p>
-      <Input placeholder="Enter Company Name" required onChange={e => setFormCompanyName(e.target.value)} />
+      {createCompanyMutation.isPending ? (
+        <div className="flex flex-grow flex-col items-center justify-center gap-y-5">
+          <Loading />
+        </div>
+      ) : (
+        <>
+          <p>You do not have a company yet.</p>
+          <Input placeholder="Enter Company Name" required onChange={e => setFormCompanyName(e.target.value)} />
+        </>
+      )}
     </Modal>
   );
 }

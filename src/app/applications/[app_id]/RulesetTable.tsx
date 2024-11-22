@@ -1,9 +1,12 @@
 import { Host, HostApi, RulesetApi, RulesetWithRulesetJson } from "@inquisico/ruleset-editor-api";
 import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
-import { Button, Space, Table, TableColumnsType } from "antd";
+import { Button, Modal, Space, Table, TableColumnsType, notification } from "antd";
 import Link from "next/link";
 
 import configuration from "@/app/constants/apiConfig";
+import { ErrorMessages, InfoMessages } from "@/app/constants/messages/messages";
+import { Loading } from "@/app/components/Loading";
+import { errorResponseHandler } from "@/app/utils/responseHandler";
 
 interface RulesetTableType extends RulesetWithRulesetJson {
   key: string;
@@ -19,7 +22,11 @@ export function RulesetTable({ companyID, appID }: RulesetTableProps) {
   const hostApi = new HostApi(configuration());
   const rulesetApi = new RulesetApi(configuration());
 
-  const { data: rulesetsID, refetch: refetchRulesetsID } = useQuery({
+  const {
+    data: rulesetsID,
+    isLoading: rulesetsIsLoading,
+    refetch: refetchRulesetsID,
+  } = useQuery({
     queryKey: ["rulesetsID", companyID, appID],
     queryFn: () => {
       return rulesetApi.getRulesets(companyID, appID);
@@ -51,36 +58,57 @@ export function RulesetTable({ companyID, appID }: RulesetTableProps) {
           queryFn: () => fetchRulesetAndHost(companyID, appID, rulesetID),
         }))
       : [],
-  })
-    .map(query => {
-      const data = query.data;
-
-      if (!data || !data.ruleset || !data.host) {
-        return;
-      }
+    combine: results => {
       return {
-        key: data.ruleset.id,
-        id: data.ruleset.id,
-        host: data.host.host,
-        lastModifiedDatetime: data.ruleset.lastModifiedDatetime,
-        appId: data.ruleset.appId,
-        rulesetJson: data.ruleset.rulesetJson,
+        data: results
+          .map(query => {
+            const data = query.data;
+            if (!data || !data.ruleset || !data.host) {
+              return;
+            }
+            return {
+              key: data.ruleset.id,
+              id: data.ruleset.id,
+              host: data.host.host,
+              lastModifiedDatetime: data.ruleset.lastModifiedDatetime,
+              appId: data.ruleset.appId,
+              rulesetJson: data.ruleset.rulesetJson,
+            };
+          })
+          .filter((ruleset): ruleset is RulesetTableType => ruleset !== undefined),
+        isRulesetWithHostLoading: results.some(result => result.isLoading),
       };
-    })
-    .filter((ruleset): ruleset is RulesetTableType => ruleset !== undefined);
+    },
+  });
 
   const deleteRulesetMutation = useMutation({
     mutationFn: (rulesetID: string) => rulesetApi.deleteRulesetById(companyID, appID, rulesetID),
     onSuccess: () => {
+      notification.success({
+        message: "Ruleset deleted",
+        description: InfoMessages.DELETE_RULESET_SUCCESS,
+        placement: "bottomRight",
+      });
       void refetchRulesetsID();
     },
-    // onError: error => {
-    //   console.error("Error deleting ruleset:", error);
-    // },
+    onError: error => {
+      errorResponseHandler(error, {
+        detail: ErrorMessages.DELETE_RULESET_ERROR,
+      });
+    },
   });
 
   const handleRulesetDelete = (rulesetID: string) => {
-    void deleteRulesetMutation.mutateAsync(rulesetID);
+    Modal.confirm({
+      title: "Delete Ruleset",
+      content: "Are you sure you want to delete this ruleset?",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      async onOk() {
+        void deleteRulesetMutation.mutate(rulesetID);
+      },
+    });
   };
 
   const columns: TableColumnsType<RulesetTableType> = [
@@ -131,14 +159,22 @@ export function RulesetTable({ companyID, appID }: RulesetTableProps) {
   ];
 
   return (
-    <Table<RulesetTableType>
-      columns={columns}
-      dataSource={rulesetWithHost
-        .filter(ruleset => ruleset !== undefined)
-        .map(ruleset => ({
-          ...ruleset,
-        }))}
-      pagination={false}
-    />
+    <>
+      {rulesetsIsLoading || rulesetWithHost.isRulesetWithHostLoading ? (
+        <div className="flex flex-grow flex-col items-center justify-center gap-y-5">
+          <Loading />
+        </div>
+      ) : (
+        <Table<RulesetTableType>
+          columns={columns}
+          dataSource={rulesetWithHost.data
+            .filter(ruleset => ruleset !== undefined)
+            .map(ruleset => ({
+              ...ruleset,
+            }))}
+          pagination={false}
+        />
+      )}
+    </>
   );
 }

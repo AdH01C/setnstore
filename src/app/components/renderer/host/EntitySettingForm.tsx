@@ -150,6 +150,7 @@ export const EntitySettingsForm = ({
                     value: entity,
                   };
                 })}
+                disabled={readonly}
               />
             )}
           </Form.Item>

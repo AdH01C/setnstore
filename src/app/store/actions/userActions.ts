@@ -7,41 +7,47 @@ export const fetchUserInit = createAsyncThunk<Identity, { isRedirect: boolean } 
   "user/fetchUserInit",
   async ({ isRedirect } = { isRedirect: false }, thunkAPI) => {
     try {
+      // Step 1: Fetch identity data
       const identityApi = new IdentityApi(configuration(isRedirect));
       const identityRes = await identityApi.getIdentity();
-      let companyRes;
-      try {
-        const companyApi = new CompanyApi(configuration(isRedirect));
-        companyRes = await companyApi.getCompanyByUserId(identityRes.id);
-      } catch {
-        // do something?
+
+      // Step 2: Fetch company data if identity exists
+      let companyRes = null;
+      if (identityRes) {
+        try {
+          const companyApi = new CompanyApi(configuration(isRedirect));
+          companyRes = await companyApi.getCompanyByUserId(identityRes.id);
+        } catch (e) {
+          // If company fetch fails, we can return only the identity.
+          if (e instanceof ApiException && e.code === 404) {
+            return { ...identityRes };
+          }
+          return thunkAPI.rejectWithValue(e);
+        }
       }
 
-      const serializableIdentity = {
+      // Step 3: Return identity with company data (if available)
+      return {
         ...identityRes,
         ...(companyRes && {
-          company: companyRes
-            ? {
-                ...companyRes,
-                createdDatetime: companyRes.createdDatetime?.toISOString(), // Convert Date to string
-              }
-            : null,
+          company: {
+            ...companyRes,
+            createdDatetime: companyRes.createdDatetime?.toISOString(), // Convert Date to string
+          },
         }),
       };
-      return serializableIdentity;
     } catch (e) {
-      //check if 404 -> create user
+      // Step 4: Handle identity fetch failure
       if (e instanceof ApiException && e.code === 404) {
+        // Create a new user if identity doesn't exist
         const userApi = new UserApi(configuration(isRedirect));
         await userApi.createUser(new User());
-        //retry
+
+        // Retry fetching the newly created identity
         try {
           const identityApi = new IdentityApi(configuration(isRedirect));
           const identityRes = await identityApi.getIdentity();
-          const serializableIdentity = {
-            ...identityRes,
-          };
-          return serializableIdentity;
+          return { ...identityRes }; // Return the new identity
         } catch (e) {
           return thunkAPI.rejectWithValue(e);
         }

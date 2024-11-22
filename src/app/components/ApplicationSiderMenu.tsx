@@ -63,21 +63,26 @@ function ApplicationSiderMenu() {
             queryFn: () => fetchRulesetAndHost(companyID, appID, rulesetID),
           }))
         : [],
-  })
-    .map(query => {
-      const data = query.data;
-      if (!data) {
-        return;
-      }
-      return getItem(
-        data.host.host,
-        data.ruleset.id,
-        <PieChartOutlined />,
-        undefined,
-        `/applications/${appID}/rulesets/${data.ruleset.id}`,
-      );
-    })
-    .filter((item): item is MenuItem => item !== undefined);
+    combine: results => {
+      return {
+        data: results
+          .map(query => {
+            const data = query.data;
+            if (!data) {
+              return;
+            }
+            return getItem(
+              data.host.host,
+              data.ruleset.id,
+              <PieChartOutlined />,
+              undefined,
+              `/applications/${appID}/rulesets/${data.ruleset.id}`,
+            );
+          })
+          .filter((item): item is MenuItem => item !== undefined),
+      };
+    },
+  });
 
   const createMenuItem = (app: AppDetailsWithID) => {
     if (app.id !== appID) {
@@ -86,7 +91,7 @@ function ApplicationSiderMenu() {
     }
 
     if (rulesetsID && rulesetsID.length > 0) {
-      return getItem(app.appName, appID, <PieChartOutlined />, rulesetWithHostItem);
+      return getItem(app.appName, appID, <PieChartOutlined />, rulesetWithHostItem.data);
     }
 
     // Default case: No ruleset, add "Add a Ruleset" menu item
@@ -95,17 +100,19 @@ function ApplicationSiderMenu() {
     ]);
   };
 
+  const items = applications?.map(createMenuItem);
+
   return (
     <Sider width={220}>
-      {applications && (
+      {
         <Menu
           mode="inline"
           defaultSelectedKeys={[appID, rulesetID ?? ""]}
           defaultOpenKeys={[appID]}
           style={{ height: "100%", borderRight: 0 }}
-          items={applications.map(createMenuItem)}
+          items={items}
         />
-      )}
+      }
     </Sider>
   );
 }

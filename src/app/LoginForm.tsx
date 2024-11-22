@@ -2,7 +2,7 @@
 
 import { Button, Form } from "antd";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { Loading } from "./components/Loading";
 import { useAuth } from "./hooks/useAuth";
@@ -11,45 +11,36 @@ function LoginForm() {
   const router = useRouter();
   const { isFetching, identity } = useAuth({ forceRefetch: false });
 
-  const onAuthlinkLogin = () => {
-    if (!isFetching && identity) {
-      if (!identity) {
-        // console.error("User not found or error fetching user data");
-        return;
-      }
+  const redirectToDashboard = () => {
+    router.push("/dashboard");
+  };
 
-      router.push("/dashboard");
+  const redirectToLogin = () => {
+    const authEndpoint = process.env.NEXT_PUBLIC_AUTH_ENDPOINT;
+    if (authEndpoint) {
+      router.push(`${authEndpoint}/login`);
     } else {
-      router.push(process.env.NEXT_PUBLIC_AUTH_ENDPOINT + "/login");
+      throw new Error("Auth endpoint is not defined");
     }
   };
 
-  const [isLoading, setIsLoading] = useState(true);
+  const onAuthlinkLogin = () => {
+    if (!isFetching && identity) {
+      redirectToDashboard();
+    } else {
+      redirectToLogin();
+    }
+  };
 
   useEffect(() => {
     if (!isFetching && identity) {
-      if (!identity) {
-        // console.error("User not found or error fetching user data");
-        setIsLoading(false);
-        return;
-      }
-
-      router.push("/dashboard");
-      return;
+      redirectToDashboard();
     }
-
-    // Allow time for render
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 150);
-
-    // Cleanup the timer on component unmount
-    return () => clearTimeout(timer);
   }, [isFetching, identity, router]);
 
   return (
     <>
-      {isLoading ? (
+      {isFetching ? (
         <Loading />
       ) : (
         <>

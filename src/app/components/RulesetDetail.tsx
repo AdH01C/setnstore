@@ -47,7 +47,12 @@ function RulesetDetail({ ruleset, isEditable = false, isDeletable = false, onEdi
     children: (
       <CodeMirror
         value={JSON.stringify(ruleset, null, 2)}
-        extensions={[javascript(), keymap.of(defaultKeymap), EditorView.lineWrapping]}
+        extensions={[
+          javascript(),
+          keymap.of(defaultKeymap),
+          EditorView.lineWrapping,
+          EditorView.contentAttributes.of({ tabindex: "0" }),
+        ]}
         theme={barf}
         height="85vh"
         editable={false}

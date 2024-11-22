@@ -4,6 +4,7 @@ import { Button, Space, Table, TableColumnsType } from "antd";
 import Link from "next/link";
 
 import configuration from "../constants/apiConfig";
+import { Loading } from "../components/Loading";
 
 interface ApplicationsTableType extends AppDetailsWithID {
   key: string;
@@ -39,7 +40,13 @@ function ApplicationsTable({ companyID, applications, handleDelete }: Applicatio
           queryFn: () => fetchAppsWithRulesetCount(companyID, application),
         }))
       : [],
-  }).map(query => query.data);
+    combine: results => {
+      return {
+        data: results.map(query => query.data),
+        isLoading: results.some(result => result.isLoading),
+      };
+    },
+  });
 
   const columns: TableColumnsType<ApplicationsTableType> = [
     // { title: "Application ID", dataIndex: "id", key: "id" },
@@ -85,15 +92,23 @@ function ApplicationsTable({ companyID, applications, handleDelete }: Applicatio
   ];
 
   return (
-    <Table<ApplicationsTableType>
-      columns={columns}
-      dataSource={applicationsWithRulesetCount
-        .filter(application => application !== undefined)
-        .map(application => ({
-          ...(application as ApplicationsTableType),
-        }))}
-      pagination={false}
-    />
+    <>
+      {applicationsWithRulesetCount.isLoading ? (
+        <div className="flex flex-grow flex-col items-center justify-center gap-y-5">
+          <Loading />
+        </div>
+      ) : (
+        <Table<ApplicationsTableType>
+          columns={columns}
+          dataSource={applicationsWithRulesetCount.data
+            .filter(application => application !== undefined)
+            .map(application => ({
+              ...(application as ApplicationsTableType),
+            }))}
+          pagination={false}
+        />
+      )}
+    </>
   );
 }
 

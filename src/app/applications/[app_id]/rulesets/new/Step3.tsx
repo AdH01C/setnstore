@@ -1,11 +1,14 @@
 import { RulesetApi } from "@inquisico/ruleset-editor-api";
 import { useMutation } from "@tanstack/react-query";
-import { Button } from "antd";
+import { Button, notification } from "antd";
 import { useRouter } from "next/navigation";
 
 import { useAppContext } from "@/app/components/AppContext";
+import { Loading } from "@/app/components/Loading";
 import { RulesetDetail } from "@/app/components/RulesetDetail";
 import configuration from "@/app/constants/apiConfig";
+import { ErrorMessages, InfoMessages } from "@/app/constants/messages/messages";
+import { errorResponseHandler } from "@/app/utils/responseHandler";
 
 interface Step3Props {
   ruleset: any;
@@ -18,24 +21,38 @@ export function Step3({ ruleset, prev }: Step3Props) {
   const rulesetApi = new RulesetApi(configuration());
 
   const createRulesetMutation = useMutation({
-    mutationFn: () => {
-      if (!companyID || !appID || !ruleset) {
-        throw new Error("companyID, appID, rulesetID or ruleset is undefined");
-      }
+    mutationFn: ({ companyID, appID, ruleset }: { companyID: string; appID: string; ruleset: any }) => {
       return rulesetApi.createRuleset(companyID, appID, {
         rulesetJson: ruleset,
       });
     },
     onSuccess: data => {
+      notification.success({
+        message: "Ruleset created",
+        description: InfoMessages.CREATE_RULESET_SUCCESS,
+        placement: "bottomRight",
+      });
       void router.push(`/applications/${appID}/rulesets/${data.id}`);
     },
-    // onError: error => {
-    //   console.error("Error creating ruleset:", error);
-    // },
+    onError: error => {
+      errorResponseHandler(error, {
+        detail: ErrorMessages.CREATE_RULESET_ERROR,
+      });
+    },
   });
 
-  const handleSubmit = () => {
-    void createRulesetMutation.mutateAsync();
+  const handleSubmit = async () => {
+    try {
+      if (companyID && appID && ruleset) {
+        void (await createRulesetMutation.mutateAsync({
+          companyID,
+          appID,
+          ruleset,
+        }));
+      }
+    } catch (e) {
+      return;
+    }
   };
 
   return (
@@ -58,7 +75,13 @@ export function Step3({ ruleset, prev }: Step3Props) {
           Submit
         </Button>
       </div>
-      <RulesetDetail ruleset={ruleset} />
+      {createRulesetMutation.isPending ? (
+        <div className="flex flex-grow flex-col items-center justify-center gap-y-5">
+          <Loading />
+        </div>
+      ) : (
+        <RulesetDetail ruleset={ruleset} />
+      )}
     </>
   );
 }

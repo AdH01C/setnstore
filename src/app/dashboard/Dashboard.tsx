@@ -2,13 +2,15 @@
 
 import { App, ApplicationApi } from "@inquisico/ruleset-editor-api";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Button, Input, Modal } from "antd";
+import { Button, Input, Modal, notification } from "antd";
 import { useState } from "react";
 
 import { ApplicationsTable } from "./ApplicationsTable";
 import { useAppContext } from "../components/AppContext";
 import { Loading } from "../components/Loading";
 import configuration from "../constants/apiConfig";
+import { ErrorMessages, InfoMessages } from "../constants/messages/messages";
+import { errorResponseHandler } from "../utils/responseHandler";
 
 function Dashboard() {
   const { companyID } = useAppContext();
@@ -43,14 +45,21 @@ function Dashboard() {
       } as App);
     },
     onSuccess: () => {
+      notification.success({
+        message: "Application created",
+        description: InfoMessages.CREATE_APPLICATION_SUCCESS,
+        placement: "bottomRight",
+      });
       void refetchApplications();
       setConfirmLoading(false);
       setIsModalOpen(false);
       setAppName("");
     },
-    // onError: error => {
-    //   console.error("Error deleting ruleset:", error);
-    // },
+    onError: error => {
+      errorResponseHandler(error, {
+        detail: ErrorMessages.CREATE_APPLICATION_ERROR,
+      });
+    },
   });
 
   const handleApplicationCreate = () => {
@@ -70,11 +79,18 @@ function Dashboard() {
       return applicationApi.deleteApplication(companyID, appID);
     },
     onSuccess: () => {
+      notification.success({
+        message: "Application deleted",
+        description: InfoMessages.DELETE_APPLICATION_SUCCESS,
+        placement: "bottomRight",
+      });
       void refetchApplications();
     },
-    // onError: error => {
-    //   console.error("Error deleting ruleset:", error);
-    // },
+    onError: error => {
+      errorResponseHandler(error, {
+        detail: ErrorMessages.DELETE_APPLICATION_ERROR,
+      });
+    },
   });
 
   const handleApplicationDelete = (appID: string) => {
@@ -85,16 +101,19 @@ function Dashboard() {
       okType: "danger",
       cancelText: "No",
       async onOk() {
-        void deleteApplicationMutation.mutateAsync(appID);
+        void deleteApplicationMutation.mutate(appID);
       },
     });
   };
 
   return (
     <div>
-      {isLoading ? (
-        <Loading />
+      {isLoading || createApplicationMutation.isPending ? (
+        <div className="flex flex-grow flex-col items-center justify-center gap-y-5">
+          <Loading />
+        </div>
       ) : (
+        // </div>
         <div>
           <Button type="primary" onClick={showModal} style={{ marginBottom: 16, marginTop: 16 }}>
             Add Application
