@@ -20,7 +20,6 @@
     "@inquisico/ruleset-editor-api": "^0.1.1",
     "@json-editor/json-editor": "^2.15.1",
     "@jsonforms/core": "^3.4.1",
-    "@jsonforms/material-renderers": "^3.4.1",
     "@jsonforms/react": "^3.4.1",
     "@jsonforms/vanilla-renderers": "^3.4.1",
     "@reduxjs/toolkit": "^2.3.0",

@@ -169,18 +169,6 @@
   resolved "https://registry.yarnpkg.com/@ctrl/tinycolor/-/tinycolor-3.6.1.tgz#b6c75a56a1947cc916ea058772d666a2c8932f31"
   integrity sha512-SITSV6aIXsuVNV3f3O0f2n/cgyEDWoSqtZMYiAmcsYHydcKrOz3gUxB/iXd/Qf08+IZX4KpgNbvUdMBmWz+kcA==
 
-"@date-io/core@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@date-io/core/-/core-3.0.0.tgz#9fd2375383b5791b7211dfce3e576211f9ddce5e"
-  integrity sha512-S3j+IAQVBYNkQzchVVhX40eBkGDreBpScy9RXwTS5j2+k07+62pMVPisQ44Gq76Rqy5AOG/EZXCwBpY/jbemvA==
-
-"@date-io/dayjs@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@date-io/dayjs/-/dayjs-3.0.0.tgz#46cf595d10639fe00b89e8c23cbcac22c0d542bb"
-  integrity sha512-vy7DSwoQiPA2L0stRqW3le7lcEBMjoMMEmbpCNkyoX3xXizKInFvhbnOBmCyusIQ7tL/WsNC4X5bVgdNWX0JLA==
-  dependencies:
-    "@date-io/core" "^3.0.0"
-
 "@emotion/hash@^0.8.0":
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/@emotion/hash/-/hash-0.8.0.tgz#bbbff68978fefdbe68ccb533bc8cbe1d1afb5413"
@@ -314,23 +302,14 @@
   dependencies:
     core-js "^3.27.2"
 
-"@jsonforms/core@^3.4.0":
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/@jsonforms/core/-/core-3.4.0.tgz#00e280b6280c868fe00cb71a9bcd7daa86188b90"
-  integrity sha512-jeU98XLru6G2WVGmJqG19W2rmSLX4im/gOWbptTzQJYj8tS38cqDoYcIRuBmAQYASj2ogJDHQnDgIXARSL8vJA==
+"@jsonforms/core@^3.4.1":
+  version "3.4.1"
+  resolved "https://registry.npmjs.org/@jsonforms/core/-/core-3.4.1.tgz#436d565164720e32a3df30792156e6152403d356"
+  integrity sha512-4p0fu2g4HfjHu8LFAL2d78O+9okyyVU4wvKHAEXnM39Rv9Opj5Ih6OF4/xXwld8169ri5aJSLISi+/Bsc6Xc4g==
   dependencies:
     "@types/json-schema" "^7.0.3"
     ajv "^8.6.1"
     ajv-formats "^2.1.0"
-    lodash "^4.17.21"
-
-"@jsonforms/material-renderers@^3.4.0":
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/@jsonforms/material-renderers/-/material-renderers-3.4.0.tgz#2da82e082ea88735f4cb4ef9db592d0b1e660e95"
-  integrity sha512-0cacbfiYPng0xrSKenCIKBMm3gNKKOGHbhV7IzgmDhBwmpT6KGIARCaIClRjni6gOvbE00ynSM7/gXKr3nd1TQ==
-  dependencies:
-    "@date-io/dayjs" "^3.0.0"
-    dayjs "1.10.7"
     lodash "^4.17.21"
 
 "@jsonforms/react@^3.4.1":
@@ -340,10 +319,10 @@
   dependencies:
     lodash "^4.17.21"
 
-"@jsonforms/vanilla-renderers@^3.4.0":
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/@jsonforms/vanilla-renderers/-/vanilla-renderers-3.4.0.tgz#77800aa9aaf3685db6ba4944cdaa5cd71a51b6c6"
-  integrity sha512-mq0/7LamMrmW9P0H/3J0+aVc6Jwtddghz1Tez7ZJv6fuX1hqsg51C/+aXVYbAvnM9oCdsho7h7iY5HphQ9cT2g==
+"@jsonforms/vanilla-renderers@^3.4.1":
+  version "3.4.1"
+  resolved "https://registry.npmjs.org/@jsonforms/vanilla-renderers/-/vanilla-renderers-3.4.1.tgz#ba19ce1cd100b20a4088c393ca47d1ca8c69680b"
+  integrity sha512-0J7q1RJMyWit0o5gHkKMjtOc/GlwEOtGUdvCWKat/UmWbb2mGhiZloMfPzbnaV9wO+zIUeKHep8wu7ChVf4X1A==
   dependencies:
     lodash "^4.17.21"
 
@@ -1324,11 +1303,6 @@ date-fns@^2.30.0:
   integrity sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==
   dependencies:
     "@babel/runtime" "^7.21.0"
-
-dayjs@1.10.7:
-  version "1.10.7"
-  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.10.7.tgz#2cf5f91add28116748440866a0a1d26f3a6ce468"
-  integrity sha512-P6twpd70BcPK34K26uJ1KT3wlhpuOAPoMwJzpsIWUxHZ7wpmbdZL/hQqBDfz7hGurYSa5PhzdhDHtt319hL3ig==
 
 dayjs@^1.11.11:
   version "1.11.13"
@@ -3506,10 +3480,9 @@ set-function-name@^2.0.1, set-function-name@^2.0.2:
     "@codemirror/lang-json" "^6.0.1"
     "@inquisico/ruleset-editor-api" "^0.1.1"
     "@json-editor/json-editor" "^2.15.1"
-    "@jsonforms/core" "^3.4.0"
-    "@jsonforms/material-renderers" "^3.4.0"
+    "@jsonforms/core" "^3.4.1"
     "@jsonforms/react" "^3.4.1"
-    "@jsonforms/vanilla-renderers" "^3.4.0"
+    "@jsonforms/vanilla-renderers" "^3.4.1"
     "@reduxjs/toolkit" "^2.3.0"
     "@tanstack/react-query" "^5.60.6"
     "@uiw/codemirror-themes" "^4.23.1"
@@ -3522,7 +3495,7 @@ set-function-name@^2.0.1, set-function-name@^2.0.2:
     react-dom "^18"
     react-hook-form "^7.53.0"
     react-redux "^9.1.2"
-    setnstore "file:../../../../../../AppData/Local/Yarn/Cache/v6/npm-setnstore-0.1.0-00fdb846-a140-4e3e-b8bc-38fa27a31428-1732435226144/node_modules/setnstore"
+    setnstore "file:../../../../../../AppData/Local/Yarn/Cache/v6/npm-setnstore-0.1.0-57c18338-2fd2-491f-9a8e-26b66245e59f-1732546028179/node_modules/setnstore"
     thememirror "^2.0.1"
 
 shebang-command@^2.0.0:
