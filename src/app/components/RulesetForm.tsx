@@ -1,10 +1,11 @@
 import { UploadOutlined } from "@ant-design/icons";
 import { defaultKeymap } from "@codemirror/commands";
-import { javascript } from "@codemirror/lang-javascript";
-import { EditorView } from "@codemirror/view";
+import { json, jsonParseLinter } from "@codemirror/lang-json";
+import { linter, lintGutter } from "@codemirror/lint";
+import { EditorView, keymap } from "@codemirror/view";
 import { JsonForms } from "@jsonforms/react";
 import { vanillaCells, vanillaRenderers } from "@jsonforms/vanilla-renderers";
-import CodeMirror, { keymap } from "@uiw/react-codemirror";
+import CodeMirror from "@uiw/react-codemirror";
 import { Button, Flex, Splitter, Tour, TourProps, Typography, Upload, message } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { barf } from "thememirror";
@@ -188,7 +189,7 @@ function RulesetForm({ formData, onFormChange, operations }: RulesetFormProps) {
           {/* Left panel containing the JsonForms with independent scrolling */}
           <Splitter.Panel
             style={{
-              paddingRight: "20px",
+              paddingRight: "10px",
               height: "100%",
               overflowY: "scroll",
               padding: "0 20px 0 0",
@@ -207,11 +208,24 @@ function RulesetForm({ formData, onFormChange, operations }: RulesetFormProps) {
           </Splitter.Panel>
 
           {/* Right panel containing CodeMirror with independent scrolling */}
-          <Splitter.Panel defaultSize="30%" max="35%">
+          <Splitter.Panel
+            defaultSize="30%"
+            min="35%"
+            max="50%"
+            style={{
+              paddingLeft: "10px",
+            }}
+          >
             <div ref={editorRef}>
               <CodeMirror
                 value={textAreaValue}
-                extensions={[javascript(), keymap.of(defaultKeymap), EditorView.lineWrapping]}
+                extensions={[
+                  json(),
+                  keymap.of(defaultKeymap),
+                  EditorView.lineWrapping,
+                  lintGutter(),
+                  linter(jsonParseLinter()),
+                ]}
                 onChange={handleCodeMirrorChange}
                 theme={barf}
                 height="85vh"
