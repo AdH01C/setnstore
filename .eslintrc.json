@@ -3,7 +3,11 @@
     "browser": true,
     "node": true
   },
-  "extends": ["next/core-web-vitals", "eslint:recommended", "plugin:import/recommended", "next", "prettier"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:import/recommended",
+    "prettier"
+  ],
   "plugins": ["import"],
   "settings": {
     "ecmaVersion": "latest",
