@@ -1,8 +1,9 @@
 import { defaultKeymap } from "@codemirror/commands";
-import { javascript } from "@codemirror/lang-javascript";
+import { json } from "@codemirror/lang-json";
 import { JsonForms } from "@jsonforms/react";
 import { vanillaCells, vanillaRenderers } from "@jsonforms/vanilla-renderers";
-import CodeMirror, { EditorView, keymap } from "@uiw/react-codemirror";
+import { EditorView, keymap } from "@codemirror/view";
+import CodeMirror from "@uiw/react-codemirror";
 import { Button, Flex } from "antd";
 import { barf } from "thememirror";
 
@@ -48,7 +49,7 @@ function RulesetDetail({ ruleset, isEditable = false, isDeletable = false, onEdi
       <CodeMirror
         value={JSON.stringify(ruleset, null, 2)}
         extensions={[
-          javascript(),
+          json(),
           keymap.of(defaultKeymap),
           EditorView.lineWrapping,
           EditorView.contentAttributes.of({ tabindex: "0" }),

@@ -1,4 +1,5 @@
-import { Button, Input } from "antd";
+import { QuestionCircleOutlined } from "@ant-design/icons";
+import { Button, Flex, Form, Input, Tooltip, Typography } from "antd";
 import { useState } from "react";
 
 interface Step1Props {
@@ -38,7 +39,19 @@ export function Step1({ ruleset, updateRuleset, next }: Step1Props) {
 
   return (
     <>
-      <Input placeholder="petstore.inquisico.com" onChange={handleHostChange} value={host} />
+      <Form.Item
+        layout="vertical"
+        label={
+          <Flex gap="small">
+            <Typography.Text>Host Path</Typography.Text>
+            <Tooltip title="Root Path of URL ">
+              <QuestionCircleOutlined />
+            </Tooltip>
+          </Flex>
+        }
+      >
+        <Input placeholder="petstore.inquisico.com" onChange={handleHostChange} value={host} style={{ width: 500 }} />
+      </Form.Item>
       <div style={{ marginTop: 24 }}>
         <Button type="primary" onClick={handleOnNext}>
           Next
