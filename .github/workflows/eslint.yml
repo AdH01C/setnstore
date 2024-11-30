@@ -15,27 +15,30 @@ jobs:
     permissions:
       contents: read
       security-events: write
-      actions: read # only required for private repository to get the Action run status
+      actions: read
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # If ESLint and dependencies are not already installed, run this step:
-      - name: Install ESLint and formatter
+      # Install ESLint globally
+      - name: Install ESLint globally
         run: |
-          yarn add eslint@8.10.0 @microsoft/eslint-formatter-sarif@3.1.0 --dev
+          npm install -g eslint@8.10.0 @microsoft/eslint-formatter-sarif@3.1.0
 
+      # Run ESLint
       - name: Run ESLint
         env:
           SARIF_ESLINT_IGNORE_SUPPRESSED: "true"
         run: |
-          yarn eslint .
+          eslint .
             --config .eslintrc.js
             --ext .js,.jsx,.ts,.tsx
             --format @microsoft/eslint-formatter-sarif
             --output-file eslint-results.sarif
         continue-on-error: true
 
+      # Upload analysis results to GitHub
       - name: Upload analysis results to GitHub
         uses: github/codeql-action/upload-sarif@v3
         with:
