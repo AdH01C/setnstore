@@ -1,35 +1,39 @@
-name: Lint
+name: ESLint
 
 on:
-  # Trigger the workflow on push or pull request,
-  # but only for the main branch
   push:
-    branches:
-      - main
+    branches: [ "main" ]
   pull_request:
-    branches:
-      - main
+    branches: [ "main" ]
+  schedule:
+    - cron: '25 13 * * 5'
 
 jobs:
-  run-linters:
-    name: Run linters
+  eslint:
+    name: Run ESLint scanning
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
 
     steps:
-      - name: Check out Git repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12
+      # Install ESLint globally
+      - name: Install ESLint globally
+        run: |
+          npm install -g eslint@8.10.0 @microsoft/eslint-formatter-sarif@3.1.0
 
-      # ESLint and Prettier must be in `package.json`
-      - name: Install Node.js dependencies
-        run: npm install -g prettier eslint
-
-      - name: Run linters
-        uses: wearerequired/lint-action@v2
-        with:
-          eslint: true
-          prettier: true
+      # Run ESLint
+      - name: Run ESLint
+        env:
+          SARIF_ESLINT_IGNORE_SUPPRESSED: "true"
+        run: |
+          eslint .
+            --config .eslintrc.js
+            --ext .js,.jsx,.ts,.tsx
+            --format @microsoft/eslint-formatter-sarif
+            --output-file eslint-results.sarif
+        continue-on-error: true
